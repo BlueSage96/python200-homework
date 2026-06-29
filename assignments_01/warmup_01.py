@@ -1,5 +1,7 @@
-# Pandas 01
 import pandas as pd
+import numpy as np
+
+# Pandas 01
 data = {
     "name": ["Alice","Bob","Carol","David","Eve"],
     "grade": [85,72,90,68,95],
@@ -11,7 +13,7 @@ df = pd.DataFrame(data)
 print(f"Pandas Q1:")
 print(f"First three rows: {df.head(3)}")
 print(f"Shape:{df.shape}")
-print(f"Column data types: {df.info()}")
+print(f"Column data types: {df.dtypes}")
 
 # Pandas 02
 df1 = df[(df['grade'] > 80)]
@@ -32,3 +34,9 @@ print(df2[["name","name_upper"]])
 df2 = df2.groupby("city")["grade"].mean()
 print(f"Pandas Q5:")
 print(df2)
+
+# Pandas 06
+df2 = df.copy()
+df2 = df2.rename(columns={"Austin":"Houston"})
+print(f"Pandas Q6:")
+print(df2[["name","city"]])
