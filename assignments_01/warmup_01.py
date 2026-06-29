@@ -53,3 +53,8 @@ print(f"shape:{np_1d.shape}")
 print(f"dtype: {np_1d.dtype}")
 print(f"ndim: {np_1d.ndim}")
 
+# Numpy 02
+arr = np.array([[1,2,3],[4,5,6],[7,8,9]])
+print(f"Numpy Q2:")
+print(f"shape:{arr.shape}")
+print(f"size: {arr.size}")
