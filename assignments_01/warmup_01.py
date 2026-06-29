@@ -20,3 +20,9 @@ print(f"Pandas Q2:\n {df1}")
 df2 = df.copy()
 df2["grade_curved"] = df[["grade"]].apply(lambda x: x["grade"] + 5,axis=1)
 print(f"Pandas Q3:\n {df2}")
+
+# Pandas 04
+df2["name_upper"] = df2[["name"]]
+df2["name_upper"] = df2["name_upper"].str.upper()
+print(f"Pandas Q4:")
+print(df2[["name","name_upper"]])
