@@ -8,6 +8,7 @@ data = {
 }
 
 df = pd.DataFrame(data)
+print(f"Pandas Q1:")
 print(f"First three rows: {df.head(3)}")
 print(f"Shape:{df.shape}")
 print(f"Column data types: {df.info()}")
@@ -26,3 +27,8 @@ df2["name_upper"] = df2[["name"]]
 df2["name_upper"] = df2["name_upper"].str.upper()
 print(f"Pandas Q4:")
 print(df2[["name","name_upper"]])
+
+# Pandas 05
+df2 = df2.groupby("city")["grade"].mean()
+print(f"Pandas Q5:")
+print(df2)
