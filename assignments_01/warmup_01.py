@@ -44,3 +44,12 @@ print(df2[["name","city"]])
 # Pandas 07
 df2 = df2.sort_values(by="grade",ascending=False)
 print(f"Pandas Q7:\n {df2.head(3)}")
+
+#_____________________________________________________________________________
+# Numpy 01
+np_1d = np.array([10, 20, 30, 40, 50])
+print(f"Numpy Q1:")
+print(f"shape:{np_1d.shape}")
+print(f"dtype: {np_1d.dtype}")
+print(f"ndim: {np_1d.ndim}")
+
