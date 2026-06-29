@@ -40,3 +40,7 @@ df2 = df.copy()
 df2 = df2.rename(columns={"Austin":"Houston"})
 print(f"Pandas Q6:")
 print(df2[["name","city"]])
+
+# Pandas 07
+df2 = df2.sort_values(by="grade",ascending=False)
+print(f"Pandas Q7:\n {df2.head(3)}")
