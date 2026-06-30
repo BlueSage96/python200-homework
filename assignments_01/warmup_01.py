@@ -95,3 +95,12 @@ plt.title('Squares')
 plt.xlabel('x')
 plt.ylabel('y')
 plt.show()
+
+# Matplotlib 02
+subjects = ["Math","Science","English","History"]
+scores = [88,92,75,83]
+plt.bar(subjects,scores,color=["Red","Blue","Green","Yellow"])
+plt.title("Subject Scores")
+plt.xlabel("Subject")
+plt.ylabel("Scores")
+plt.show()
