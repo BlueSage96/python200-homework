@@ -90,7 +90,7 @@ print(f"standard deviation: {ran_val.std()}")
 # Matplotlib 01
 x = [0,1,2,3,4,5]
 y = [0,1,4,9,16,25]
-plt.plot(x,y,marker='o',linestyle='-')
+plt.plot(x,y,color="Blue",marker='o',linestyle='-')
 plt.title('Squares')
 plt.xlabel('x')
 plt.ylabel('y')
@@ -109,11 +109,20 @@ plt.show()
 x1, y1 = [1,2,3,4,5],[2,4,5,4,5]
 x2, y2 = [1,2,3,4,5],[5,4,3,2,1]
 
-fig,ax = plt.subplots()
+fig, ax = plt.subplots()
 ax.scatter(x1,y1,color="orange",label="Dataset 1")
 ax.scatter(x2,y2,color="black",label="Dataset 2")
 
 ax.legend(loc="lower left")
 ax.set_xlabel("X-axis")
 ax.set_ylabel("Y-axis")
+plt.show()
+
+# Matplotlib 04
+fig, (ax1, ax2) = plt.subplots(1,2)
+ax1.set_title("Squares")
+ax1.plot(x,y,color="Purple")
+ax2.set_title("Subject Scores")
+ax2.bar(subjects,scores,color=["Blue","Red","Yellow","Green"])
+plt.tight_layout()
 plt.show()
