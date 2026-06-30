@@ -68,3 +68,12 @@ arr1 = np.zeros((3,4))
 arr2 = np.zeros((2,5))
 print(f"Numpy Q4:")
 print(f"3x4:\n {arr1} \n2x5:\n {arr2}")
+
+# Numpy 05
+aran = np.arange(0,50,5)
+print(f"Numpy Q5:\n")
+print(f"array:\n {aran}")
+print(f"shape: {aran.shape}")
+print(f"mean: {arr.mean()}")
+print(f"sum: {arr.sum()}")
+print(f"standard deviation: {arr.std()}")
