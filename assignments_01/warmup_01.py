@@ -58,3 +58,7 @@ arr = np.array([[1,2,3],[4,5,6],[7,8,9]])
 print(f"Numpy Q2:")
 print(f"shape:{arr.shape}")
 print(f"size: {arr.size}")
+
+# Numpy 03
+arr = arr[0:2,0:2] #start:end:step --> [row:row,col:col]
+print(f"Numpy Q3:\n {arr}")
