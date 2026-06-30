@@ -77,3 +77,9 @@ print(f"shape: {aran.shape}")
 print(f"mean: {arr.mean()}")
 print(f"sum: {arr.sum()}")
 print(f"standard deviation: {arr.std()}")
+
+# Numpy 06
+ran_val = np.random.normal(0,1,200)
+print(f"Numpy Q6:")
+print(f"mean: {ran_val.mean()}")
+print(f"standard deviation: {ran_val.std()}")
