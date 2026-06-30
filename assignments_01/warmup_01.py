@@ -104,3 +104,16 @@ plt.title("Subject Scores")
 plt.xlabel("Subject")
 plt.ylabel("Scores")
 plt.show()
+
+# Matplotlib 03
+x1, y1 = [1,2,3,4,5],[2,4,5,4,5]
+x2, y2 = [1,2,3,4,5],[5,4,3,2,1]
+
+fig,ax = plt.subplots()
+ax.scatter(x1,y1,color="orange",label="Dataset 1")
+ax.scatter(x2,y2,color="black",label="Dataset 2")
+
+ax.legend(loc="lower left")
+ax.set_xlabel("X-axis")
+ax.set_ylabel("Y-axis")
+plt.show()
