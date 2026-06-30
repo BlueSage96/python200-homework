@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Pandas 01
 data = {
@@ -83,3 +84,14 @@ ran_val = np.random.normal(0,1,200)
 print(f"Numpy Q6:")
 print(f"mean: {ran_val.mean()}")
 print(f"standard deviation: {ran_val.std()}")
+
+#_____________________________________________________________________________
+
+# Matplotlib 01
+x = [0,1,2,3,4,5]
+y = [0,1,4,9,16,25]
+plt.plot(x,y,marker='o',linestyle='-')
+plt.title('Squares')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.show()
