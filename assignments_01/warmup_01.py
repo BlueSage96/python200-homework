@@ -60,5 +60,11 @@ print(f"shape:{arr.shape}")
 print(f"size: {arr.size}")
 
 # Numpy 03
-arr = arr[0:2,0:2] #start:end:step --> [row:row,col:col]
+arr = arr[0:2,0:2] #start:end:step or sss (start:stop:step) --> [row:row,col:col]
 print(f"Numpy Q3:\n {arr}")
+
+# Numpy 04
+arr1 = np.zeros((3,4))
+arr2 = np.zeros((2,5))
+print(f"Numpy Q4:")
+print(f"3x4:\n {arr1} \n2x5:\n {arr2}")
