@@ -135,7 +135,16 @@ median = np.median(data)
 variance = np.var(data)
 standard = np.std(data)
 
+print(f"Descriptive Stats 01:\n")
 print(f"Mean: {mean}")
 print(f"Median: {median}")
 print(f"Variance: {variance}")
 print(f"Standard Deviation {standard}")
+
+# Descriptive Stats 02
+ran_val = np.random.normal(65,10,500)
+plt.hist(ran_val,bins=20,color="turquoise")
+plt.title("Distribution of Scores")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.show()
