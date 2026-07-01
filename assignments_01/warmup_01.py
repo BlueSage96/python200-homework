@@ -50,15 +50,15 @@ print(f"Pandas Q7:\n {df2.head(3)}")
 # Numpy 01
 np_1d = np.array([10, 20, 30, 40, 50])
 print(f"Numpy Q1:")
-print(f"shape:{np_1d.shape}")
-print(f"dtype: {np_1d.dtype}")
-print(f"ndim: {np_1d.ndim}")
+print(f"Shape:{np_1d.shape}")
+print(f"Dtype: {np_1d.dtype}")
+print(f"Ndim: {np_1d.ndim}")
 
 # Numpy 02
 arr = np.array([[1,2,3],[4,5,6],[7,8,9]])
 print(f"Numpy Q2:")
-print(f"shape:{arr.shape}")
-print(f"size: {arr.size}")
+print(f"Shape:{arr.shape}")
+print(f"Size: {arr.size}")
 
 # Numpy 03
 arr = arr[0:2,0:2] #start:end:step or sss (start:stop:step) --> [row:row,col:col]
@@ -73,17 +73,17 @@ print(f"3x4:\n {arr1} \n2x5:\n {arr2}")
 # Numpy 05
 aran = np.arange(0,50,5)
 print(f"Numpy Q5:\n")
-print(f"array:\n {aran}")
-print(f"shape: {aran.shape}")
-print(f"mean: {arr.mean()}")
-print(f"sum: {arr.sum()}")
-print(f"standard deviation: {arr.std()}")
+print(f"Array:\n {aran}")
+print(f"Shape: {aran.shape}")
+print(f"Mean: {arr.mean()}")
+print(f"Sum: {arr.sum()}")
+print(f"Standard Deviation: {arr.std()}")
 
 # Numpy 06
 ran_val = np.random.normal(0,1,200)
 print(f"Numpy Q6:")
-print(f"mean: {ran_val.mean()}")
-print(f"standard deviation: {ran_val.std()}")
+print(f"Mean: {ran_val.mean()}")
+print(f"Standard Deviation: {ran_val.std()}")
 
 #_____________________________________________________________________________
 
@@ -126,3 +126,16 @@ ax2.set_title("Subject Scores")
 ax2.bar(subjects,scores,color=["Blue","Red","Yellow","Green"])
 plt.tight_layout()
 plt.show()
+
+#_____________________________________________________________________________
+# Descriptive Stats 01
+data = [12,15,14,10,18,22,13,16,14,15]
+mean = np.mean(data)
+median = np.median(data)
+variance = np.var(data)
+standard = np.std(data)
+
+print(f"Mean: {mean}")
+print(f"Median: {median}")
+print(f"Variance: {variance}")
+print(f"Standard Deviation {standard}")
