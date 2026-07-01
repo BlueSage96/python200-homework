@@ -148,3 +148,10 @@ plt.title("Distribution of Scores")
 plt.xlabel("x")
 plt.ylabel("y")
 plt.show()
+
+# Descriptive Stats 03
+group_a = [55,60,63,70,68,62,58,65]
+group_b = [75,80,78,90,85,79,82,88]
+plt.boxplot(x=[group_a,group_b], positions=[1,2], labels=["Group A","Group B"],patch_artist=True,medianprops={'color':'pink'})
+plt.title("Score Comparison")
+plt.show()
