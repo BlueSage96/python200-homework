@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import ttest_ind
+from scipy.stats import ttest_ind, kstest
 from scipy import stats
 
 # Pandas 01
@@ -264,7 +264,7 @@ print(f"Pvalue: {res.pvalue}")
 # Hypothesis Question 02
 alpha = 0.05
 res_pvalue = res.pvalue
-print(f"Hypothesis Question 02:\n")
+print(f"\nHypothesis Question 02:\n")
 
 if (res_pvalue >= alpha):
     print(f"Statistically significant: {alpha}")
@@ -286,3 +286,8 @@ new_scores = stats.ttest_1samp(scores,popmean=70)
 print(f"\nHypothesis Question 04:\n")
 print(f"Statistic: {new_scores.statistic}")
 print(f"Pvalue: {new_scores.pvalue}")
+
+# Hypothesis Question 05
+res2 = kstest(group_a, stats.norm.cdf, alternative='less')
+print(f"\nHypothesis Question 05:\n")
+print(f"Pvalue: {res2.pvalue}")
