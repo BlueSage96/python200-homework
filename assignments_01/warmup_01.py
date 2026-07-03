@@ -19,61 +19,61 @@ print(f"Column data types: {df.dtypes}")
 
 # Pandas 02
 df1 = df[(df['grade'] > 80)]
-print(f"Pandas Q2:\n {df1}")
+print(f"\nPandas Q2:\n {df1}")
 
 # Pandas 03
 df2 = df.copy()
 df2["grade_curved"] = df[["grade"]].apply(lambda x: x["grade"] + 5,axis=1)
-print(f"Pandas Q3:\n {df2}")
+print(f"\nPandas Q3:\n {df2}")
 
 # Pandas 04
 df2["name_upper"] = df2[["name"]]
 df2["name_upper"] = df2["name_upper"].str.upper()
-print(f"Pandas Q4:")
+print(f"\nPandas Q4:")
 print(df2[["name","name_upper"]])
 
 # Pandas 05
 df2 = df2.groupby("city")["grade"].mean()
-print(f"Pandas Q5:")
+print(f"\nPandas Q5:")
 print(df2)
 
 # Pandas 06
 df2 = df.copy()
 df2 = df2.rename(columns={"Austin":"Houston"})
-print(f"Pandas Q6:")
+print(f"\nPandas Q6:")
 print(df2[["name","city"]])
 
 # Pandas 07
 df2 = df2.sort_values(by="grade",ascending=False)
-print(f"Pandas Q7:\n {df2.head(3)}")
+print(f"\nPandas Q7:\n {df2.head(3)}")
 
 #_____________________________________________________________________________
 # Numpy 01
 np_1d = np.array([10, 20, 30, 40, 50])
-print(f"Numpy Q1:")
+print(f"\nNumpy Q1:")
 print(f"Shape:{np_1d.shape}")
 print(f"Dtype: {np_1d.dtype}")
 print(f"Ndim: {np_1d.ndim}")
 
 # Numpy 02
 arr = np.array([[1,2,3],[4,5,6],[7,8,9]])
-print(f"Numpy Q2:")
+print(f"\nNumpy Q2:")
 print(f"Shape:{arr.shape}")
 print(f"Size: {arr.size}")
 
 # Numpy 03
 arr = arr[0:2,0:2] #start:end:step or sss (start:stop:step) --> [row:row,col:col]
-print(f"Numpy Q3:\n {arr}")
+print(f"\nNumpy Q3:\n {arr}")
 
 # Numpy 04
 arr1 = np.zeros((3,4))
 arr2 = np.zeros((2,5))
-print(f"Numpy Q4:")
+print(f"\nNumpy Q4:")
 print(f"3x4:\n {arr1} \n2x5:\n {arr2}")
 
 # Numpy 05
 aran = np.arange(0,50,5)
-print(f"Numpy Q5:\n")
+print(f"\nNumpy Q5:\n")
 print(f"Array:\n {aran}")
 print(f"Shape: {aran.shape}")
 print(f"Mean: {arr.mean()}")
@@ -82,7 +82,7 @@ print(f"Standard Deviation: {arr.std()}")
 
 # Numpy 06
 ran_val = np.random.normal(0,1,200)
-print(f"Numpy Q6:")
+print(f"\nNumpy Q6:")
 print(f"Mean: {ran_val.mean()}")
 print(f"Standard Deviation: {ran_val.std()}")
 
@@ -136,7 +136,7 @@ median = np.median(data)
 variance = np.var(data)
 standard = np.std(data)
 
-print(f"Descriptive Stats 01:\n")
+print(f"\nDescriptive Stats 01:\n")
 print(f"Mean: {mean}")
 print(f"Median: {median}")
 print(f"Variance: {variance}")
@@ -183,7 +183,7 @@ data1_df = pd.DataFrame(data1)
 data2 = [10,12,12,16,150]
 data2_df = pd.DataFrame(data2)
 
-print("Descriptive Stats 05:\n")
+print("\nDescriptive Stats 05:\n")
 print(f"Data 1 mean: {data1_df.mean()}")
 print(f"Data 2 mean: {data2_df.mean()}")
 
@@ -203,7 +203,7 @@ data1_df = pd.DataFrame(data1)
 data2 = [10,12,12,16,150]
 data2_df = pd.DataFrame(data2)
 
-print("Descriptive Stats 05:\n")
+print("\nDescriptive Stats 05:\n")
 print(f"Data 1 mean: {data1_df.mean()}")
 print(f"Data 2 mean: {data2_df.mean()}")
 
@@ -224,7 +224,7 @@ group_a = [72,68,75,70,69,73,71,74]
 group_b = [80,85,78,83,82,86,79,84]
 
 res = ttest_ind(group_a, group_b)
-print(f"Hypothesis Question 01:\n")
+print(f"\nHypothesis Question 01:\n")
 print(f"Statistic: {res.statistic}")
 print(f"Pvalue: {res.pvalue}")
 
@@ -235,7 +235,7 @@ data1_df = pd.DataFrame(data1)
 data2 = [10,12,12,16,150]
 data2_df = pd.DataFrame(data2)
 
-print("Descriptive Stats 05:\n")
+print("\nDescriptive Stats 05:\n")
 print(f"Data 1 mean: {data1_df.mean()}")
 print(f"Data 2 mean: {data2_df.mean()}")
 
@@ -256,7 +256,7 @@ group_a = [72,68,75,70,69,73,71,74]
 group_b = [80,85,78,83,82,86,79,84]
 
 res = ttest_ind(group_a, group_b)
-print(f"Hypothesis Question 01:\n")
+print(f"\nHypothesis Question 01:\n")
 print(f"Statistic: {res.statistic}")
 print(f"Pvalue: {res.pvalue}")
 
@@ -269,3 +269,12 @@ if (res_pvalue >= alpha):
     print(f"Statistically significant: {alpha}")
 else:
     print(f"Not statistically significant: {alpha}")
+    
+# Hypothesis Question 03
+before = [60,65,70,58,62,67,63,66]
+after = [68,70,76,65,69,72,70,71]
+
+new_scores = ttest_ind(before,after)
+print(f"\nHypothesis Question 03:\n")
+print(f"Statistic: {new_scores.statistic}")
+print(f"Pvalue: {new_scores.pvalue}")
