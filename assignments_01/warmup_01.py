@@ -155,3 +155,23 @@ group_b = [75,80,78,90,85,79,82,88]
 plt.boxplot(x=[group_a,group_b], positions=[1,2], labels=["Group A","Group B"],patch_artist=True,medianprops={'color':'pink'})
 plt.title("Score Comparison")
 plt.show()
+
+# Descriptive Stats 04
+normal_data = np.random.normal(50,5,200)
+skewed_data = np.random.exponential(10, 200)
+
+# Creates subplots
+fig, axs = plt.subplots(1, 2, figsize=(15, 5))
+
+# Plots Boxplot for Data 1
+axs[0].set_title('Distribution Comparison')
+axs[0].boxplot(normal_data,labels=["Normal"],patch_artist=True,medianprops={'color':'red'})
+
+# Plots Boxplot for Data 2
+axs[1].set_title('Distribution Comparison')
+axs[1].boxplot(skewed_data,labels=["Exponential"],patch_artist=True,medianprops={'color':'blue'})
+plt.show()
+
+# Reflection:
+#The exponential distribution is more skewed. 
+#The median would provide a more appropriate measure of central tendency for each distribution.
