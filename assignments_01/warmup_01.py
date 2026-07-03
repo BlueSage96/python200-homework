@@ -228,3 +228,44 @@ print(f"Hypothesis Question 01:\n")
 print(f"Statistic: {res.statistic}")
 print(f"Pvalue: {res.pvalue}")
 
+# Descriptive Stats 05
+data1 = [10,12,12,16,18]
+data1_df = pd.DataFrame(data1)
+
+data2 = [10,12,12,16,150]
+data2_df = pd.DataFrame(data2)
+
+print("Descriptive Stats 05:\n")
+print(f"Data 1 mean: {data1_df.mean()}")
+print(f"Data 2 mean: {data2_df.mean()}")
+
+print(f"Data 1 median: {data1_df.median()}")
+print(f"Data 2 median: {data2_df.median()}")
+
+print(f"Data 1 mode: {data1_df.mode()}")
+print(f"Data 2 mode: {data2_df.mode()}")
+
+# Data2's mean is different because of having an outlier number of 150.
+# The median just eliminates the outer numbers in the array and takes the middle result.
+# If there's multiple median numbers, the average of those two numbers is the median.
+
+#_____________________________________________________________________________
+
+# Hypothesis Question 01
+group_a = [72,68,75,70,69,73,71,74]
+group_b = [80,85,78,83,82,86,79,84]
+
+res = ttest_ind(group_a, group_b)
+print(f"Hypothesis Question 01:\n")
+print(f"Statistic: {res.statistic}")
+print(f"Pvalue: {res.pvalue}")
+
+# Hypothesis Question 02
+alpha = 0.05
+res_pvalue = res.pvalue
+print(f"Hypothesis Question 02:\n")
+
+if (res_pvalue >= alpha):
+    print(f"Statistically significant: {alpha}")
+else:
+    print(f"Not statistically significant: {alpha}")
