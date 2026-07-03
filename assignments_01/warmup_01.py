@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import ttest_ind
 
 # Pandas 01
 data = {
@@ -172,6 +173,26 @@ axs[1].set_title('Distribution Comparison')
 axs[1].boxplot(skewed_data,labels=["Exponential"],patch_artist=True,medianprops={'color':'blue'})
 plt.show()
 
-# Reflection:
 #The exponential distribution is more skewed. 
 #The median would provide a more appropriate measure of central tendency for each distribution.
+
+# Descriptive Stats 05
+data1 = [10,12,12,16,18]
+data1_df = pd.DataFrame(data1)
+
+data2 = [10,12,12,16,150]
+data2_df = pd.DataFrame(data2)
+
+print("Descriptive Stats 05:\n")
+print(f"Data 1 mean: {data1_df.mean()}")
+print(f"Data 2 mean: {data2_df.mean()}")
+
+print(f"Data 1 median: {data1_df.median()}")
+print(f"Data 2 median: {data2_df.median()}")
+
+print(f"Data 1 mode: {data1_df.mode()}")
+print(f"Data 2 mode: {data2_df.mode()}")
+
+# Data2's mean is different because of having an outlier number of 150.
+# The median just eliminates the outer numbers in the array and takes the middle result.
+# If there's multiple median numbers, the average of those two numbers is the median.
