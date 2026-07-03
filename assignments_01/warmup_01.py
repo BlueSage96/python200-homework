@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import ttest_ind
+from scipy import stats
 
 # Pandas 01
 data = {
@@ -274,7 +275,14 @@ else:
 before = [60,65,70,58,62,67,63,66]
 after = [68,70,76,65,69,72,70,71]
 
-new_scores = ttest_ind(before,after)
+before_after = ttest_ind(before,after)
 print(f"\nHypothesis Question 03:\n")
+print(f"Statistic: {before_after.statistic}")
+print(f"Pvalue: {before_after.pvalue}")
+
+# Hypothesis Question 04
+scores = [72,68,75,70,69,74,71,73]
+new_scores = stats.ttest_1samp(scores,popmean=70)
+print(f"\nHypothesis Question 04:\n")
 print(f"Statistic: {new_scores.statistic}")
 print(f"Pvalue: {new_scores.pvalue}")
