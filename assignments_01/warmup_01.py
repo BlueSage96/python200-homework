@@ -291,3 +291,10 @@ print(f"Pvalue: {new_scores.pvalue}")
 res2 = kstest(group_a, stats.norm.cdf, alternative='less')
 print(f"\nHypothesis Question 05:\n")
 print(f"Pvalue: {res2.pvalue}")
+
+# Hypothesis Question 06
+print(f"\nHypothesis Question 06:\n")
+print(f"Group_a scores are less than group_b.\nThis is confirmed since the group_a's solo p-value is 0.\n"
+      "The p-value direction is positive moving to the left direction.\n" 
+      "The statistic moves in a negative direction or to the right.\n"
+      "\nThis result is due to chance.")
