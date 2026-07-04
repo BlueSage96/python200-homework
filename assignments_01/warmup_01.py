@@ -130,6 +130,7 @@ plt.tight_layout()
 plt.show()
 
 #_____________________________________________________________________________
+
 # Descriptive Stats 01
 data = [12,15,14,10,18,22,13,16,14,15]
 mean = np.mean(data)
@@ -332,3 +333,14 @@ df = pd.DataFrame(people)
 people_corr = df.corr()
 print(f"\nCorrelation Question 03:\n")
 print(people_corr)
+
+# Corrleation Question 04
+x = [10,20,30,40,50]
+y = [90,75,60,45,30]
+
+fig, ax = plt.subplots()
+ax.set_title("Negative Correlation")
+ax.scatter(x,y,color="teal")
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+plt.show()
