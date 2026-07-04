@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import ttest_ind, kstest
+from scipy.stats import ttest_ind, kstest, pearsonr
 from scipy import stats
 
 # Pandas 01
@@ -298,3 +298,17 @@ print(f"Group_a scores are less than group_b.\nThis is confirmed since the group
       "The p-value direction is positive moving to the left direction.\n" 
       "The statistic moves in a negative direction or to the right.\n"
       "\nThis result is due to chance.")
+
+#_____________________________________________________________________________
+
+# Correlation Question 1
+x = [1,2,3,4,5]
+y = [2,4,6,8,10]
+pearson = np.corrcoef(x,y)
+
+print(f"\nCorrelation Question 1:\n")
+print(f"Correlation matrix: {pearson}")
+print(f"Correlation coefficient: {pearson[0,1]}")
+
+# I expect the correlation to be 1 because x1, y1, x2, and y2 are all 1 
+
