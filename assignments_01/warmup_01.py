@@ -1,8 +1,10 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+
 from scipy.stats import ttest_ind, kstest, pearsonr
 from scipy import stats
+import seaborn as sns
 
 # Pandas 01
 data = {
@@ -343,4 +345,9 @@ ax.set_title("Negative Correlation")
 ax.scatter(x,y,color="teal")
 ax.set_xlabel("x")
 ax.set_ylabel("y")
+plt.show()
+
+# Corrleation Question 05
+sns.heatmap(people_corr,annot=True,cmap="coolwarm")
+plt.title("Correlation Heatmap")
 plt.show()
