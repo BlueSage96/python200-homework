@@ -301,23 +301,34 @@ print(f"Group_a scores are less than group_b.\nThis is confirmed since the group
 
 #_____________________________________________________________________________
 
-# Correlation Question 1
+# Correlation Question 01
 x = [1,2,3,4,5]
 y = [2,4,6,8,10]
 pearson = np.corrcoef(x,y)
 
-print(f"\nCorrelation Question 1:\n")
+print(f"\nCorrelation Question 01:\n")
 print(f"Correlation matrix: {pearson}")
 print(f"Correlation coefficient: {pearson[0,1]}")
 
 # I expect the correlation to be 1 because x1, y1, x2, and y2 are all 1 
 
-# Correlation Question 2
+# Correlation Question 02
 x = [1,2,3,4,5,6,7,8,9,10]
 y = [10,9,8,7,6,5,4,3,2,1]
 
 pearson2 = pearsonr(x,y)
-print(f"\nCorrelation Question 2:\n")
+print(f"\nCorrelation Question 02:\n")
 print(f"Statistic: {pearson2.statistic}")
 print(f"P-value: {pearson2.pvalue}")
 
+# Corrlation Question 03
+people = {
+    "height": [160,165,170,175,180],
+    "weight": [55,60,65,72,80],
+    "age": [25,30,22,35,28]
+}
+
+df = pd.DataFrame(people)
+people_corr = df.corr()
+print(f"\nCorrelation Question 03:\n")
+print(people_corr)
