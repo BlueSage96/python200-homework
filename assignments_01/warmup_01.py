@@ -312,3 +312,12 @@ print(f"Correlation coefficient: {pearson[0,1]}")
 
 # I expect the correlation to be 1 because x1, y1, x2, and y2 are all 1 
 
+# Correlation Question 2
+x = [1,2,3,4,5,6,7,8,9,10]
+y = [10,9,8,7,6,5,4,3,2,1]
+
+pearson2 = pearsonr(x,y)
+print(f"\nCorrelation Question 2:\n")
+print(f"Statistic: {pearson2.statistic}")
+print(f"P-value: {pearson2.pvalue}")
+
