@@ -351,3 +351,32 @@ plt.show()
 sns.heatmap(people_corr,annot=True,cmap="coolwarm")
 plt.title("Correlation Heatmap")
 plt.show()
+
+#_____________________________________________________________________________
+
+# Pipeline Question 01
+arr = np.array([12.0, 15.0, np.nan, 14.0, 10.0, np.nan, 18.0, 14.0, 16.0, 22.0, np.nan, 13.0])
+
+def create_series(arr):
+    return pd.Series(arr,name="values")
+
+def clean_data(series):
+    cleaned = create_series(series).dropna()
+    return cleaned
+    
+def summarize_data(series):
+    series = ({
+        "mean": series.mean(),
+        "median": series.median(),
+        "std": series.std(),
+        "mode": series.mode()[0]
+    })
+    return series
+
+def data_pipeline(arr):
+    created = create_series(arr)
+    return summarize_data(clean_data(created))
+
+result = data_pipeline(arr)
+print(f"\n Pipeline Question 01: \n")
+print(result)
