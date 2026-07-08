@@ -65,10 +65,10 @@ def happy_stats():
     happy_std = happy_score.std()
     happy_mean_grouped = df.groupby(["Year","regional_indicator"])["happiness_score"].mean()
     
-    print(f"Mean:\n {happy_mean}")
-    print(f"\nMedian:\n {happy_median}")
-    print(f"\nStandard deviation:\n {happy_std}")
-    print(f"\nGrouped mean:\n {happy_mean_grouped}")
+    # print(f"Mean:\n {happy_mean}")
+    # print(f"\nMedian:\n {happy_median}")
+    # print(f"\nStandard deviation:\n {happy_std}")
+    # print(f"\nGrouped mean:\n {happy_mean_grouped}")
 happy_stats()
 
 # Task 3
@@ -91,13 +91,13 @@ def visuals():
     plt.xlabel("Score")
     plt.ylabel("Frequency")
     plt.savefig("outputs/happiness_histogram.png",dpi=300)
-    plt.show()
+    # plt.show()
     
     # Boxplot
     sns.boxplot(x = years, y = happy,data=df)
     plt.title("Happiness Distribution by Years")
     plt.savefig("outputs/happiness_by_year.png",dpi=300)
-    plt.show()
+    # plt.show()
     
     # Scatter Plot
     fig, ax = plt.subplots()
@@ -106,7 +106,7 @@ def visuals():
     ax.set_xlabel("GDP")
     ax.set_ylabel("Happy")
     plt.savefig("outputs/gdp_vs_happiness.png",dpi=300)
-    plt.show()
+    # plt.show()
 
     # Heatmap
     heat_corr = heat_cols.corr(numeric_only=True)
@@ -114,6 +114,35 @@ def visuals():
     sns.heatmap(heat_corr,annot=True,cmap="coolwarm",fmt=".2f")
     plt.title("Correlation Heatmap")
     plt.savefig("correlation_heatmap.png",dpi=300)
-    plt.show()
+    # plt.show()
     
 visuals()
+
+# Task 4
+#@task(retries=3,retry_delay_seconds=2)
+
+def hypothesis():
+    year1 = df[df['Year'] == 2019]["happiness_score"]
+    year2 = df[df['Year'] == 2020]["happiness_score"]
+    #make sure hapiness scores are numeric! Float not object!
+    year_hypo = ttest_ind(year1,year2)
+    print(f"Statistic: {year_hypo.statistic}\n")
+    print(f"Pvalue: {year_hypo.pvalue}\n")
+    print(f"Mean 2019: {year1.mean()}\n")
+    print(f"Mean 2020: {year2.mean()}")
+    
+    #Results:
+    # The p-value is greater than or equal to 0.05, so the difference in
+    # average happiness scores between 2019 and 2020 is not statistically significant.
+    # This suggests there is not enough evidence to conclude that average
+    # global happiness scores changed between 2019 and 2020.
+    
+    #Test 2
+    country1 = df[df['Country'] == "Switzerland"]["happiness_score"]
+    country2 = df[df['Country'] == "United States"]["happiness_score"]
+    country_hypo = ttest_ind(country1,country2)
+    print(f"Statistic: {country_hypo.statistic}\n")
+    print(f"Pvalue: {country_hypo.pvalue}\n")
+    print(f"Mean Switzerland: {country1.mean()}\n")
+    print(f"Mean United States: {country2.mean()}")
+hypothesis()
