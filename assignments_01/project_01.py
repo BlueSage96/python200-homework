@@ -50,13 +50,12 @@ happiness_data()
 
 data = pd.read_csv("outputs/merged_happiness.csv")
 df = pd.DataFrame(data)
+df.rename(columns={"Happiness score":"happiness_score","Regional indicator":"regional_indicator"},inplace=True)
 
 # Task 2
 #@task(retries=3,retry_delay_seconds=2)
 def happy_stats():
     # A little cleanup
-    df.rename(columns={"Happiness score":"happiness_score","Regional indicator":"regional_indicator"},inplace=True)
-
     df["happiness_score"] = df["happiness_score"].astype(float).round(2)
 
     happy_score = df["happiness_score"]
@@ -120,16 +119,15 @@ visuals()
 
 # Task 4
 #@task(retries=3,retry_delay_seconds=2)
-
 def hypothesis():
     year1 = df[df['Year'] == 2019]["happiness_score"]
     year2 = df[df['Year'] == 2020]["happiness_score"]
     #make sure hapiness scores are numeric! Float not object!
     year_hypo = ttest_ind(year1,year2)
-    print(f"Statistic: {year_hypo.statistic}\n")
-    print(f"Pvalue: {year_hypo.pvalue}\n")
-    print(f"Mean 2019: {year1.mean()}\n")
-    print(f"Mean 2020: {year2.mean()}")
+    # print(f"Statistic: {year_hypo.statistic}\n")
+    # print(f"Pvalue: {year_hypo.pvalue}\n")
+    # print(f"Mean 2019: {year1.mean()}\n")
+    # print(f"Mean 2020: {year2.mean()}")
     
     #Results:
     # The p-value is greater than or equal to 0.05, so the difference in
@@ -141,8 +139,103 @@ def hypothesis():
     country1 = df[df['Country'] == "Switzerland"]["happiness_score"]
     country2 = df[df['Country'] == "United States"]["happiness_score"]
     country_hypo = ttest_ind(country1,country2)
-    print(f"Statistic: {country_hypo.statistic}\n")
-    print(f"Pvalue: {country_hypo.pvalue}\n")
-    print(f"Mean Switzerland: {country1.mean()}\n")
-    print(f"Mean United States: {country2.mean()}")
+    # print(f"Statistic: {country_hypo.statistic}\n")
+    # print(f"Pvalue: {country_hypo.pvalue}\n")
+    # print(f"Mean Switzerland: {country1.mean()}\n")
+    # print(f"Mean United States: {country2.mean()}")
 hypothesis()
+
+# Task 5
+#@task(retries=3,retry_delay_seconds=2)
+def pearson_happiness():
+    happy = df["happiness_score"]
+    year = df["Year"]
+    gdp = df["GDP per capita"]
+    social_support = df["Social support"]
+    life_expectancy = df["Healthy life expectancy"] 
+    freedom = df["Freedom to make life choices"]    
+    corruption = df["Perceptions of corruption"]
+    generosity = df["Generosity"]
+    
+    # print(life_expectancy.dtype)
+    # print(life_expectancy.isna().sum())
+    # print(happy.dtype)
+    # print(happy.isna().sum())
+
+    pearson1 = pearsonr(year,happy)
+    pearson2 = pearsonr(gdp,happy)
+    pearson3 = pearsonr(social_support,happy)
+    
+    # Make sure bad values are dropped and both columns are the same length
+    temp = df[["Healthy life expectancy", "happiness_score"]].dropna()
+    pearson4 = pearsonr(temp["Healthy life expectancy"],temp["happiness_score"])
+    pearson5 = pearsonr(freedom,happy)
+    pearson6 = pearsonr(corruption,happy)
+    pearson7 = pearsonr(generosity,happy)
+    
+    # print("Pearson 1\n")
+    # print(f"Statistic:\n {pearson1.statistic}")
+    # print(f"P-value:\n {pearson1.pvalue}")
+    
+    # print("Pearson 2\n")
+    # print(f"Statistic:\n {pearson2.statistic}")
+    # print(f"P-value:\n {pearson2.pvalue}")
+    
+    # print("Pearson 3\n")
+    # print(f"Statistic:\n {pearson3.statistic}")
+    # print(f"P-value:\n {pearson3.pvalue}")
+    
+    # print("Pearson 4\n")
+    # print(f"Statistic:\n {pearson4.statistic}")
+    # print(f"P-value:\n {pearson4.pvalue}")
+    
+    # print("Pearson 5\n")
+    # print(f"Statistic:\n {pearson5.statistic}")
+    # print(f"P-value:\n {pearson5.pvalue}")
+    
+    # print("Pearson 6\n")
+    # print(f"Statistic:\n {pearson6.statistic}")
+    # print(f"P-value:\n {pearson6.pvalue}")
+    
+    # print("Pearson 7\n")
+    # print(f"Statistic:\n {pearson7.statistic}")
+    # print(f"P-value:\n {pearson7.pvalue}")
+    
+    adjusted_alpha = 0.05/7
+    
+    print(f"Pearson1 P-value: {pearson1.pvalue}")
+    print(f"Adjusted alpha: {adjusted_alpha}")
+    # Significant at α = 0.05: Yes
+    # Significant after Bonferroni: No
+    
+    print(f"Pearson2 P-value: {pearson2.pvalue}")
+    print(f"Adjusted alpha: {adjusted_alpha}")
+    # Significant at α = 0.05: Yes
+    # Significant after Bonferroni: Yes
+    
+    print(f"Pearson3 P-value: {pearson3.pvalue}")
+    print(f"Adjusted alpha: {adjusted_alpha}")
+    # Significant at α = 0.05: Yes
+    # Significant after Bonferroni: Yes
+    
+    print(f"Pearson4 P-value: {pearson4.pvalue}")
+    print(f"Adjusted alpha: {adjusted_alpha}")
+    # Significant at α = 0.05: Yes
+    # Significant after Bonferroni: Yes
+
+    print(f"Pearson5 P-value: {pearson5.pvalue}")
+    print(f"Adjusted alpha: {adjusted_alpha}")
+    # Significant at α = 0.05: Yes
+    # Significant after Bonferroni: Yes
+
+    print(f"Pearson6 P-value: {pearson6.pvalue}")
+    print(f"Adjusted alpha: {adjusted_alpha}")
+    # Significant at α = 0.05: Yes
+    # Significant after Bonferroni: Yes
+
+    print(f"Pearson7 P-value: {pearson7.pvalue}")
+    print(f"Adjusted alpha: {adjusted_alpha}")
+    # Significant at α = 0.05: Yes
+    # Significant after Bonferroni: Yes
+
+pearson_happiness()
