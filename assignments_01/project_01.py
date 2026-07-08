@@ -90,13 +90,13 @@ def visuals():
     plt.xlabel("Score")
     plt.ylabel("Frequency")
     plt.savefig("outputs/happiness_histogram.png",dpi=300)
-    # plt.show()
+    plt.show()
     
     # Boxplot
     sns.boxplot(x = years, y = happy,data=df)
     plt.title("Happiness Distribution by Years")
     plt.savefig("outputs/happiness_by_year.png",dpi=300)
-    # plt.show()
+    plt.show()
     
     # Scatter Plot
     fig, ax = plt.subplots()
@@ -105,15 +105,15 @@ def visuals():
     ax.set_xlabel("GDP")
     ax.set_ylabel("Happy")
     plt.savefig("outputs/gdp_vs_happiness.png",dpi=300)
-    # plt.show()
+    plt.show()
 
     # Heatmap
     heat_corr = heat_cols.corr(numeric_only=True)
     plt.figure(figsize=(12,6))
     sns.heatmap(heat_corr,annot=True,cmap="coolwarm",fmt=".2f")
     plt.title("Correlation Heatmap")
-    plt.savefig("correlation_heatmap.png",dpi=300)
-    # plt.show()
+    plt.savefig("outputs/correlation_heatmap.png",dpi=300)
+    plt.show()
     
 visuals()
 
@@ -203,39 +203,57 @@ def pearson_happiness():
     
     adjusted_alpha = 0.05/7
     
-    print(f"Pearson1 P-value: {pearson1.pvalue}")
-    print(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: No
+    # print(f"Pearson1 P-value: {pearson1.pvalue}")
+    # print(f"Adjusted alpha: {adjusted_alpha}")
+    # # Significant at α = 0.05: Yes
+    # # Significant after Bonferroni: No
     
-    print(f"Pearson2 P-value: {pearson2.pvalue}")
-    print(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
+    # print(f"Pearson2 P-value: {pearson2.pvalue}")
+    # print(f"Adjusted alpha: {adjusted_alpha}")
+    # # Significant at α = 0.05: Yes
+    # # Significant after Bonferroni: Yes
     
-    print(f"Pearson3 P-value: {pearson3.pvalue}")
-    print(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
+    # print(f"Pearson3 P-value: {pearson3.pvalue}")
+    # print(f"Adjusted alpha: {adjusted_alpha}")
+    # # Significant at α = 0.05: Yes
+    # # Significant after Bonferroni: Yes
     
-    print(f"Pearson4 P-value: {pearson4.pvalue}")
-    print(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
+    # print(f"Pearson4 P-value: {pearson4.pvalue}")
+    # print(f"Adjusted alpha: {adjusted_alpha}")
+    # # Significant at α = 0.05: Yes
+    # # Significant after Bonferroni: Yes
 
-    print(f"Pearson5 P-value: {pearson5.pvalue}")
-    print(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
+    # print(f"Pearson5 P-value: {pearson5.pvalue}")
+    # print(f"Adjusted alpha: {adjusted_alpha}")
+    # # Significant at α = 0.05: Yes
+    # # Significant after Bonferroni: Yes
 
-    print(f"Pearson6 P-value: {pearson6.pvalue}")
-    print(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
+    # print(f"Pearson6 P-value: {pearson6.pvalue}")
+    # print(f"Adjusted alpha: {adjusted_alpha}")
+    # # Significant at α = 0.05: Yes
+    # # Significant after Bonferroni: Yes
 
-    print(f"Pearson7 P-value: {pearson7.pvalue}")
-    print(f"Adjusted alpha: {adjusted_alpha}")
+    # print(f"Pearson7 P-value: {pearson7.pvalue}")
+    # print(f"Adjusted alpha: {adjusted_alpha}")
     # Significant at α = 0.05: Yes
     # Significant after Bonferroni: Yes
 
 pearson_happiness()
+
+# Task 5
+@task(retries=3,retry_delay_seconds=2)
+def summary_report():
+   logger = get_run_logger() 
+   logger.info("Merged dataset")
+   logger.info("Number of countries: 175")
+   logger.info("Number of years: 10")
+   
+   logger.info("Top 3 regions by mean happiness score:")
+   logger.info("1. North America and ANZ 2. Western Europe 3. Latin America and Caribbean")
+   
+   logger.info("Bottom 3 regions by mean happiness score:")
+   logger.info("1. Sub-Saharan Africa 2. South Asia 3. Middle East and North Africa")
+   
+   logger.info("Average happiness scores changed between 2019 and 2020, suggesting that people's reported happiness was different after the start of the pandemic.")
+   logger.info("Social support had the strongest relationship with happiness score, even after using a stricter significance test.")
+summary_report()
