@@ -1,12 +1,9 @@
-import numpy as np
 import pandas as pd
-
 from prefect import flow, task
 import matplotlib.pyplot as plt 
-from prefect.logging import get_run_logger
 
-from scipy.stats import ttest_ind, kstest, pearsonr
-from scipy import stats
+from prefect.logging import get_run_logger
+from scipy.stats import ttest_ind,pearsonr
 import seaborn as sns
 
 # Task 1
@@ -24,7 +21,7 @@ paths = [
         ]
 
 
-# @task(retries=3,retry_delay_seconds=2)
+@task(retries=3,retry_delay_seconds=2)
 def happiness_data():
     final_dataframe = []          
 
@@ -46,14 +43,13 @@ def happiness_data():
     # merge all info into one csv --> go's to output folder
     happiness_merged = pd.concat(final_dataframe)
     happiness_merged.to_csv("outputs/merged_happiness.csv",index=False)
-happiness_data()
 
 data = pd.read_csv("outputs/merged_happiness.csv")
 df = pd.DataFrame(data)
 df.rename(columns={"Happiness score":"happiness_score","Regional indicator":"regional_indicator"},inplace=True)
 
 # Task 2
-#@task(retries=3,retry_delay_seconds=2)
+@task(retries=3,retry_delay_seconds=2)
 def happy_stats():
     # A little cleanup
     df["happiness_score"] = df["happiness_score"].astype(float).round(2)
@@ -64,14 +60,15 @@ def happy_stats():
     happy_std = happy_score.std()
     happy_mean_grouped = df.groupby(["Year","regional_indicator"])["happiness_score"].mean()
     
-    # print(f"Mean:\n {happy_mean}")
-    # print(f"\nMedian:\n {happy_median}")
-    # print(f"\nStandard deviation:\n {happy_std}")
-    # print(f"\nGrouped mean:\n {happy_mean_grouped}")
-happy_stats()
+    logger = get_run_logger() 
+
+    logger.info(f"Mean:\n {happy_mean}")
+    logger.info(f"\nMedian:\n {happy_median}")
+    logger.info(f"\nStandard deviation:\n {happy_std}")
+    logger.info(f"\nGrouped mean:\n {happy_mean_grouped}")
 
 # Task 3
-#@task(retries=3,retry_delay_seconds=2)
+@task(retries=3,retry_delay_seconds=2)
 def visuals():
     happy = df["happiness_score"]
     years = df["Year"]
@@ -114,20 +111,19 @@ def visuals():
     plt.title("Correlation Heatmap")
     plt.savefig("outputs/correlation_heatmap.png",dpi=300)
     plt.show()
-    
-visuals()
 
 # Task 4
-#@task(retries=3,retry_delay_seconds=2)
+@task(retries=3,retry_delay_seconds=2)
 def hypothesis():
     year1 = df[df['Year'] == 2019]["happiness_score"]
     year2 = df[df['Year'] == 2020]["happiness_score"]
-    #make sure hapiness scores are numeric! Float not object!
     year_hypo = ttest_ind(year1,year2)
-    # print(f"Statistic: {year_hypo.statistic}\n")
-    # print(f"Pvalue: {year_hypo.pvalue}\n")
-    # print(f"Mean 2019: {year1.mean()}\n")
-    # print(f"Mean 2020: {year2.mean()}")
+    logger = get_run_logger() 
+
+    logger.info(f"Statistic: {year_hypo.statistic}\n")
+    logger.info(f"Pvalue: {year_hypo.pvalue}\n")
+    logger.info(f"Mean 2019: {year1.mean()}\n")
+    logger.info(f"Mean 2020: {year2.mean()}")
     
     #Results:
     # The p-value is greater than or equal to 0.05, so the difference in
@@ -139,14 +135,13 @@ def hypothesis():
     country1 = df[df['Country'] == "Switzerland"]["happiness_score"]
     country2 = df[df['Country'] == "United States"]["happiness_score"]
     country_hypo = ttest_ind(country1,country2)
-    # print(f"Statistic: {country_hypo.statistic}\n")
-    # print(f"Pvalue: {country_hypo.pvalue}\n")
-    # print(f"Mean Switzerland: {country1.mean()}\n")
-    # print(f"Mean United States: {country2.mean()}")
-hypothesis()
+    logger.info(f"Statistic: {country_hypo.statistic}\n")
+    logger.info(f"Pvalue: {country_hypo.pvalue}\n")
+    logger.info(f"Mean Switzerland: {country1.mean()}\n")
+    logger.info(f"Mean United States: {country2.mean()}")
 
 # Task 5
-#@task(retries=3,retry_delay_seconds=2)
+@task(retries=3,retry_delay_seconds=2)
 def pearson_happiness():
     happy = df["happiness_score"]
     year = df["Year"]
@@ -157,10 +152,7 @@ def pearson_happiness():
     corruption = df["Perceptions of corruption"]
     generosity = df["Generosity"]
     
-    # print(life_expectancy.dtype)
-    # print(life_expectancy.isna().sum())
-    # print(happy.dtype)
-    # print(happy.isna().sum())
+    logger = get_run_logger() 
 
     pearson1 = pearsonr(year,happy)
     pearson2 = pearsonr(gdp,happy)
@@ -169,76 +161,75 @@ def pearson_happiness():
     # Make sure bad values are dropped and both columns are the same length
     temp = df[["Healthy life expectancy", "happiness_score"]].dropna()
     pearson4 = pearsonr(temp["Healthy life expectancy"],temp["happiness_score"])
+    
     pearson5 = pearsonr(freedom,happy)
     pearson6 = pearsonr(corruption,happy)
     pearson7 = pearsonr(generosity,happy)
     
-    # print("Pearson 1\n")
-    # print(f"Statistic:\n {pearson1.statistic}")
-    # print(f"P-value:\n {pearson1.pvalue}")
+    logger.info("Pearson 1\n")
+    logger.info(f"Statistic:\n {pearson1.statistic}")
+    logger.info(f"P-value:\n {pearson1.pvalue}")
     
-    # print("Pearson 2\n")
-    # print(f"Statistic:\n {pearson2.statistic}")
-    # print(f"P-value:\n {pearson2.pvalue}")
+    logger.info("Pearson 2\n")
+    logger.info(f"Statistic:\n {pearson2.statistic}")
+    logger.info(f"P-value:\n {pearson2.pvalue}")
     
-    # print("Pearson 3\n")
-    # print(f"Statistic:\n {pearson3.statistic}")
-    # print(f"P-value:\n {pearson3.pvalue}")
+    logger.info("Pearson 3\n")
+    logger.info(f"Statistic:\n {pearson3.statistic}")
+    logger.info(f"P-value:\n {pearson3.pvalue}")
     
-    # print("Pearson 4\n")
-    # print(f"Statistic:\n {pearson4.statistic}")
-    # print(f"P-value:\n {pearson4.pvalue}")
+    logger.info("Pearson 4\n")
+    logger.info(f"Statistic:\n {pearson4.statistic}")
+    logger.info(f"P-value:\n {pearson4.pvalue}")
     
-    # print("Pearson 5\n")
-    # print(f"Statistic:\n {pearson5.statistic}")
-    # print(f"P-value:\n {pearson5.pvalue}")
+    logger.info("Pearson 5\n")
+    logger.info(f"Statistic:\n {pearson5.statistic}")
+    logger.info(f"P-value:\n {pearson5.pvalue}")
     
-    # print("Pearson 6\n")
-    # print(f"Statistic:\n {pearson6.statistic}")
-    # print(f"P-value:\n {pearson6.pvalue}")
+    logger.info("Pearson 6\n")
+    logger.info(f"Statistic:\n {pearson6.statistic}")
+    logger.info(f"P-value:\n {pearson6.pvalue}")
     
-    # print("Pearson 7\n")
-    # print(f"Statistic:\n {pearson7.statistic}")
-    # print(f"P-value:\n {pearson7.pvalue}")
+    logger.info("Pearson 7\n")
+    logger.info(f"Statistic:\n {pearson7.statistic}")
+    logger.info(f"P-value:\n {pearson7.pvalue}")
     
     adjusted_alpha = 0.05/7
     
-    # print(f"Pearson1 P-value: {pearson1.pvalue}")
-    # print(f"Adjusted alpha: {adjusted_alpha}")
-    # # Significant at α = 0.05: Yes
-    # # Significant after Bonferroni: No
+    logger.info(f"Pearson1 P-value: {pearson1.pvalue}")
+    logger.info(f"Adjusted alpha: {adjusted_alpha}")
+    # Significant at α = 0.05: Yes
+    # Significant after Bonferroni: No
     
-    # print(f"Pearson2 P-value: {pearson2.pvalue}")
-    # print(f"Adjusted alpha: {adjusted_alpha}")
-    # # Significant at α = 0.05: Yes
-    # # Significant after Bonferroni: Yes
+    logger.info(f"Pearson2 P-value: {pearson2.pvalue}")
+    logger.info(f"Adjusted alpha: {adjusted_alpha}")
+    # Significant at α = 0.05: Yes
+    # Significant after Bonferroni: Yes
     
-    # print(f"Pearson3 P-value: {pearson3.pvalue}")
-    # print(f"Adjusted alpha: {adjusted_alpha}")
-    # # Significant at α = 0.05: Yes
-    # # Significant after Bonferroni: Yes
+    logger.info(f"Pearson3 P-value: {pearson3.pvalue}")
+    logger.info(f"Adjusted alpha: {adjusted_alpha}")
+    # Significant at α = 0.05: Yes
+    # Significant after Bonferroni: Yes
     
-    # print(f"Pearson4 P-value: {pearson4.pvalue}")
-    # print(f"Adjusted alpha: {adjusted_alpha}")
-    # # Significant at α = 0.05: Yes
-    # # Significant after Bonferroni: Yes
-
-    # print(f"Pearson5 P-value: {pearson5.pvalue}")
-    # print(f"Adjusted alpha: {adjusted_alpha}")
-    # # Significant at α = 0.05: Yes
-    # # Significant after Bonferroni: Yes
-
-    # print(f"Pearson6 P-value: {pearson6.pvalue}")
-    # print(f"Adjusted alpha: {adjusted_alpha}")
-    # # Significant at α = 0.05: Yes
-    # # Significant after Bonferroni: Yes
-
-    # print(f"Pearson7 P-value: {pearson7.pvalue}")
-    # print(f"Adjusted alpha: {adjusted_alpha}")
+    logger.info(f"Pearson4 P-value: {pearson4.pvalue}")
+    logger.info(f"Adjusted alpha: {adjusted_alpha}")
     # Significant at α = 0.05: Yes
     # Significant after Bonferroni: Yes
 
-pearson_happiness()
+    logger.info(f"Pearson5 P-value: {pearson5.pvalue}")
+    logger.info(f"Adjusted alpha: {adjusted_alpha}")
+    # Significant at α = 0.05: Yes
+    # Significant after Bonferroni: Yes
+
+    logger.info(f"Pearson6 P-value: {pearson6.pvalue}")
+    logger.info(f"Adjusted alpha: {adjusted_alpha}")
+    # Significant at α = 0.05: Yes
+    # Significant after Bonferroni: Yes
+
+    logger.info(f"Pearson7 P-value: {pearson7.pvalue}")
+    logger.info(f"Adjusted alpha: {adjusted_alpha}")
+    # Significant at α = 0.05: Yes
+    # Significant after Bonferroni: Yes
 
 # Task 5
 @task(retries=3,retry_delay_seconds=2)
@@ -256,4 +247,15 @@ def summary_report():
    
    logger.info("Average happiness scores changed between 2019 and 2020, suggesting that people's reported happiness was different after the start of the pandemic.")
    logger.info("Social support had the strongest relationship with happiness score, even after using a stricter significance test.")
-summary_report()
+
+@flow(name="pipeline_flow")
+def happiness_pipeline():
+    happiness_data()
+    happy_stats()
+    visuals()
+    hypothesis()
+    pearson_happiness()
+    summary_report()
+
+if __name__== "__main__":
+    happiness_pipeline()
