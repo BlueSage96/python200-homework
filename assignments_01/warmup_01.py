@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from scipy.stats import ttest_ind, kstest, pearsonr
+from scipy.stats import ttest_ind, ttest_rel, kstest, pearsonr
 from scipy import stats
 import seaborn as sns
 
@@ -21,17 +21,17 @@ print(f"Shape:{df.shape}")
 print(f"Column data types: {df.dtypes}")
 
 # Pandas 02
-df1 = df[(df['grade'] > 80)]
+df1 = df.copy()
+df1 = df1[(df1['grade'] > 80) & (df1['passed']==True)]
 print(f"\nPandas Q2:\n {df1}")
 
 # Pandas 03
 df2 = df.copy()
-df2["grade_curved"] = df[["grade"]].apply(lambda x: x["grade"] + 5,axis=1)
+df2["grade_curved"] = df["grade"] + 5
 print(f"\nPandas Q3:\n {df2}")
 
 # Pandas 04
-df2["name_upper"] = df2[["name"]]
-df2["name_upper"] = df2["name_upper"].str.upper()
+df2["name_upper"] = df2["name"].str.upper()
 print(f"\nPandas Q4:")
 print(df2[["name","name_upper"]])
 
@@ -42,13 +42,13 @@ print(df2)
 
 # Pandas 06
 df2 = df.copy()
-df2 = df2.rename(columns={"Austin":"Houston"})
+df2["city"] = df2["city"].replace({"Austin":"Houston"})
 print(f"\nPandas Q6:")
 print(df2[["name","city"]])
 
 # Pandas 07
-df2 = df2.sort_values(by="grade",ascending=False)
-print(f"\nPandas Q7:\n {df2.head(3)}")
+df = df.sort_values(by="grade",ascending=False)
+print(f"\nPandas Q7:\n {df.head(3)}")
 
 #_____________________________________________________________________________
 # Numpy 01
@@ -79,9 +79,9 @@ aran = np.arange(0,50,5)
 print(f"\nNumpy Q5:\n")
 print(f"Array:\n {aran}")
 print(f"Shape: {aran.shape}")
-print(f"Mean: {arr.mean()}")
-print(f"Sum: {arr.sum()}")
-print(f"Standard Deviation: {arr.std()}")
+print(f"Mean: {aran.mean()}")
+print(f"Sum: {aran.sum()}")
+print(f"Standard Deviation: {aran.std()}")
 
 # Numpy 06
 ran_val = np.random.normal(0,1,200)
@@ -197,63 +197,11 @@ print(f"Data 2 median: {data2_df.median()}")
 print(f"Data 1 mode: {data1_df.mode()}")
 print(f"Data 2 mode: {data2_df.mode()}")
 
-# Data2's mean is different because of having an outlier number of 150.
-# The median just eliminates the outer numbers in the array and takes the middle result.
-# If there's multiple median numbers, the average of those two numbers is the median.
-# Descriptive Stats 05
-data1 = [10,12,12,16,18]
-data1_df = pd.DataFrame(data1)
-
-data2 = [10,12,12,16,150]
-data2_df = pd.DataFrame(data2)
-
-print("\nDescriptive Stats 05:\n")
-print(f"Data 1 mean: {data1_df.mean()}")
-print(f"Data 2 mean: {data2_df.mean()}")
-
-print(f"Data 1 median: {data1_df.median()}")
-print(f"Data 2 median: {data2_df.median()}")
-
-print(f"Data 1 mode: {data1_df.mode()}")
-print(f"Data 2 mode: {data2_df.mode()}")
-
-# Data2's mean is different because of having an outlier number of 150.
-# The median just eliminates the outer numbers in the array and takes the middle result.
-# If there's multiple median numbers, the average of those two numbers is the median.
+# Data2 contains an outlier (150), which increases the mean.
+# The median stays the same as data1 because it is not affected much by extreme values.
 
 #_____________________________________________________________________________
 
-# Hypothesis Question 01
-group_a = [72,68,75,70,69,73,71,74]
-group_b = [80,85,78,83,82,86,79,84]
-
-res = ttest_ind(group_a, group_b)
-print(f"\nHypothesis Question 01:\n")
-print(f"Statistic: {res.statistic}")
-print(f"Pvalue: {res.pvalue}")
-
-# Descriptive Stats 05
-data1 = [10,12,12,16,18]
-data1_df = pd.DataFrame(data1)
-
-data2 = [10,12,12,16,150]
-data2_df = pd.DataFrame(data2)
-
-print("\nDescriptive Stats 05:\n")
-print(f"Data 1 mean: {data1_df.mean()}")
-print(f"Data 2 mean: {data2_df.mean()}")
-
-print(f"Data 1 median: {data1_df.median()}")
-print(f"Data 2 median: {data2_df.median()}")
-
-print(f"Data 1 mode: {data1_df.mode()}")
-print(f"Data 2 mode: {data2_df.mode()}")
-
-# Data2's mean is different because of having an outlier number of 150.
-# The median just eliminates the outer numbers in the array and takes the middle result.
-# If there's multiple median numbers, the average of those two numbers is the median.
-
-#_____________________________________________________________________________
 
 # Hypothesis Question 01
 group_a = [72,68,75,70,69,73,71,74]
@@ -270,15 +218,15 @@ res_pvalue = res.pvalue
 print(f"\nHypothesis Question 02:\n")
 
 if (res_pvalue >= alpha):
-    print(f"Statistically significant: {alpha}")
+    print(f"Statistically significant based on p-value: {alpha}")
 else:
-    print(f"Not statistically significant: {alpha}")
+    print(f"Not statistically significant based on p-value: {alpha}")
     
 # Hypothesis Question 03
 before = [60,65,70,58,62,67,63,66]
 after = [68,70,76,65,69,72,70,71]
 
-before_after = ttest_ind(before,after)
+before_after = ttest_rel(before,after)
 print(f"\nHypothesis Question 03:\n")
 print(f"Statistic: {before_after.statistic}")
 print(f"Pvalue: {before_after.pvalue}")
@@ -291,16 +239,16 @@ print(f"Statistic: {new_scores.statistic}")
 print(f"Pvalue: {new_scores.pvalue}")
 
 # Hypothesis Question 05
-res2 = kstest(group_a, stats.norm.cdf, alternative='less')
+res2 = kstest(group_a, stats.norm.cdf, alternative='greater')
 print(f"\nHypothesis Question 05:\n")
 print(f"Pvalue: {res2.pvalue}")
 
 # Hypothesis Question 06
 print(f"\nHypothesis Question 06:\n")
-print(f"Group_a scores are less than group_b.\nThis is confirmed since the group_a's solo p-value is 0.\n"
-      "The p-value direction is positive moving to the left direction.\n" 
-      "The statistic moves in a negative direction or to the right.\n"
-      "\nThis result is due to chance.")
+print(
+    "Group B had a higher average score than Group A.\n"
+    "Because the p-value is much smaller than 0.05, the difference is unlikely to be due to chance."
+)
 
 #_____________________________________________________________________________
 
@@ -316,8 +264,8 @@ print(f"Correlation coefficient: {pearson[0,1]}")
 # I expect the correlation to be 1 because x1, y1, x2, and y2 are all 1 
 
 # Correlation Question 02
-x = [1,2,3,4,5,6,7,8,9,10]
-y = [10,9,8,7,6,5,4,3,2,1]
+x = [1,  2,  3,  4,  5,  6,  7,  8,  9, 10]
+y = [10, 9,  7,  8,  6,  5,  3,  4,  2,  1]
 
 pearson2 = pearsonr(x,y)
 print(f"\nCorrelation Question 02:\n")
