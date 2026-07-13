@@ -81,3 +81,15 @@ print(f"X Train:\n {X_train}")
 print(f"X Test:\n {X_test}")
 print(f"Y Train:\n {y_train}")
 print(f"Y test:\n {y_train}")
+
+# Linear Regression 03
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+print(f"\nLinear Regression 03:\n")
+print(f"Slope:",model.coef_[0])
+print(f"Intercept:", model.intercept_)
+print(f"RMSE:",np.sqrt(np.mean((y_pred - y_test) ** 2)))
+print(f"R2:",model.score(X_test, y_test))
+
+#The slope predicts how much the medical cost increases by age
