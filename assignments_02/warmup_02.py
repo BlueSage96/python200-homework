@@ -16,6 +16,7 @@ model.fit(years,salary) #relationship b/n years & salary
 predict1 = model.predict([[4]])
 predict2 = model.predict([[8]])
 
+print(f"Scikit Learn 01:\n")
 print(f"Slope:\n {model.coef_[0]}")
 print(f"Intercept:\n {model.intercept_}")
 print(f"Prediction 1:\n {predict1}")
@@ -25,6 +26,7 @@ print(f"Prediction 2:\n {predict2}")
 x = np.array([10,20,30,40,50])
 new_x = np.array([10,20,30,40,50]).reshape(-1,1)
 
+print(f"\nScikit Learn 01:\n")
 print(f"1D shape:\n {x.shape}")
 print(f"2D shape:\n {new_x.shape}")
 
@@ -66,3 +68,16 @@ plt.show()
 
 #There are two distinct groups visible and the age of the smoker 
 # shows that as the patient gets older, their healthcare cost will rise
+
+# Linear Regression 02
+X = age.reshape(-1,1)
+y = cost
+X_train, X_test, y_train, y_test = train_test_split(
+    X,y,test_size=0.2,random_state=42
+)
+
+print(f"\nLinear Regression 02:\n")
+print(f"X Train:\n {X_train}")
+print(f"X Test:\n {X_test}")
+print(f"Y Train:\n {y_train}")
+print(f"Y test:\n {y_train}")
