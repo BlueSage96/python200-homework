@@ -1,8 +1,11 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
+
 from sklearn.linear_model import LinearRegression
 from sklearn.cluster import KMeans
 from sklearn.datasets import make_blobs
+from sklearn.model_selection import train_test_split
 
 #scikit learn Q1
 years = np.array([1,2,3,5,7,10]).reshape(-1,1)
@@ -44,3 +47,11 @@ plt.ylabel("Cluster Y")
 plt.title("Clusters Demo")
 plt.savefig("outputs/kmeans_clusters.png")
 plt.show()
+
+# Linear Regression
+# Medical costs dataset
+np.random.seed(42)
+num_patients = 100
+age = np.random.randint(20,65,num_patients).astype(float)
+smoker = np.random.randint(0,2,num_patients).astype(float)
+cost = 200 * age + 15000 * smoker + np.random.randint(0,3000,num_patients)
