@@ -55,3 +55,14 @@ num_patients = 100
 age = np.random.randint(20,65,num_patients).astype(float)
 smoker = np.random.randint(0,2,num_patients).astype(float)
 cost = 200 * age + 15000 * smoker + np.random.randint(0,3000,num_patients)
+
+# Linear Regression Q1
+plt.scatter(age,cost,c=smoker,cmap="coolwarm")
+plt.title("Medical Cost vs Age")
+plt.xlabel("Age")
+plt.ylabel("Cost")
+plt.savefig("outputs/cost_vs_age.png")
+plt.show()
+
+#There are two distinct groups visible and the age of the smoker 
+# shows that as the patient gets older, their healthcare cost will rise
