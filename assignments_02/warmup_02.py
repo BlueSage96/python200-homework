@@ -14,3 +14,13 @@ print(f"Slope:\n {model.coef_[0]}")
 print(f"Intercept:\n {model.intercept_}")
 print(f"Prediction 1:\n {predict1}")
 print(f"Prediction 2:\n {predict2}")
+
+#scikit learn Q2
+x = np.array([10,20,30,40,50])
+new_x = np.array([10,20,30,40,50]).reshape(-1,1)
+
+print(f"1D shape:\n {x.shape}")
+print(f"2D shape:\n {new_x.shape}")
+
+#Leaving x as an 1D array will cause errors when calling .fit() and .predict()
+#Making x as 2D allows for complex computation later on.
