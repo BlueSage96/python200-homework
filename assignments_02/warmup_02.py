@@ -112,3 +112,13 @@ print(f"R2:",model_full.score(X_test2, y_test2))
 
 #Added the smoker flag helps R2 significantly
 #Smoker coefficient represents the total cost of healthcare for all 100 patients
+
+
+# Linear Regression 05
+plt.scatter(y_pred2,y_test2,color="orange",cmap="coolwarm")
+plt.plot( [0,30000],[0,30000], color="black")
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Predicted vs Actual")
+plt.savefig("outputs/predicted_vs_actual.png")
+plt.show()
