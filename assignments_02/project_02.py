@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 import seaborn as sns
 
+from sklearn.linear_model import LinearRegression
+from sklearn.cluster import KMeans
+from sklearn.datasets import make_blobs
+from sklearn.model_selection import train_test_split
+
 # Task 1
 students_data = pd.read_csv("student_performance_math.csv",sep=";")
 students_df = pd.DataFrame(students_data)
@@ -81,3 +86,23 @@ plt.savefig("outputs/g1_g3_bar_graph")
 plt.show()
 
 #There's a high corrleation for the students in first period & third period
+
+# Task 4
+model = LinearRegression()
+failures = students_df2["failures"]
+failures = failures.to_numpy()
+X = failures.reshape(-1,1)
+y = g3
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,y,test_size=0.2,random_state=42
+)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+print(f"\nSlope:",model.coef_[0])
+print(f"RMSE:",np.sqrt(np.mean((y_pred - y_test) ** 2)))
+print(f"R2:",model.score(X_test, y_test))
+
+# G3 students didn't score well on the final exam based on the slope and RMSE
+# R2 did very little in increasing the slope and RMSE
