@@ -93,3 +93,22 @@ print(f"RMSE:",np.sqrt(np.mean((y_pred - y_test) ** 2)))
 print(f"R2:",model.score(X_test, y_test))
 
 #The slope predicts how much the medical cost increases by age
+
+# Linear Regression 04
+X_full = np.column_stack([age,smoker])
+y = cost
+
+X_train2, X_test2, y_train2, y_test2 = train_test_split(
+    X_full,y,test_size=0.2,random_state=42
+)
+model_full = LinearRegression()
+model_full.fit(X_train2, y_train2)
+y_pred2 = model_full.predict(X_test2)
+
+print(f"\nLinear Regression 04:\n")
+print("age coefficient:", model_full.coef_[0])
+print("smoker coefficient: ", model_full.coef_[1])
+print(f"R2:",model_full.score(X_test2, y_test2))
+
+#Added the smoker flag helps R2 significantly
+#Smoker coefficient represents the total cost of healthcare for all 100 patients
