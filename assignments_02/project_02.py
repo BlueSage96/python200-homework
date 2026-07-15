@@ -23,7 +23,7 @@ plt.hist(g3,bins=21,color="green")
 plt.xlabel("Final Grade")
 plt.ylabel("Grade Prediction")
 plt.title("Distribution of Final Math Grades")
-plt.savefig("outputs/g3_distributon.png")
+plt.savefig("outputs/g3_distribution.png")
 plt.show()
 
 # Task 2
