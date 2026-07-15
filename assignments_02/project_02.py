@@ -122,7 +122,7 @@ y_pred = model.predict(X_test)
 
 print(f"\nRMSE:",np.sqrt(np.mean((y_pred - y_test) ** 2)))
 print(f"Train R2:",model.score(X_train, y_train))
-print(f"Test R2:",model.score(X_test, y_test))
+print(f"Test R2:\n",model.score(X_test, y_test))
 
 # The test R2 helps a little, meaning that adding features had a lukewarm effect on task 4's R2
 
@@ -157,5 +157,35 @@ plt.show()
 # 4. One result that surprised you
 # The biggest surprise is schoolsup because it would make sense for students to take advantage 
 # of the extra resources from the school
+
+
+# Extra: G1
+feature_cols = ["failures","Medu","Fedu","studytime","higher","schoolsup",
+                "internet","sex","freetime","activities","traveltime","G1"]
+X = students_df2[feature_cols].values
+y = students_df2["G3"].values
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,y,test_size=0.2,random_state=42
+)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+print(f"\nRMSE:",np.sqrt(np.mean((y_pred - y_test) ** 2)))
+print(f"Train R2:",model.score(X_train, y_train))
+print(f"Test R2:",model.score(X_test, y_test))
+
+# 1. Does a high R² here mean G1 is causing G3? 
+# The high R2 shows a strong correlation between G1 and G3.
+# However, the high correlation does not mean that G1 has any influence on G3.
+
+# 2. Is this a useful model for identifying students who might struggle? 
+# Yes as long as G1 is a feature because the period grades are sequential 
+# and G1 and G2 cannot be skipped.
+
+# 3. What might educators need to do if they wanted to intervene early,
+# before G1 is even available?
+# Even without G1, teachers can encourage students to take advantage of 
+# schoolsup, studytime and decrease absences which leads to less failures.
 
 
