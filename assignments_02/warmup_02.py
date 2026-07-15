@@ -44,10 +44,12 @@ print(f"Points in cluster:\n {np.bincount(labels)}")
 
 fig, ax = plt.subplots()
 ax.scatter(X_clusters[:,0],X_clusters[:,1],c=labels)
+ax.scatter(kmeans.cluster_centers_[:,0],kmeans.cluster_centers_[:,1],color="black",marker="X",s=200)
 plt.xlabel("Cluster X")
 plt.ylabel("Cluster Y")
 plt.title("Clusters Demo")
 plt.savefig("outputs/kmeans_clusters.png")
+
 plt.show()
 
 # Linear Regression
@@ -56,7 +58,7 @@ np.random.seed(42)
 num_patients = 100
 age = np.random.randint(20,65,num_patients).astype(float)
 smoker = np.random.randint(0,2,num_patients).astype(float)
-cost = 200 * age + 15000 * smoker + np.random.randint(0,3000,num_patients)
+cost = 200 * age + 15000 * smoker + np.random.normal(0,3000,num_patients)
 
 # Linear Regression Q1
 plt.scatter(age,cost,c=smoker,cmap="coolwarm")
@@ -80,7 +82,7 @@ print(f"\nLinear Regression 02:\n")
 print(f"X Train:\n {X_train}")
 print(f"X Test:\n {X_test}")
 print(f"Y Train:\n {y_train}")
-print(f"Y test:\n {y_train}")
+print(f"Y test:\n {y_test}")
 
 # Linear Regression 03
 model.fit(X_train, y_train)
@@ -108,17 +110,19 @@ y_pred2 = model_full.predict(X_test2)
 print(f"\nLinear Regression 04:\n")
 print("age coefficient:", model_full.coef_[0])
 print("smoker coefficient: ", model_full.coef_[1])
-print(f"R2:",model_full.score(X_test2, y_test2))
+print(f"R2:{model_full.score(X_test2, y_test2)}\n")
 
-#Added the smoker flag helps R2 significantly
-#Smoker coefficient represents the total cost of healthcare for all 100 patients
-
+# How does the smoker feature influence the predicted medical cost?
+# Adding the smoker flag helps R2 significantly by going from 0.07 to 0.77
+# The smoker coefficient represents the predicted cost of healthcare for all 100 patients
 
 # Linear Regression 05
 plt.scatter(y_pred2,y_test2,color="orange",cmap="coolwarm")
-plt.plot( [0,30000],[0,30000], color="black")
+plt.plot( [0,25000],[0,25000], color="black")
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
 plt.title("Predicted vs Actual")
 plt.savefig("outputs/predicted_vs_actual.png")
 plt.show()
+
+#Above the line is positive correlation and below the line is negative correlation.
