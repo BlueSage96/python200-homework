@@ -53,7 +53,8 @@ print(f"\nUpdated dataset:\n {pearson2}")
 g3 = students_df2["G3"]
 sorted_pearson = []
 numeric_cols = students_df2[["sex","age","Medu","Fedu","traveltime","studytime",
-                            "failures","schoolsup","internet","higher","activities","freetime","goout","Walc","G1","G2","G3"]]
+                            "failures","schoolsup","internet","higher","activities",
+                            "freetime","goout","Walc","G1","G2","G3"]]
 for cols in numeric_cols:
     if cols != "G3":
        pearson1 = pearsonr(students_df2[cols],g3)
@@ -106,3 +107,28 @@ print(f"R2:",model.score(X_test, y_test))
 
 # G3 students didn't score well on the final exam based on the slope and RMSE
 # R2 did very little in increasing the slope and RMSE
+
+# Task 5
+feature_cols = ["failures","Medu","Fedu","studytime","higher","schoolsup",
+                "internet","sex","freetime","activities","traveltime"]
+X = students_df2[feature_cols].values
+y = students_df2["G3"].values
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,y,test_size=0.2,random_state=42
+)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+print(f"\nRMSE:",np.sqrt(np.mean((y_pred - y_test) ** 2)))
+print(f"Train R2:",model.score(X_train, y_train))
+print(f"Test R2:",model.score(X_test, y_test))
+
+# The test R2 helps a little, meaning that adding features had a lukewarm effect on task 4's R2
+
+# Print each feature name & its cofficient
+for name, coef in zip(feature_cols, model.coef_):
+    print(f"{name:12s}:{coef:+3f}")
+# No surprise and the R2 are close, and that tells me the model has an overall weak relationship
+# I would drop failures, schoolsup, and traveltime as they cause a lot of the weak model relationship.
+# Activities is fine since the number is lower than the above.
