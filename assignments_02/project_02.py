@@ -32,7 +32,7 @@ print(f"\nBefore G3 0: {students_df.shape}")
 g30 = students_df[(students_df["G3"] == 0)]
 # Drop 0s
 students_df2 = students_df.drop(g30.index)
-print(f"\nAfter G3 0:\n {students_df.shape}")
+print(f"\nAfter G3 0:\n {students_df2.shape}")
 
 #Removing 0s helps simiplify the dataset before 
 # converting yes/no to 1/0 and sex column 0/1
@@ -132,3 +132,30 @@ for name, coef in zip(feature_cols, model.coef_):
 # No surprise and the R2 are close, and that tells me the model has an overall weak relationship
 # I would drop failures, schoolsup, and traveltime as they cause a lot of the weak model relationship.
 # Activities is fine since the number is lower than the above.
+
+# Task 6
+plt.plot( [0,20],[0,20], color="black")
+plt.scatter(y_pred,y_test,color="green",cmap="coolwarm")
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Predicted vs Actual (Full Model)")
+plt.savefig("outputs/predicted_vs_actual_full.png")
+plt.show()
+
+# 1. The size of the filtered dataset and the test set
+# After filtered dataset contained 357 students and 71-72 for the test set.
+
+# 2. The RMSE and R² of your best model in plain language -- 
+# on a 0-20 scale, what does a typical prediction error actually mean?
+# The lower the RMSE is to 0 or 1 the more accurate the prediction is.
+# Since the R2 is 0.15-0.17, it can only determine the 15-17% of student's final grades.
+
+# 3. Which two features have the largest positive and largest negative coefficients, and what those mean?
+#  The largest positive feature is internet which makes sense given that mostly kid & teens use it.
+#  The largest negative feature is schoolsup meaning that students didn't use the extra educational support.
+
+# 4. One result that surprised you
+# The biggest surprise is schoolsup because it would make sense for students to take advantage 
+# of the extra resources from the school
+
+
