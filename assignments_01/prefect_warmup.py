@@ -10,9 +10,8 @@ def create_series(arr):
 
 @task
 def clean_data(series):
-    cleaned = create_series(series).dropna()
-    return cleaned
-
+    return series.dropna()
+    
 @task    
 def summarize_data(series):
     series = ({
@@ -26,7 +25,9 @@ def summarize_data(series):
 @flow(name="pipeline_flow")
 def data_pipeline(arr):
     created = create_series(arr)
-    return summarize_data(clean_data(created))
+    cleaned = clean_data(created)
+    summary = summarize_data(cleaned)
+    return summary
 
 if __name__ == "__main__":
     data_pipeline(arr)
