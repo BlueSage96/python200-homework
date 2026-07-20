@@ -37,7 +37,7 @@ print("Mean of sepal length:", X_train_scaled[:,0].mean())
 print("Mean of sepal width:",X_train_scaled[:,1].mean())
 print("Mean of petal length:",X_train_scaled[:,2].mean())
 print("Mean of petal width:",X_train_scaled[:,3].mean())
-#Using X_train because the X_train contains the mean and std for only the training data.
+# Using X_train because the X_train contains the mean and std for only the training data.
 
 #KNN 01
 knn = KNeighborsClassifier(n_neighbors=5)
@@ -61,7 +61,7 @@ score2 = accuracy_score(y_test, preds2)
 
 print(f"\nKNN 02:\n")
 print("Accuracy:", score2)
-#The accuracy is the same for unscaled and scaled data, so scaling makes no difference
+# The accuracy is the same for unscaled and scaled data, so scaling makes no difference
 
 #KNN 03
 knn3 = KNeighborsClassifier(n_neighbors=5)
@@ -72,7 +72,7 @@ print(f"Fold scores: {cv_scores}")
 print(f"Mean fold scores: {cv_scores.mean():.3f}")
 print(f"Standard deviation of fold scores: {cv_scores.std():.3f}")
 
-#The cross_val_score is more trustworthy than a single train/test 
+# The cross_val_score is more trustworthy than a single train/test 
 # split because each group of training data (fold) is evaluated 
 # and the average score is more stable than any single split.
 
@@ -84,7 +84,7 @@ for k in k_values:
     knn4 = KNeighborsClassifier(n_neighbors=5)
     cross = cross_val_score(knn4,X_train,y_train,cv=5)
     print(f"k={k:2d}: mean={cross.mean():.3f}")
-    #I would use k=15 as it has a wider range of neighbors to average than the other ks. \z
+    # I would use k=15 as it has a wider range of neighbors to average than the other ks. \z
     
     
 #Classifier Evaluation 01
@@ -94,3 +94,16 @@ display.plot()
 plt.title("KNN Confusion Matrix")
 plt.savefig("outputs/knn_confusion_matrix.png")
 plt.show()
+
+#Decision Tree 01
+dtc = DecisionTreeClassifier(max_depth=3,random_state=42)
+dtc.fit(X_train,y_train)
+preds3 = dtc.predict(X_test)
+score3 = accuracy_score(y_test, preds3)
+class_report2 = classification_report(y_test, preds3)
+
+print(f"\nDecision Trees 01:\n")
+print("Accuracy:", score3)
+print(class_report2)
+# KNN's accuracy is 1.0 while Decision Tree accuracy is 0.9666666666666667
+# No scaled vs. unscaled data would not affect the result.
