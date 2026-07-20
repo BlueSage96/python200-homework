@@ -107,3 +107,22 @@ print("Accuracy:", score3)
 print(class_report2)
 # KNN's accuracy is 1.0 while Decision Tree accuracy is 0.9666666666666667
 # No scaled vs. unscaled data would not affect the result.
+
+#Logical Regression 01
+log_reg1 = LogisticRegression(C=0.01,max_iter=1000,solver='liblinear')
+log_reg2 = LogisticRegression(C=1.0,max_iter=1000,solver='liblinear')
+log_reg3 = LogisticRegression(C=100,max_iter=1000,solver='liblinear')
+
+log_reg1.fit(X_train_scaled,y_train)
+log_reg2.fit(X_train_scaled,y_train)
+log_reg3.fit(X_train_scaled,y_train)
+
+log_reg_np1 = np.abs(log_reg1.coef_).sum()
+log_reg_np2 = np.abs(log_reg2.coef_).sum()
+log_reg_np3 = np.abs(log_reg3.coef_).sum()
+
+print(f"\nLogical Regression 01:\n")
+print(f"Model one C value: {log_reg1.C} and total size: {log_reg_np1}")
+print(f"Model two C value: {log_reg2.C} and total size: {log_reg_np2}")
+print(f"Model three C value: {log_reg3.C} and total size: {log_reg_np3}")
+# The coefficients increase significally depending on the size of C.
