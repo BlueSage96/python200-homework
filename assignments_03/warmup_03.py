@@ -84,4 +84,13 @@ for k in k_values:
     knn4 = KNeighborsClassifier(n_neighbors=5)
     cross = cross_val_score(knn4,X_train,y_train,cv=5)
     print(f"k={k:2d}: mean={cross.mean():.3f}")
-    #I would use k=15 as it has a wider range of neighbors to average than the other ks. 
+    #I would use k=15 as it has a wider range of neighbors to average than the other ks. \z
+    
+    
+#Classifier Evaluation 01
+cm = confusion_matrix(y_test,preds)
+display = ConfusionMatrixDisplay(confusion_matrix=cm,display_labels=iris.target_names)
+display.plot()
+plt.title("KNN Confusion Matrix")
+plt.savefig("outputs/knn_confusion_matrix.png")
+plt.show()
