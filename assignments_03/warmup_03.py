@@ -75,3 +75,13 @@ print(f"Standard deviation of fold scores: {cv_scores.std():.3f}")
 #The cross_val_score is more trustworthy than a single train/test 
 # split because each group of training data (fold) is evaluated 
 # and the average score is more stable than any single split.
+
+#KNN 04
+print(f"\nKNN 04:\n")
+
+k_values = [1,3,5,7,9,11,13,15]
+for k in k_values:
+    knn4 = KNeighborsClassifier(n_neighbors=5)
+    cross = cross_val_score(knn4,X_train,y_train,cv=5)
+    print(f"k={k:2d}: mean={cross.mean():.3f}")
+    #I would use k=15 as it has a wider range of neighbors to average than the other ks. 
