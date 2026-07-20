@@ -33,10 +33,10 @@ print(f"y-test Shape: {y_test.shape}\n")
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 print(f"\nPreprocessing 02:\n")
-print("Mean of sepal length:", X_train_scaled[0].mean())
-print("Mean of sepal width:",X_train_scaled[1].mean())
-print("Mean of petal length:",X_train_scaled[2].mean())
-print("Mean of petal width:",X_train_scaled[3].mean())
+print("Mean of sepal length:", X_train_scaled[:,0].mean())
+print("Mean of sepal width:",X_train_scaled[:,1].mean())
+print("Mean of petal length:",X_train_scaled[:,2].mean())
+print("Mean of petal width:",X_train_scaled[:,3].mean())
 #Using X_train because the X_train contains the mean and std for only the training data.
 
 #KNN 01
@@ -50,3 +50,15 @@ class_report = classification_report(y_test, preds)
 print(f"\nKNN 01:\n")
 print("Accuracy:", score)
 print(class_report)
+
+#KNN 02
+knn2 = KNeighborsClassifier(n_neighbors=5)
+X_test_scaled = scaler.fit_transform(X_test)
+knn2.fit(X_train_scaled,y_train) #Xs - features y's - labels
+
+preds2 = knn2.predict(X_test_scaled)
+score2 = accuracy_score(y_test, preds2)
+
+print(f"\nKNN 02:\n")
+print("Accuracy:", score2)
+#The accuracy is the same for unscaled and scaled data, so scaling makes no difference
