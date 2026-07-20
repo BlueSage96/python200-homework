@@ -62,3 +62,16 @@ score2 = accuracy_score(y_test, preds2)
 print(f"\nKNN 02:\n")
 print("Accuracy:", score2)
 #The accuracy is the same for unscaled and scaled data, so scaling makes no difference
+
+#KNN 03
+knn3 = KNeighborsClassifier(n_neighbors=5)
+cv_scores = cross_val_score(knn3,X_train,y_train,cv=5)
+
+print(f"\nKNN 03:\n")
+print(f"Fold scores: {cv_scores}")
+print(f"Mean fold scores: {cv_scores.mean():.3f}")
+print(f"Standard deviation of fold scores: {cv_scores.std():.3f}")
+
+#The cross_val_score is more trustworthy than a single train/test 
+# split because each group of training data (fold) is evaluated 
+# and the average score is more stable than any single split.
