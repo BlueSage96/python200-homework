@@ -172,3 +172,24 @@ plt.ylabel("Total Explained")
 plt.savefig("outputs/pca_variance_explained.png")
 plt.show()
 #The components are very small and would take 13 components to explain 80% of variance
+
+#PCA 04
+def reconstruct_digit(sample_idx,scores,pca,n_components):
+    #Reconstruct one digit using the first n_components principal components
+    reconstruction = pca.mean_.copy()
+    for i in range(n_components):
+        reconstruction = reconstruction + scores[sample_idx,i] * pca.components_[i]
+    return reconstruction.reshape(8,8)
+
+
+fig, axs = plt.subplots(5,5,figsize=(10,10))
+component_counts = [2, 5, 15, 40]
+
+for row, n in enumerate(component_counts, start=1):
+    for col in range(5):
+        axs[0][col].imshow(images[col], cmap="gray")
+        reconstruction = reconstruct_digit(col, scores, pca, n)
+        axs[row][col].imshow(reconstruction, cmap="gray")
+plt.savefig("outputs/pca_reconstructions.png")
+plt.show()
+#Numbers become recognizable at n=40 and it matches where the variance curve levels off.
