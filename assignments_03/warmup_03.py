@@ -150,7 +150,7 @@ plt.show()
 #PCA 02
 fig, ax1 = plt.subplots()
 pca = PCA(svd_solver="randomized",random_state=0)
-pca.fit(X_digits)
+pca_fit = pca.fit(X_digits)
 scores = pca.transform(X_digits)
 
 scatter = ax1.scatter(scores[:,0],scores[:,1],c=y_digits,cmap="tab10",s=10) # c = color array
@@ -158,3 +158,17 @@ plt.colorbar(scatter,label="Digit")
 plt.title("PCA 2D Projection")
 plt.savefig("outputs/pca-2d_projection.png")
 plt.show()
+
+#PCA 03
+perc_exp_vals = pca_fit.explained_variance_ratio_ 
+total_explained = np.cumsum(perc_exp_vals)
+
+plt.scatter(perc_exp_vals,total_explained,color="orange")
+plt.title("PCA Variance Explained")
+
+plt.xlabel("Exp Vals")
+plt.ylabel("Total Explained")
+
+plt.savefig("outputs/pca_variance_explained.png")
+plt.show()
+#The components are very small and would take 13 components to explain 80% of variance
