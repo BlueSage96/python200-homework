@@ -129,13 +129,13 @@ print(f"Model three C value: {log_reg3.C} and total size: {log_reg_np3}")
 
 # PCA
 digits = load_digits()
-x_digits = digits.data # 1797 images, each flattened to 64 pixel values
+X_digits = digits.data # 1797 images, each flattened to 64 pixel values
 y_digits = digits.target # digit labels 0-9
 images = digits.images # same data shaped as 8x8 images for plotting
 
 #PCA 01
 print(f"\nPCA 01:\n")
-print(f"Shape of x digits: {x_digits.shape}")
+print(f"Shape of x digits: {X_digits.shape}")
 print(f"Shape of images: {images.shape}")
 
 fig, ax = plt.subplots(1, 10, figsize=(15, 2))
@@ -145,4 +145,16 @@ for i in range(10):
     ax[i].set_title(y_digits[i])
     ax[i].axis("off")
 plt.savefig("outputs/sample_digits.png")
+plt.show()
+
+#PCA 02
+fig, ax1 = plt.subplots()
+pca = PCA(svd_solver="randomized",random_state=0)
+pca.fit(X_digits)
+scores = pca.transform(X_digits)
+
+scatter = ax1.scatter(scores[:,0],scores[:,1],c=y_digits,cmap="tab10",s=10) # c = color array
+plt.colorbar(scatter,label="Digit")
+plt.title("PCA 2D Projection")
+plt.savefig("outputs/pca-2d_projection.png")
 plt.show()
