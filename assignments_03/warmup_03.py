@@ -126,3 +126,23 @@ print(f"Model one C value: {log_reg1.C} and total size: {log_reg_np1}")
 print(f"Model two C value: {log_reg2.C} and total size: {log_reg_np2}")
 print(f"Model three C value: {log_reg3.C} and total size: {log_reg_np3}")
 # The coefficients increase significally depending on the size of C.
+
+# PCA
+digits = load_digits()
+x_digits = digits.data # 1797 images, each flattened to 64 pixel values
+y_digits = digits.target # digit labels 0-9
+images = digits.images # same data shaped as 8x8 images for plotting
+
+#PCA 01
+print(f"\nPCA 01:\n")
+print(f"Shape of x digits: {x_digits.shape}")
+print(f"Shape of images: {images.shape}")
+
+fig, ax = plt.subplots(1, 10, figsize=(15, 2))
+#use a loop to prevent "repetitive code"!
+for i in range(10):
+    ax[i].imshow(images[i],cmap="gray_r")
+    ax[i].set_title(y_digits[i])
+    ax[i].axis("off")
+plt.savefig("outputs/sample_digits.png")
+plt.show()
