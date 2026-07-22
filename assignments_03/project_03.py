@@ -177,7 +177,7 @@ X_train_pca = pca.transform(X_train_scaled)[:, :n]
 X_test_pca  = pca.transform(X_test_scaled)[:, :n]
 
 #Task 03
-
+print(f"\nTa 03:\n")
 #KNN on unscaled data
 knn = KNeighborsClassifier(n_neighbors=5)
 knn.fit(X_train,y_train)
@@ -293,4 +293,60 @@ display = ConfusionMatrixDisplay(confusion_matrix=cm)
 display.plot()
 plt.title("Decision Tree 04 Confusion Matrix")
 plt.savefig("outputs/decision_tree_04_confusion_matrix.png")
-plt.show()
+
+
+#Task 04
+print(f"\nTask 04:\n")
+cv_scores = cross_val_score(knn,X_train,y_train,cv=5)
+
+print(f"\nKNN 01:\n")
+print(f"Mean fold scores: {cv_scores.mean():.3f}")
+print(f"Standard deviation of fold scores: {cv_scores.std():.3f}")
+
+cv_scores2 = cross_val_score(knn2,X_train,y_train,cv=5)
+
+print(f"\nKNN 02:\n")
+print(f"Mean fold scores: {cv_scores2.mean():.3f}")
+print(f"Standard deviation of fold scores: {cv_scores2.std():.3f}")
+
+cv_scores_dtc1 = cross_val_score(dtc1,X_train,y_train,cv=5)
+
+print(f"\nDecision Tree 01:\n")
+print(f"Mean fold scores: {cv_scores_dtc1.mean():.3f}")
+print(f"Standard deviation of fold scores: {cv_scores_dtc1.std():.3f}")
+
+cv_scores_dtc2 = cross_val_score(dtc2,X_train,y_train,cv=5)
+
+print(f"\nDecision Tree 02:\n")
+print(f"Mean fold scores: {cv_scores_dtc2.mean():.3f}")
+print(f"Standard deviation of fold scores: {cv_scores_dtc2.std():.3f}")
+
+cv_scores_dtc3 = cross_val_score(dtc3,X_train,y_train,cv=5)
+
+print(f"\nDecision Tree 03:\n")
+print(f"Mean fold scores: {cv_scores_dtc3.mean():.3f}")
+print(f"Standard deviation of fold scores: {cv_scores_dtc3.std():.3f}")
+
+cv_scores_dtc4 = cross_val_score(dtc4,X_train,y_train,cv=5)
+
+print(f"\nDecision Tree 04:\n")
+print(f"Mean fold scores: {cv_scores_dtc4.mean():.3f}")
+print(f"Standard deviation of fold scores: {cv_scores_dtc4.std():.3f}")
+
+cv_scores_rf = cross_val_score(rf,X_train,y_train,cv=5)
+
+print(f"\nRandom Forest 01:\n")
+print(f"Mean fold scores: {cv_scores_rf.mean():.3f}")
+print(f"Standard deviation of fold scores: {cv_scores_rf.std():.3f}")
+
+cv_scores_logistic_scaled = cross_val_score(logistic_scaled,X_train,y_train,cv=5)
+
+print(f"\nLogistic Regression 01:\n")
+print(f"Mean fold scores: {cv_scores_logistic_scaled.mean():.3f}")
+print(f"Standard deviation of fold scores: {cv_scores_logistic_scaled.std():.3f}")
+
+cv_scores_logistic_pca = cross_val_score(logistic_pca,X_train,y_train,cv=5)
+
+print(f"\nLogistic Regression 02:\n")
+print(f"Mean fold scores: {cv_scores_logistic_pca.mean():.3f}")
+print(f"Standard deviation of fold scores: {cv_scores_logistic_pca.std():.3f}")
