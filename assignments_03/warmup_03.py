@@ -149,6 +149,7 @@ plt.show()
 
 #PCA 02
 fig, ax1 = plt.subplots()
+
 pca = PCA(svd_solver="randomized",random_state=0)
 pca_fit = pca.fit(X_digits)
 scores = pca.transform(X_digits)

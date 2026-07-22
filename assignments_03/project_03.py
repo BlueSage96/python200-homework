@@ -7,6 +7,7 @@ from io import BytesIO
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import (
     confusion_matrix,
@@ -115,7 +116,55 @@ plt.show()
 #2. The heavy skew to 0 means a lot of the emails don't contain the same 
 # set of words and characters irregardless if they are spam or ham.
 
-#3. Capitalizing individual words would rack up more data than using similar words and characters.
+#3. Capitalizing individual words would rack up more data than using 
+# similar words and characters.
 
 #4. The training and test data will contain drastic skews so there may be 
 # a need to normalize some of the data before training and testing.
+
+#Task 02
+
+#Data prep - Standardize the features because they have different scales
+# like capital_run_length_total that has much larger values
+# than the other features), which helps Logistic Regression perform better.
+
+#Remove spam_label for X data 
+X = df.drop("spam_label",axis=1)
+y = df["spam_label"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test) # learn same mean & standard deviation from training data
+
+pca = PCA()
+pca_fit = pca.fit(X_train_scaled)
+
+perc_exp_vals = pca_fit.explained_variance_ratio_ 
+total_explained = np.cumsum(perc_exp_vals)
+
+n = 0
+
+for i, value in enumerate(total_explained):
+    if value >= 0.90:
+        n = i + 1
+        break
+
+
+plt.scatter(perc_exp_vals,total_explained,color="turquoise")
+plt.title("PCA Variance Explained")
+
+plt.xlabel("Exp Vals")
+plt.ylabel("Total Explained")
+plt.savefig("outputs/pca_variance_project_03.png")
+plt.show()
+
+print("Explained variance (%):", ", ".join(f"{v:.2f}" for v in perc_exp_vals))
+print(f"Total (%): {n}")
+
+#Transform both train and test data and slice the first n components
+X_train_pca = pca.transform(X_train_scaled[:,:n])
+X_test_pca = pca.transform(X_test_scaled[:,:n])
