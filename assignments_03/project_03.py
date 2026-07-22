@@ -8,9 +8,16 @@ from io import BytesIO
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import (
     confusion_matrix,
+    ConfusionMatrixDisplay,
     accuracy_score,
     precision_score,
     recall_score,
@@ -154,7 +161,7 @@ for i, value in enumerate(total_explained):
         break
 
 
-plt.scatter(perc_exp_vals,total_explained,color="turquoise")
+plt.plot(total_explained,color="turquoise")
 plt.title("PCA Variance Explained")
 
 plt.xlabel("Exp Vals")
@@ -166,5 +173,124 @@ print("Explained variance (%):", ", ".join(f"{v:.2f}" for v in perc_exp_vals))
 print(f"Total (%): {n}")
 
 #Transform both train and test data and slice the first n components
-X_train_pca = pca.transform(X_train_scaled[:,:n])
-X_test_pca = pca.transform(X_test_scaled[:,:n])
+X_train_pca = pca.transform(X_train_scaled)[:, :n]
+X_test_pca  = pca.transform(X_test_scaled)[:, :n]
+
+#Task 03
+
+#KNN on unscaled data
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train,y_train)
+preds = knn.predict(X_test)
+score = accuracy_score(y_test,preds)
+class_report = classification_report(y_test,preds)
+
+print(f"\nKNN 01:\n")
+print(f"Accuracy: {score}")
+print(f"Report: {class_report}")
+
+#KNN on scaled data
+knn2 = KNeighborsClassifier(n_neighbors=5)
+knn2.fit(X_train_scaled,y_train)
+preds2 = knn2.predict(X_test_scaled)
+score2 = accuracy_score(y_test,preds)
+class_report2 = classification_report(y_test,preds2)
+
+print(f"\nKNN 02:\n")
+print(f"Accuracy: {score2}")
+print(f"Report: {class_report2}")
+
+#Decision Tree 01
+dtc1 = DecisionTreeClassifier(max_depth=3,random_state=42)
+dtc1.fit(X_train,y_train)
+train_preds_dtc1 = dtc1.predict(X_train)
+test_preds_dtc1 = dtc1.predict(X_test)
+
+train_accuracy_dtc1 = accuracy_score(y_train, train_preds_dtc1)
+test_accuracy_dtc1 = accuracy_score(y_test,test_preds_dtc1)
+
+print(f"\nDecision Tree 01:\n")
+print(f"Train Accuracy: {train_accuracy_dtc1}")
+print(f"Test Accuracy: {test_accuracy_dtc1}")
+
+#Decision Tree 02
+dtc2 = DecisionTreeClassifier(max_depth=5,random_state=42)
+dtc2.fit(X_train,y_train)
+train_preds_dtc2 = dtc2.predict(X_train)
+test_preds_dtc2 = dtc2.predict(X_test)
+
+train_accuracy_dtc2 = accuracy_score(y_train, train_preds_dtc2)
+test_accuracy_dtc2 = accuracy_score(y_test,test_preds_dtc2)
+
+print(f"\nDecision Tree 02:\n")
+print(f"Train Accuracy: {train_accuracy_dtc2}")
+print(f"Test Accuracy: {test_accuracy_dtc2}")
+
+#Decision Tree 03
+dtc3 = DecisionTreeClassifier(max_depth=10,random_state=42)
+dtc3.fit(X_train,y_train)
+train_preds_dtc3 = dtc3.predict(X_train)
+test_preds_dtc3 = dtc3.predict(X_test)
+
+train_accuracy_dtc3 = accuracy_score(y_train, train_preds_dtc3)
+test_accuracy_dtc3 = accuracy_score(y_test,test_preds_dtc3)
+
+print(f"\nDecision Tree 03:\n")
+print(f"Train Accuracy: {train_accuracy_dtc3}")
+print(f"Test Accuracy: {test_accuracy_dtc3}")
+
+#Decision Tree 04
+dtc4 = DecisionTreeClassifier(max_depth=None,random_state=42)
+dtc4.fit(X_train,y_train)
+train_preds_dtc4 = dtc4.predict(X_train)
+test_preds_dtc4 = dtc4.predict(X_test)
+
+train_accuracy_dtc4 = accuracy_score(y_train, train_preds_dtc4)
+test_accuracy_dtc4 = accuracy_score(y_test,test_preds_dtc4)
+class_report_dtc4 = classification_report(y_test, test_preds_dtc4)
+
+print(f"\nDecision Tree 04:\n")
+print(f"Train Accuracy: {train_accuracy_dtc4}")
+print(f"Test Accuracy: {test_accuracy_dtc4}")
+
+#1. The test accuracy doesn't increase as fast as the train accuracy does.
+#2. I would use no depth as it has the best train accuracy
+
+print(f"\nDecision Tree 04 accuracy and report:\n")
+print(f"Test Accuracy: {test_accuracy_dtc4}")
+print(f"Report: {class_report_dtc4}")
+
+#Random Foreset Classifier
+rf = RandomForestClassifier(n_estimators=100,random_state=42)
+rf.fit(X_train,y_train)
+rf_pred = rf.predict(X_test)
+
+rf_score = accuracy_score(y_test, rf_pred)
+rf_class_report = classification_report(y_test, rf_pred)
+
+print(f"\nRandom Forest 01:\n")
+print(f"Accuracy: {rf_score}")
+print(f"Report: {class_report}")
+
+#Logical Regression
+logistic_scaled = LogisticRegression(C=1.0,max_iter=1000,solver="liblinear")
+logistic_pca = LogisticRegression(C=1.0,max_iter=1000,solver="liblinear")
+
+logistic_scaled = logistic_scaled.fit(X_train_scaled,y_train)
+logistic_pca = logistic_pca.fit(X_train_pca,y_train)
+
+logistic_scaled = np.abs(logistic_scaled.coef_).sum()
+logistic_pca = np.abs(logistic_pca.coef_).sum()
+
+print(f"\nLogical Regression 01:\n")
+print(f"Scaled data: {logistic_scaled}")
+print(f"PCA data: {logistic_pca}")
+
+#Going by the accuracies, decision tree 04 is the best model.
+
+cm = confusion_matrix(y_train,train_preds_dtc4)
+display = ConfusionMatrixDisplay(confusion_matrix=cm)
+display.plot()
+plt.title("Decision Tree 04 Confusion Matrix")
+plt.savefig("outputs/decision_tree_04_confusion_matrix.png")
+plt.show()
