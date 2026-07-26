@@ -13,6 +13,7 @@ from sklearn.metrics import (
     roc_auc_score,
     RocCurveDisplay,
     classification_report,
+    f1_score
 )
 import joblib
 
@@ -38,10 +39,11 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.fit_transform(X_test)
 
 #ROC 01
+print(f"ROC 01:\n")
 log_reg = LogisticRegression(max_iter=1000,random_state=42)
 log_reg.fit(X_train,y_train)
-probs = log_reg.predict_proba(X_test)[:,1]
-auc = roc_auc_score(y_test,probs)
+y_probs = log_reg.predict_proba(X_test)[:,1]
+auc = roc_auc_score(y_test,y_probs)
 
 print(f"AUC not scaled: {auc:.3f}")
 
@@ -56,7 +58,7 @@ print(f"AUC scaled: {knn_auc:.3f}")
 # model than the logistic regression.
 
 #ROC 02
-fpr, tpr, _ = roc_curve(y_test,probs)
+fpr, tpr, thresholds = roc_curve(y_test, y_probs)
 knn_fpr, knn_tpr, _ = roc_curve(y_test,knn_probs)
 
 fig, ax = plt.subplots(figsize=(6, 5))
@@ -73,3 +75,26 @@ plt.show()
 
 #1. KNN has the lower FPR when each model reaches TPS = 0.80.
 #2. KNN would produce fewer alarms when needing to catch 80% of positives.
+
+#ROC 03
+best_f1 = 0
+# use enumerate and get indices/positions
+for i,t in enumerate(thresholds):
+    y_pred = (y_probs >= t).astype(int)
+    f1 = f1_score(y_test,y_pred)
+    if f1 > best_f1:
+        # Save values
+        best_f1 = f1
+        best_threshold = t
+        best_tpr = tpr[i]
+        best_fpr = fpr[i]
+       
+print(f"\nROC 03:\n")
+print(f"TPR: {best_tpr}")
+print(f"FPR: {best_fpr}")
+print(f"Thresholds: {best_threshold}")
+print(f"F1: {best_f1}")
+
+#1. The optimal threshold is below 0.5 (it's 0.28)
+#2. In a real world application, I would choose a 
+# lower threshold than 0.5 to make sure I get the optimal threshold
