@@ -1,10 +1,13 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+
 from sklearn.datasets import make_classification
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
+
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
@@ -157,3 +160,24 @@ print(f"Test AUC: {auc_dtc}")
 # since it's best AUC is larger than the logistic regression one.
 
 #2. I would decide not only by AUC but also threshold and F1.
+
+#GridSearch 03
+print(f"\nGridSearch 03:\n")
+
+print(f"\nLogistic Regression:\n")
+results = pd.DataFrame(grid_search.cv_results_)
+print(
+    results[["mean_test_score", "std_test_score"]]
+    .sort_values("mean_test_score", ascending=False)
+    .to_string(index=False)
+)
+
+print(f"\nDecision Tree Classifier:\n")
+results_dtc = pd.DataFrame(grid_search_dtc.cv_results_)
+print(
+    results_dtc[["mean_test_score", "std_test_score"]]
+    .sort_values("mean_test_score", ascending=False)
+    .to_string(index=False)
+)
+
+#I would pick the valuse with the lower standard deviation for better accuracy.
