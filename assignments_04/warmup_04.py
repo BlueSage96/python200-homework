@@ -36,7 +36,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 #Scaled data
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.fit_transform(X_test)
+X_test_scaled = scaler.transform(X_test)
 
 #ROC 01
 print(f"ROC 01:\n")
@@ -98,3 +98,32 @@ print(f"F1: {best_f1}")
 #1. The optimal threshold is below 0.5 (it's 0.28)
 #2. In a real world application, I would choose a 
 # lower threshold than 0.5 to make sure I get the optimal threshold
+
+#GridSearch 01
+pipe = Pipeline([("scaler",StandardScaler(),("clf",LogisticRegression(max_iter=1000)))])
+param_grid = {
+    "C":[0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+}
+
+grid_search = GridSearchCV(
+    estimator=LogisticRegression(max_iter=1000,random_state=42),
+    param_grid=param_grid,
+    cv=5,
+    scoring="roc_auc",
+    n_jobs=-1
+)
+
+grid_search.fit(X_train_scaled,y_train)
+
+best_lr = grid_search.best_estimator_
+y_pred_lr = best_lr.predict(X_test_scaled)
+y_probs_lr = best_lr.predict_proba(X_test_scaled)[:,1]
+auc_lr = roc_auc_score(y_test,y_pred_lr)
+
+print(f"\nGridSearch 01:\n")
+print(f"Best C: {grid_search.best_params_['C']}")
+print(f"Best CV AUC: {grid_search.best_score_:.3f}")
+print(f"Test AUC: {auc_lr}")
+
+#1. I guessed 10.0 by default, not the actual best C (100.0)
+#2. The AUC changed by 100%
