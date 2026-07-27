@@ -126,4 +126,34 @@ print(f"Best CV AUC: {grid_search.best_score_:.3f}")
 print(f"Test AUC: {auc_lr}")
 
 #1. I guessed 10.0 by default, not the actual best C (100.0)
+
 #2. The AUC changed by 100%
+
+#GridSearch 02
+param_grid_dtc = {
+    "max_depth":[2,3,5,8,None]
+}
+grid_search_dtc = GridSearchCV(
+    estimator=DecisionTreeClassifier(random_state=42),
+    param_grid=param_grid_dtc,
+    cv=5,
+    scoring="roc_auc",
+    n_jobs=-1
+)
+
+grid_search_dtc.fit(X_train_scaled,y_train)
+
+best_dtc = grid_search_dtc.best_estimator_
+y_pred_dtc = best_dtc.predict(X_test_scaled)
+y_probs_dtc = best_dtc.predict_proba(X_test_scaled)[:,1]
+auc_dtc = roc_auc_score(y_test,y_pred_dtc)
+
+print(f"\nGridSearch 02:\n")
+print(f"Best Max Depth: {grid_search_dtc.best_params_['max_depth']}")
+print(f"Best CV AUC: {grid_search_dtc.best_score_:.3f}")
+print(f"Test AUC: {auc_dtc}")
+
+#1. I would bring the decision tree into further development 
+# since it's best AUC is larger than the logistic regression one.
+
+#2. I would decide not only by AUC but also threshold and F1.
