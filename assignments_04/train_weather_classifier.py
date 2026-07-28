@@ -2,7 +2,11 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+
 import requests
+import json
+import sklearn
+import sys
 
 from sklearn.datasets import make_classification
 from sklearn.linear_model import LogisticRegression
@@ -110,3 +114,22 @@ plt.show()
 #2. Looking at the precision & recall, false negatives are more common.
 #3. Under-recommend it
 #4. Threshold at >0.5 for better accuracy.
+
+#Save model and metadata
+
+joblib.dump(best_pipe,"models/weather_classifier.pkl")
+print("Pipeline saved to file")
+
+metadata = {
+    "python_version":  sys.version,
+    "sklearn_version": sklearn.__version__,
+    "features":        FEATURES,
+    "label":           "good_for_running",
+    "best_params":     grid_search.best_params_,
+    "test_auc":        round(test_auc, 4),
+    "trained_on":      "2023 Open-Meteo, Clinton NC (lat 34.99713980841658, lon -78.33071903597848)",
+}
+with open("models/weather_classifier_metadata.json", "w") as f:
+    json.dump(metadata, f, indent=2)
+
+print("Model and metadata saved to models/")
