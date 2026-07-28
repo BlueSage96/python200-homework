@@ -200,3 +200,21 @@ assert (original_preds == loaded_preds).all(), "Predictions do not match!"
 print("Predictions match. Model saved and loaded successfully.")
 
 #If scaler is missing, the mean and standard deviation cannot be transformed consistently.
+
+#Joblib 02
+# --- Simulated prediction script ---
+# Three hand-crafted test cases — raw, unscaled data
+new_samples = np.array([
+    [2.5,  1.2, -0.3,  0.8,  1.0, -0.5,  0.2,  0.9, -1.1,  0.4],
+    [-1.0, 0.5,  0.9, -0.7, -0.2,  1.3, -0.8,  0.1,  0.5, -0.3],
+    [0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0],
+])
+
+prediction = loaded_clf.predict(new_samples)
+predict_proba = loaded_clf.predict_proba(new_samples)
+
+print(f"\nJoblib 02:\n")
+print(f"Prediction: {prediction}\n")
+print(f"Prediction Probability:\n {predict_proba}")
+
+#I imagine the all 0's row would produce 0 for the prediction and probability.
