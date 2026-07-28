@@ -59,3 +59,10 @@ print("Good for running:", df["good_for_running"].sum())
 #The days labeled "good for running" is 148 days or 41%.
 #I would say the percentage should be higher for my area, 
 # but I don't know where to find the feature data for my town.
+
+FEATURES = [
+    "temperature_2m_max",
+    "temperature_2m_min",
+    "precipitation_sum",
+    "wind_speed_10m_max",
+]
