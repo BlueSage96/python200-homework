@@ -48,6 +48,8 @@ df = pd.DataFrame(response.json()["daily"])
 df["date"] = pd.to_datetime(df["time"])
 df = df.drop("time", axis=1)
 
+print(df)
+
 def label_running_day(row):
     return int(
         7 <= row["temperature_2m_max"] <= 26
