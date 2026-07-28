@@ -77,3 +77,7 @@ pipe = Pipeline([
     ("scaler", StandardScaler()),
     ("clf",LogisticRegression(max_iter=1000,random_state=42))
 ])
+
+param_grid = {"clf__C": [0.01, 0.1, 1.0, 10.0, 100.0]}
+grid_search = GridSearchCV(pipe, param_grid, cv=5, scoring="roc_auc")
+grid_search.fit(X_train,y_train)
