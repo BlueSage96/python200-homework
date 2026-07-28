@@ -12,5 +12,6 @@
     "clf__C": 100.0
   },
   "test_auc": 0.8853,
-  "trained_on": "2023 Open-Meteo, Clinton NC (lat 34.99713980841658, lon -78.33071903597848)"
+  "trained_on": "2023 Open-Meteo, Clinton NC (lat 34.99713980841658, lon -78.33071903597848)",
+  "city": "lat 34.99713980841658, lon -78.33071903597848"
 }

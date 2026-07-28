@@ -128,6 +128,7 @@ metadata = {
     "best_params":     grid_search.best_params_,
     "test_auc":        round(test_auc, 4),
     "trained_on":      "2023 Open-Meteo, Clinton NC (lat 34.99713980841658, lon -78.33071903597848)",
+    "city": "lat 34.99713980841658, lon -78.33071903597848"
 }
 with open("models/weather_classifier_metadata.json", "w") as f:
     json.dump(metadata, f, indent=2)
