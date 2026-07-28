@@ -103,20 +103,24 @@ print(f"F1: {best_f1}")
 # lower threshold than 0.5 to make sure I get the optimal threshold
 
 #GridSearch 01
-pipe = Pipeline([("scaler",StandardScaler(),("clf",LogisticRegression(max_iter=1000)))])
+lr_pipe = Pipeline([
+    ("scaler",StandardScaler()),
+     ("clf",LogisticRegression(max_iter=1000)
+      )])
+
 param_grid = {
-    "C":[0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+    "clf__C":[0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
 }
 
 grid_search = GridSearchCV(
-    estimator=LogisticRegression(max_iter=1000,random_state=42),
+    estimator=lr_pipe,
     param_grid=param_grid,
     cv=5,
     scoring="roc_auc",
     n_jobs=-1
 )
 
-grid_search.fit(X_train_scaled,y_train)
+grid_search.fit(X_train,y_train)
 
 best_lr = grid_search.best_estimator_
 y_pred_lr = best_lr.predict(X_test_scaled)
@@ -124,7 +128,7 @@ y_probs_lr = best_lr.predict_proba(X_test_scaled)[:,1]
 auc_lr = roc_auc_score(y_test,y_pred_lr)
 
 print(f"\nGridSearch 01:\n")
-print(f"Best C: {grid_search.best_params_['C']}")
+print(f"Best C: {grid_search.best_params_['clf__C']}")
 print(f"Best CV AUC: {grid_search.best_score_:.3f}")
 print(f"Test AUC: {auc_lr}")
 
@@ -181,3 +185,18 @@ print(
 )
 
 #I would pick the valuse with the lower standard deviation for better accuracy.
+
+#Joblib 01
+#Save pipeline
+joblib.dump(best_lr,"models/warmup_model.pkl")
+
+#load pipeline
+loaded_clf = joblib.load("models/warmup_model.pkl")
+
+original_preds = best_lr.predict(X_test)
+loaded_preds   = loaded_clf.predict(X_test)
+
+assert (original_preds == loaded_preds).all(), "Predictions do not match!"
+print("Predictions match. Model saved and loaded successfully.")
+
+#If scaler is missing, the mean and standard deviation cannot be transformed consistently.
