@@ -38,3 +38,16 @@ for i, (pred, prob) in enumerate(zip(predictions, probabilities)):
     print(f"Day {i+1}:  {label} ({prob:.2f}) probability\n")
     
 print(f"Conditions {brand_new_day}")
+
+#Task 03
+#1. I did a borderline case for all of the features. 
+#The probabilities were: Day 1: 10%, day 2: 25%, day 3 99%, day 4: 70%, day 5: 1%
+#The model is confident on days 3 and 4 and uncertain on days 1, 2, and 5.
+#I would classify 0.52 as "uncertain".
+
+#2. There was no error message when I ran predict_weather.py first.
+#It displays old information until I ran train_weather_classifier.py
+
+#3. The prediction script would be modified to automatically fetch the 
+# next day's weather, extract any required features, make a DataFrame 
+# from those values, and then automatically test the data via the trained model.
