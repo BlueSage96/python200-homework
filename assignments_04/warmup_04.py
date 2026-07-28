@@ -69,7 +69,7 @@ RocCurveDisplay(fpr=fpr,tpr=tpr).plot(ax=ax, name=f"Logistic Regression (AUC={au
 RocCurveDisplay(fpr=knn_fpr, tpr=knn_tpr).plot(ax=ax, name=f"KNN k=5 (AUC={knn_auc:.2f})")
 
 ax.plot([0, 1], [0, 1], linestyle="--", color="gray", label="Random")
-ax.set_title("KNN and Linear Regression ROC Comparison")
+ax.set_title("KNN and Logistic Regression ROC Comparison")
 ax.legend()
 
 plt.tight_layout()
