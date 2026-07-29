@@ -112,18 +112,20 @@ ax.set_title("Weather Logistic Regression ROC")
 plt.savefig("outputs/weather_roc.png")
 plt.show()
 
-# 1. The model does a good job of separating good and bad running days.
-#    The AUC score is surprisingly good since the model only uses four
-#    weather features.
+# 1. The model achieved a very high AUC score, which means it can
+#    distinguish good running days from bad running days very well.
+#    This was slightly better than I expected considering only four
+#    weather variables were used to make predictions.
 
-# 2. Looking at the precision and recall values, false negatives are more
-#    common than false positives. I would rather under-recommend running
-#    because it is better to tell someone to skip a run than recommend
-#    running in poor weather conditions.
+# 2. Looking at the classification report, false negatives occur more
+#    often than false positives. In practice this means the model may
+#    occasionally tell someone to skip running when the weather is
+#    actually acceptable. I would rather have this type of error than
+#    recommend running during unsafe weather.
 
-# 3. I would keep the threshold close to the default of 0.5, but I might
-#    increase it slightly to make the model more conservative. This would
-#    reduce the chance of recommending days that are actually bad for running.
+# 3. # If this were a real application, I would probably increase the
+#      threshold slightly above 0.5 so the app is a little more cautious
+#      before recommending a run.
 
 #Save model and metadata
 
@@ -139,8 +141,14 @@ metadata = {
     "test_auc":        round(test_auc, 4),
     "trained_on":      "2023 Open-Meteo, Clinton NC (lat 34.99713980841658, lon -78.33071903597848)",
     "city": "lat 34.99713980841658, lon -78.33071903597848",
-    "threshold labels": "label_thresholds = temperature_2m_max,temperature_2m_min,precipitation_sum, wind_speed_10m_max"
-
+    "label_thresholds":
+    (
+        "Good for running if "
+        "temperature_2m_max is between 7 and 26°C, "
+        "temperature_2m_min is at least 0°C, "
+        "precipitation is under 3 mm, "
+        "and maximum wind speed is under 30 km/h."
+    )
 }
 with open("models/weather_classifier_metadata.json", "w") as f:
     json.dump(metadata, f, indent=2)
