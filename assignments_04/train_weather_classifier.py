@@ -112,10 +112,18 @@ ax.set_title("Weather Logistic Regression ROC")
 plt.savefig("outputs/weather_roc.png")
 plt.show()
 
-#1. The model is "good" quality and AUC is suprisingly good.
-#2. Looking at the precision & recall, false negatives are more common.
-#3. Under-recommend it
-#4. Threshold at >0.5 for better accuracy.
+# 1. The model does a good job of separating good and bad running days.
+#    The AUC score is surprisingly good since the model only uses four
+#    weather features.
+
+# 2. Looking at the precision and recall values, false negatives are more
+#    common than false positives. I would rather under-recommend running
+#    because it is better to tell someone to skip a run than recommend
+#    running in poor weather conditions.
+
+# 3. I would keep the threshold close to the default of 0.5, but I might
+#    increase it slightly to make the model more conservative. This would
+#    reduce the chance of recommending days that are actually bad for running.
 
 #Save model and metadata
 
@@ -130,7 +138,9 @@ metadata = {
     "best_params":     grid_search.best_params_,
     "test_auc":        round(test_auc, 4),
     "trained_on":      "2023 Open-Meteo, Clinton NC (lat 34.99713980841658, lon -78.33071903597848)",
-    "city": "lat 34.99713980841658, lon -78.33071903597848"
+    "city": "lat 34.99713980841658, lon -78.33071903597848",
+    "threshold labels": "label_thresholds = temperature_2m_max,temperature_2m_min,precipitation_sum, wind_speed_10m_max"
+
 }
 with open("models/weather_classifier_metadata.json", "w") as f:
     json.dump(metadata, f, indent=2)
