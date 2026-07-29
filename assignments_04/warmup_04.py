@@ -135,9 +135,11 @@ print(f"Best C: {grid_search.best_params_['clf__C']}")
 print(f"Best CV AUC: {grid_search.best_score_:.3f}")
 print(f"Test AUC: {auc_lr}")
 print(f"AUC change: {auc_change}")
-#1. GridSearch did not pick the default C=1.0. It selected C=100.0 instead.
 
-#2. The AUC changed by 0.3%
+# GridSearch selected C=100.0 instead of the default C=1.0.
+# The default model had a test AUC of 0.706, while the tuned model
+# achieved 0.7093. This is an improvement of 0.003 AUC points, so
+# tuning provided a small performance gain.
 
 #GridSearch 02
 param_grid_dtc = {
@@ -216,11 +218,14 @@ new_samples = np.array([
 for n, row in enumerate(new_samples):
     prediction = loaded_clf.predict([row])
     predict_proba = loaded_clf.predict_proba([row])
+    
+    # predict class 1, not the whole array
+    confidence = predict_proba[0][1]
 
     print(f"\nJoblib 02:\n")
     print(f"Row {n+1}:")
     print(f"Predicted class: {prediction[0]}\n")
-    print(f"Probability:\n {predict_proba[0]}")
+    print(f"Probability:\n {confidence:.3f}")
 
 # I expect the all-zeros row to predict class 0 since it's basically a
 # neutral example with no strong feature values.
