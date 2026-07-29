@@ -27,31 +27,47 @@ new_days = pd.DataFrame({
     "wind_speed_10m_max": [15.0, 10.0, 45.0, 20.0, 33.0],
 })
 
+#port values from the metadata_clf "features" column 
+new_days = new_days[metadata_clf["features"]]
 
-#make up days
+#validate column names with metadata
+assert list(new_days.columns) == metadata_clf["features"], \
+"Feature columns do not match metadata!"
+
 predictions = weather_clf.predict(new_days)
 probabilities = weather_clf.predict_proba(new_days)[:,1]
 
 #use weather model to test my data
-for i, ((_,brand_new_day), pred, prob) in enumerate(zip(new_days.iterrows(),predictions, probabilities)):
-    label = "good for running" if pred == 1 else "skip"
-    print(f"Day {i+1}\n")  
-    print(f"Conditions: {brand_new_day}\n")
-    print(f"Labels: {label}\n")
-    print(f"Confidence: {prob:.2f}) ")
+for i, (_, row) in enumerate(new_days.iterrows()):
+    #Grabs the prediction and probability for the current day
+    prediction = predictions[i]
+    probability = probabilities[i]
+
+    label = "good for running" if prediction else "skip"
+
+    print(f"\nDay {i+1}")
+    print("-" * 25)
+    print(f"temperature_2m_max : {row['temperature_2m_max']} °C")
+    print(f"temperature_2m_min : {row['temperature_2m_min']} °C")
+    print(f"precipitation_sum  : {row['precipitation_sum']} mm")
+    print(f"wind_speed_10m_max : {row['wind_speed_10m_max']} km/h")
+    print(f"Prediction         : {label}")
+    print(f"Probability(good)  : {probability:.2%}")
     
-
 #Task 03
-#1. I did a borderline case for all of the features' arrays. For example, I used 7.0 
-# for "temperature_2m_max".
-#The probabilities were: Day 1: 10%, day 2: 25%, day 3 99%, day 4: 70%, day 5: 1%
-#The model is confident on days 3 and 4 and uncertain on days 1, 2, and 5.
-#I would classify 0.52 as "uncertain" since it is further from 1.0 and closer to 0.5.
+#1. Day 4 is my borderline example because the weather is close to my
+#   running thresholds. The model predicted approximately 0.52,
+#   which is only slightly above the default cutoff. I would describe
+#   this prediction as uncertain. In a real application I would
+#   probably show a message such as "Conditions are borderline—check
+#   the detailed forecast before running."
 
-#2. There would be a "file not found" or "missing file failure mode". 
-# I would make the error message say: "The file you are loading does not exist or 
-# has been moved. Please provide the correct filename and filepath."
+#2. If predict_weather.py is run before train_weather_classifier.py,
+#   the saved model and metadata files will not exist and joblib.load()
+#   will raise a FileNotFoundError. I would catch this exception and
+#   display a helpful message telling the user to run
+#   train_weather_classifier.py first to create the required files.
 
-#3. The prediction script would be modified to automatically fetch the 
-# next day's weather, extract any required features, make a DataFrame 
-# from those values, and then automatically test the data via the trained model.
+#3. The prediction script would be modified to automatically fetch the
+#   next day's weather forecast, extract the required features, create a
+#   DataFrame with those values, and use the trained model to make a prediction.
