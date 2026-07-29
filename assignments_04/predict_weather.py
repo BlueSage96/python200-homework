@@ -20,7 +20,7 @@ print(f"Test AUC: {metadata_clf['test_auc']}")
 #Task 02
 print(f"\nTask 02:\n")
 #data frame for made up data
-brand_new_day = pd.DataFrame({
+new_days = pd.DataFrame({
     "temperature_2m_max": [32.0, 15.0, 7.0, 14.0, 29.0],
     "temperature_2m_min": [18.0, -23.0, 40.0, 1.0, 0.0],
     "precipitation_sum":  [0.75, 0.10,  4.0, 1.25, 2.5],
@@ -28,25 +28,29 @@ brand_new_day = pd.DataFrame({
 })
 
 
-#make up days, weather conditions (clearly good, clearly bad, & a borderline case (almost good or bad))
-predictions = weather_clf.predict(brand_new_day)
-probabilities = weather_clf.predict_proba(brand_new_day)[:,1]
+#make up days
+predictions = weather_clf.predict(new_days)
+probabilities = weather_clf.predict_proba(new_days)[:,1]
 
 #use weather model to test my data
-for i, (pred, prob) in enumerate(zip(predictions, probabilities)):
+for i, ((_,brand_new_day), pred, prob) in enumerate(zip(new_days.iterrows(),predictions, probabilities)):
     label = "good for running" if pred == 1 else "skip"
-    print(f"Day {i+1}:  {label} ({prob:.2f}) probability\n")
+    print(f"Day {i+1}\n")  
+    print(f"Conditions: {brand_new_day}\n")
+    print(f"Labels: {label}\n")
+    print(f"Confidence: {prob:.2f}) ")
     
-print(f"Conditions {brand_new_day}")
 
 #Task 03
-#1. I did a borderline case for all of the features. 
+#1. I did a borderline case for all of the features' arrays. For example, I used 7.0 
+# for "temperature_2m_max".
 #The probabilities were: Day 1: 10%, day 2: 25%, day 3 99%, day 4: 70%, day 5: 1%
 #The model is confident on days 3 and 4 and uncertain on days 1, 2, and 5.
-#I would classify 0.52 as "uncertain".
+#I would classify 0.52 as "uncertain" since it is further from 1.0 and closer to 0.5.
 
-#2. There was no error message when I ran predict_weather.py first.
-#It displays old information until I ran train_weather_classifier.py
+#2. There would be a "file not found" or "missing file failure mode". 
+# I would make the error message say: "The file you are loading does not exist or 
+# has been moved. Please provide the correct filename and filepath."
 
 #3. The prediction script would be modified to automatically fetch the 
 # next day's weather, extract any required features, make a DataFrame 
