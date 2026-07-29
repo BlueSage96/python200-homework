@@ -48,17 +48,18 @@ log_reg.fit(X_train,y_train)
 y_probs = log_reg.predict_proba(X_test)[:,1]
 auc = roc_auc_score(y_test,y_probs)
 
-print(f"AUC not scaled: {auc:.3f}")
+print(f"AUC Logistic Regression: {auc:.3f}")
 
 knn = KNeighborsClassifier(n_neighbors=5)
 knn.fit(X_train_scaled,y_train)
 knn_probs = knn.predict_proba(X_test_scaled)[:,1]
 knn_auc = roc_auc_score(y_test,knn_probs)
 
-print(f"AUC scaled: {knn_auc:.3f}")
+print(f"AUC KNN: {knn_auc:.3f}")
 
-#KNN has the better auc score meaning it has a better-discriminating 
-# model than the logistic regression.
+#KNN has an AUC of 0.939 while logistic regression has an AUC of 0.706.
+#Since KNN has a higher AUC, it can distinguish between two classes 
+# better than logistic regression.
 
 #ROC 02
 fpr, tpr, thresholds = roc_curve(y_test, y_probs)
@@ -76,8 +77,8 @@ plt.tight_layout()
 plt.savefig("outputs/roc_comparison.png")
 plt.show()
 
-#1. KNN has the lower FPR when each model reaches TPS = 0.80.
-#2. KNN would produce fewer alarms when needing to catch 80% of positives.
+# At TPR = 0.80, KNN has a lower false positive rate than Logistic Regression.
+# This means KNN produces fewer false alarms while still correctly identifying 80% of the positive cases.
 
 #ROC 03
 best_f1 = 0
@@ -93,10 +94,10 @@ for i,t in enumerate(thresholds):
         best_fpr = fpr[i]
        
 print(f"\nROC 03:\n")
-print(f"TPR: {best_tpr}")
-print(f"FPR: {best_fpr}")
-print(f"Thresholds: {best_threshold}")
-print(f"F1: {best_f1}")
+print(f"Optimal TPR: {best_tpr}")
+print(f"Optimal FPR: {best_fpr}")
+print(f"Optimal Threshold: {best_threshold}")
+print(f"Optimal F1: {best_f1}")
 
 #1. The optimal threshold is below 0.5 (it's 0.28)
 #2. In a real world application, I would choose a 
@@ -112,6 +113,7 @@ param_grid = {
     "clf__C":[0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
 }
 
+
 grid_search = GridSearchCV(
     estimator=lr_pipe,
     param_grid=param_grid,
@@ -122,19 +124,20 @@ grid_search = GridSearchCV(
 
 grid_search.fit(X_train,y_train)
 
-best_lr = grid_search.best_estimator_
-y_pred_lr = best_lr.predict(X_test_scaled)
-y_probs_lr = best_lr.predict_proba(X_test_scaled)[:,1]
-auc_lr = roc_auc_score(y_test,y_pred_lr)
+best_lr_pipe = grid_search.best_estimator_
+y_pred_lr = best_lr_pipe.predict(X_test_scaled)
+y_probs_lr = best_lr_pipe.predict_proba(X_test_scaled)[:,1]
+auc_lr = roc_auc_score(y_test,y_probs_lr)
+auc_change = auc_lr - auc
 
 print(f"\nGridSearch 01:\n")
 print(f"Best C: {grid_search.best_params_['clf__C']}")
 print(f"Best CV AUC: {grid_search.best_score_:.3f}")
 print(f"Test AUC: {auc_lr}")
+print(f"AUC change: {auc_change}")
+#1. GridSearch did not pick the default C=1.0. It selected C=100.0 instead.
 
-#1. I guessed 10.0 by default, not the actual best C (100.0)
-
-#2. The AUC changed by 100%
+#2. The AUC changed by 0.3%
 
 #GridSearch 02
 param_grid_dtc = {
@@ -153,7 +156,7 @@ grid_search_dtc.fit(X_train_scaled,y_train)
 best_dtc = grid_search_dtc.best_estimator_
 y_pred_dtc = best_dtc.predict(X_test_scaled)
 y_probs_dtc = best_dtc.predict_proba(X_test_scaled)[:,1]
-auc_dtc = roc_auc_score(y_test,y_pred_dtc)
+auc_dtc = roc_auc_score(y_test,y_probs_dtc)
 
 print(f"\nGridSearch 02:\n")
 print(f"Best Max Depth: {grid_search_dtc.best_params_['max_depth']}")
@@ -171,7 +174,7 @@ print(f"\nGridSearch 03:\n")
 print(f"\nLogistic Regression:\n")
 results = pd.DataFrame(grid_search.cv_results_)
 print(
-    results[["mean_test_score", "std_test_score"]]
+    results[["param_clf__C","mean_test_score", "std_test_score"]]
     .sort_values("mean_test_score", ascending=False)
     .to_string(index=False)
 )
@@ -184,16 +187,16 @@ print(
     .to_string(index=False)
 )
 
-#I would pick the valuse with the lower standard deviation for better accuracy.
+#I would pick the values with the lower standard deviation for better accuracy.
 
 #Joblib 01
 #Save pipeline
-joblib.dump(best_lr,"models/warmup_model.pkl")
+joblib.dump(best_lr_pipe,"models/warmup_model.pkl")
 
 #load pipeline
 loaded_clf = joblib.load("models/warmup_model.pkl")
 
-original_preds = best_lr.predict(X_test)
+original_preds = best_lr_pipe.predict(X_test)
 loaded_preds   = loaded_clf.predict(X_test)
 
 assert (original_preds == loaded_preds).all(), "Predictions do not match!"
@@ -210,11 +213,14 @@ new_samples = np.array([
     [0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0],
 ])
 
-prediction = loaded_clf.predict(new_samples)
-predict_proba = loaded_clf.predict_proba(new_samples)
+for n, row in enumerate(new_samples):
+    prediction = loaded_clf.predict([row])
+    predict_proba = loaded_clf.predict_proba([row])
 
-print(f"\nJoblib 02:\n")
-print(f"Prediction: {prediction}\n")
-print(f"Prediction Probability:\n {predict_proba}")
+    print(f"\nJoblib 02:\n")
+    print(f"Row {n+1}:")
+    print(f"Predicted class: {prediction[0]}\n")
+    print(f"Probability:\n {predict_proba[0]}")
 
-#I imagine the all 0's row would produce 0 for the prediction and probability.
+# I expect the all-zeros row to predict class 0 since it's basically a
+# neutral example with no strong feature values.
