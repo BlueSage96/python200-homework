@@ -45,8 +45,11 @@ def happiness_data():
     # merge all info into one csv --> go's to output folder
     happiness_merged = pd.concat(final_dataframe)
     happiness_merged["Year"] = happiness_merged["Year"].astype(int)
-    happiness_merged.to_csv("assignments_01/outputs/merged_happiness.csv",index=False)
-
+    
+    # Save to the outputs folder inside assignments_01.
+    # Since this script runs from the assignments_01 directory,
+    # the correct relative path is "outputs/...".
+    happiness_merged.to_csv("outputs/merged_happiness.csv", index=False)
     return happiness_merged
 
 # Task 2
@@ -89,14 +92,14 @@ def visuals(df):
     plt.xlabel("Score")
     plt.ylabel("Frequency")
     
-    plt.savefig("assignments_01/outputs/happiness_histogram.png",dpi=300)
+    plt.savefig("outputs/happiness_histogram.png",dpi=300)
     plt.show()
     logger.info("Saved histogram.")
     
     # Boxplot
     sns.boxplot(x = years, y = happy,data=df)
     plt.title("Happiness Distribution by Years")
-    plt.savefig("assignments_01/outputs/happiness_by_year.png",dpi=300)
+    plt.savefig("outputs/happiness_by_year.png",dpi=300)
     plt.show()
     logger.info("Saved boxplot.")
     
@@ -107,7 +110,7 @@ def visuals(df):
     ax.set_xlabel("GDP")
     ax.set_ylabel("Happy")
     
-    plt.savefig("assignments_01/outputs/gdp_vs_happiness.png",dpi=300)
+    plt.savefig("outputs/gdp_vs_happiness.png",dpi=300)
     plt.show()
     logger.info("Saved scatter plot.")
     
@@ -117,7 +120,7 @@ def visuals(df):
     sns.heatmap(heat_corr,annot=True,cmap="coolwarm",fmt=".2f")
     
     plt.title("Correlation Heatmap")
-    plt.savefig("assignments_01/outputs/correlation_heatmap.png",dpi=300)
+    plt.savefig("outputs/correlation_heatmap.png",dpi=300)
     plt.show()
     logger.info("Saved heatmap.")
 
