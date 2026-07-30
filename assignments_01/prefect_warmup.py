@@ -22,15 +22,15 @@ def summarize_data(series):
     })
     return series
 
-@flow(name="pipeline_flow")
-def data_pipeline(arr):
+@flow
+def pipeline_flow():
     created = create_series(arr)
     cleaned = clean_data(created)
     summary = summarize_data(cleaned)
     return summary
 
 if __name__ == "__main__":
-    data_pipeline(arr)
+    pipeline_flow()
     
 # 1. The compute time would become sluggish should the data becomes more complex.
 
