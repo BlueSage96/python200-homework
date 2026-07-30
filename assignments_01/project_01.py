@@ -23,9 +23,6 @@ paths = [
 
 @task(retries=3,retry_delay_seconds=2)
 def happiness_data():
-    data = pd.read_csv("outputs/merged_happiness.csv")
-    df = pd.DataFrame(data)
-    
     final_dataframe = []          
 
     for path in paths:
@@ -48,7 +45,7 @@ def happiness_data():
     # merge all info into one csv --> go's to output folder
     happiness_merged = pd.concat(final_dataframe)
     happiness_merged["Year"] = happiness_merged["Year"].astype(int)
-    happiness_merged.to_csv("outputs/merged_happiness.csv",index=False)
+    happiness_merged.to_csv("assignments_01/outputs/merged_happiness.csv",index=False)
 
     return happiness_merged
 
@@ -74,6 +71,7 @@ def happy_stats(df):
 # Task 3
 @task(retries=3,retry_delay_seconds=2)
 def visuals(df):
+    logger = get_run_logger()
     happy = df["Happiness score"]
     years = df["Year"]
     
@@ -90,14 +88,17 @@ def visuals(df):
     plt.title("Happiness Over the Years")
     plt.xlabel("Score")
     plt.ylabel("Frequency")
-    plt.savefig("outputs/happiness_histogram.png",dpi=300)
+    
+    plt.savefig("assignments_01/outputs/happiness_histogram.png",dpi=300)
     plt.show()
+    logger.info("Saved histogram.")
     
     # Boxplot
     sns.boxplot(x = years, y = happy,data=df)
     plt.title("Happiness Distribution by Years")
-    plt.savefig("outputs/happiness_by_year.png",dpi=300)
+    plt.savefig("assignments_01/outputs/happiness_by_year.png",dpi=300)
     plt.show()
+    logger.info("Saved boxplot.")
     
     # Scatter Plot
     fig, ax = plt.subplots()
@@ -105,16 +106,20 @@ def visuals(df):
     ax.scatter(gdp,happy,color="turquoise")
     ax.set_xlabel("GDP")
     ax.set_ylabel("Happy")
-    plt.savefig("outputs/gdp_vs_happiness.png",dpi=300)
+    
+    plt.savefig("assignments_01/outputs/gdp_vs_happiness.png",dpi=300)
     plt.show()
-
+    logger.info("Saved scatter plot.")
+    
     # Heatmap
     heat_corr = heat_cols.corr(numeric_only=True)
     plt.figure(figsize=(12,6))
     sns.heatmap(heat_corr,annot=True,cmap="coolwarm",fmt=".2f")
+    
     plt.title("Correlation Heatmap")
-    plt.savefig("outputs/correlation_heatmap.png",dpi=300)
+    plt.savefig("assignments_01/outputs/correlation_heatmap.png",dpi=300)
     plt.show()
+    logger.info("Saved heatmap.")
 
 # Task 4
 @task(retries=3,retry_delay_seconds=2)
@@ -195,29 +200,29 @@ def pearson_happiness(df):
     
     # Loop over correlation name & result
     for name, result in correlations:
-        print(f"\n{name}")
-        print(f"Correlation (r): {result.statistic:.3f}")
-        print(f"P-value: {result.pvalue:.6f}")
-        print(f"Adjusted alpha: {adjusted_alpha}")
+        logger.info(f"\n{name}")
+        logger.info(f"Correlation (r): {result.statistic:.3f}")
+        logger.info(f"P-value: {result.pvalue:.6f}")
+        logger.info(f"Adjusted alpha: {adjusted_alpha}")
         
         if result.pvalue < adjusted_alpha:
-            print("Significant after Bonferroni correlation: Yes\n")
+            logger.info("Significant after Bonferroni correlation: Yes\n")
         else:
-            print("Significant after Bonferroni correlation: No\n")
+            logger.info("Significant after Bonferroni correlation: No\n")
 
 # Task 5
 @task(retries=3,retry_delay_seconds=2)
-def summary_report():
+def summary_report(df):
    logger = get_run_logger() 
    logger.info("Merged dataset\n")
-   logger.info("Number of countries: 175")
-   logger.info("Number of years: 10")
+   logger.info(f"Number of countries: {df['Country'].nunique()}")
+   logger.info(f"Number of years: {df['Year'].nunique()}")
    
-   logger.info("\nTop 3 regions by mean happiness score:")
-   logger.info("1. North America and ANZ 2. Western Europe 3. Latin America and Caribbean")
-   
-   logger.info("\nBottom 3 regions by mean happiness score:")
-   logger.info("1. Sub-Saharan Africa 2. South Asia 3. Middle East and North Africa")
+   regional_means = (
+       df.groupby("Regional indicator")["Happiness score"].mean().sort_values(ascending=False)
+   )
+   logger.info(f"\nTop 3 regions by mean happiness score: {regional_means.head(3)}")
+   logger.info(f"\nBottom 3 regions by mean happiness score:{regional_means.tail(3)}")
    
    logger.info("\nAverage happiness scores changed between 2019 and 2020, suggesting that people's reported happiness was different after the start of the pandemic.")
    logger.info("\nSocial support had the strongest relationship with happiness score, even after using a stricter significance test.")
@@ -230,7 +235,7 @@ def happiness_pipeline():
     visuals(df)
     hypothesis(df)
     pearson_happiness(df)
-    summary_report()
+    summary_report(df)
 
 if __name__== "__main__":
     happiness_pipeline()
