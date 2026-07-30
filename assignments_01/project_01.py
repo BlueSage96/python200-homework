@@ -6,18 +6,26 @@ from prefect.logging import get_run_logger
 from scipy.stats import ttest_ind,pearsonr
 import seaborn as sns
 
+from pathlib import Path
+# Folder containing project_01.py
+BASE_DIR = Path(__file__).resolve().parent
+
+# Input and output folders
+INPUT_DIR = BASE_DIR / "inputs"
+OUTPUT_DIR = BASE_DIR / "outputs"
+
 # Task 1
 paths = [ 
-         "inputs/world_happiness_2015.csv",
-         "inputs/world_happiness_2016.csv",
-         "inputs/world_happiness_2017.csv",
-         "inputs/world_happiness_2018.csv",
-         "inputs/world_happiness_2019.csv",
-         "inputs/world_happiness_2020.csv",
-         "inputs/world_happiness_2021.csv",
-         "inputs/world_happiness_2022.csv",
-         "inputs/world_happiness_2023.csv",
-         "inputs/world_happiness_2024.csv",
+        INPUT_DIR/ "world_happiness_2015.csv",
+        INPUT_DIR/ "world_happiness_2016.csv",
+        INPUT_DIR/ "world_happiness_2017.csv",
+        INPUT_DIR/ "world_happiness_2018.csv",
+        INPUT_DIR/ "world_happiness_2019.csv",
+        INPUT_DIR/ "world_happiness_2020.csv",
+        INPUT_DIR/ "world_happiness_2021.csv",
+        INPUT_DIR/ "world_happiness_2022.csv",
+        INPUT_DIR/ "world_happiness_2023.csv",
+        INPUT_DIR/ "world_happiness_2024.csv",
         ]
 
 
@@ -31,15 +39,11 @@ def happiness_data():
         object_cols = read_path.select_dtypes(include="object").columns
         read_path[object_cols] = read_path[object_cols].replace(",", ".", regex=True)
         read_path = read_path.apply(pd.to_numeric,errors="ignore")
-        
         read_path = read_path.rename(columns={"Ladder score":"Happiness score"})
         
-        loop_path = pd.DataFrame(read_path)
-        path_year = path.replace(".csv", "").rsplit("_")
-        
         #Grab last piece of the filename instead of hardcoding an index
-        year = int(path_year[-1])
-        final_path = loop_path.assign(Year=year)
+        year = int(path.stem.split("_")[-1])
+        final_path = read_path.assign(Year=year)
         final_dataframe.append(final_path)
         
     # merge all info into one csv --> go's to output folder
@@ -48,8 +52,8 @@ def happiness_data():
     
     # Save to the outputs folder inside assignments_01.
     # Since this script runs from the assignments_01 directory,
-    # the correct relative path is "outputs/...".
-    happiness_merged.to_csv("outputs/merged_happiness.csv", index=False)
+    # the correct relative path is "OUTPUT_DIR/...".
+    happiness_merged.to_csv(OUTPUT_DIR/"merged_happiness.csv", index=False)
     return happiness_merged
 
 # Task 2
@@ -92,14 +96,14 @@ def visuals(df):
     plt.xlabel("Score")
     plt.ylabel("Frequency")
     
-    plt.savefig("outputs/happiness_histogram.png",dpi=300)
+    plt.savefig(OUTPUT_DIR/"happiness_histogram.png",dpi=300)
     plt.show()
     logger.info("Saved histogram.")
     
     # Boxplot
     sns.boxplot(x = years, y = happy,data=df)
     plt.title("Happiness Distribution by Years")
-    plt.savefig("outputs/happiness_by_year.png",dpi=300)
+    plt.savefig(OUTPUT_DIR/"happiness_by_year.png",dpi=300)
     plt.show()
     logger.info("Saved boxplot.")
     
@@ -110,7 +114,7 @@ def visuals(df):
     ax.set_xlabel("GDP")
     ax.set_ylabel("Happy")
     
-    plt.savefig("outputs/gdp_vs_happiness.png",dpi=300)
+    plt.savefig(OUTPUT_DIR/"gdp_vs_happiness.png",dpi=300)
     plt.show()
     logger.info("Saved scatter plot.")
     
@@ -120,7 +124,7 @@ def visuals(df):
     sns.heatmap(heat_corr,annot=True,cmap="coolwarm",fmt=".2f")
     
     plt.title("Correlation Heatmap")
-    plt.savefig("outputs/correlation_heatmap.png",dpi=300)
+    plt.savefig(OUTPUT_DIR/"correlation_heatmap.png",dpi=300)
     plt.show()
     logger.info("Saved heatmap.")
 
