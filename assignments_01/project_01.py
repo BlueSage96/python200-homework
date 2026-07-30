@@ -8,16 +8,16 @@ import seaborn as sns
 
 # Task 1
 paths = [ 
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2015.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2016.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2017.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2018.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2019.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2020.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2021.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2022.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2023.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2024.csv",
+         "inputs/world_happiness_2015.csv",
+         "inputs/world_happiness_2016.csv",
+         "inputs/world_happiness_2017.csv",
+         "inputs/world_happiness_2018.csv",
+         "inputs/world_happiness_2019.csv",
+         "inputs/world_happiness_2020.csv",
+         "inputs/world_happiness_2021.csv",
+         "inputs/world_happiness_2022.csv",
+         "inputs/world_happiness_2023.csv",
+         "inputs/world_happiness_2024.csv",
         ]
 
 
@@ -39,8 +39,10 @@ def happiness_data():
         
         loop_path = pd.DataFrame(read_path)
         path_year = path.replace(".csv", "").rsplit("_")
-
-        final_path = loop_path.assign(Year=path_year[3])
+        
+        #Grab last piece of the filename instead of hardcoding an index
+        year = int(path_year[-1])
+        final_path = loop_path.assign(Year=year)
         final_dataframe.append(final_path)
         
     # merge all info into one csv --> go's to output folder
