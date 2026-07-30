@@ -22,7 +22,7 @@ def summarize_data(series):
     })
     return series
 
-@flow(name="pipeline_flow")
+@flow(name="data_pipeline")
 def data_pipeline(arr):
     created = create_series(arr)
     cleaned = clean_data(created)
