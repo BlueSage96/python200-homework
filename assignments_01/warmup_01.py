@@ -309,8 +309,7 @@ def create_series(arr):
     return pd.Series(arr,name="values")
 
 def clean_data(series):
-    cleaned = create_series(series).dropna()
-    return cleaned
+    return series.dropna()
     
 def summarize_data(series):
     series = ({
@@ -326,5 +325,8 @@ def data_pipeline(arr):
     return summarize_data(clean_data(created))
 
 result = data_pipeline(arr)
+
 print(f"\n Pipeline Question 01: \n")
-print(result)
+
+for key, value in result.items():
+    print(f"{key}: {value}")
