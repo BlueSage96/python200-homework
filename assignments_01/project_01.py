@@ -135,23 +135,33 @@ def hypothesis(df):
     # This suggests there is not enough evidence to conclude that average
     # global happiness scores changed between 2019 and 2020.
     
-    #Test 2
+    #Test of my choice
     country1 = df[df['Country'] == "Switzerland"]["Happiness score"]
     country2 = df[df['Country'] == "United States"]["Happiness score"]
     country_hypo = ttest_ind(country1,country2)
+    
     logger.info(f"Statistic: {country_hypo.statistic}\n")
     logger.info(f"Pvalue: {country_hypo.pvalue}\n")
     logger.info(f"Mean Switzerland: {country1.mean()}\n")
     logger.info(f"Mean United States: {country2.mean()}")
+    
+    if country_hypo.pvalue < 0.05:
+        logger.info(
+            "The average happiness scores for Switzerland and the United States are significantly different."
+        )
+    else:
+        logger.info(
+            "There is no statistically significant difference between Switzerland and the United States."
+        )
 
 # Task 5
 @task(retries=3,retry_delay_seconds=2)
 def pearson_happiness(df):
+    
     happy = df["Happiness score"]
     year = df["Year"]
     gdp = df["GDP per capita"]
-    social_support = df["Social support"]
-    life_expectancy = df["Healthy life expectancy"] 
+    social_support = df["Social support"] 
     freedom = df["Freedom to make life choices"]    
     corruption = df["Perceptions of corruption"]
     generosity = df["Generosity"]
@@ -171,87 +181,46 @@ def pearson_happiness(df):
     pearson6 = pearsonr(corruption,happy)
     pearson7 = pearsonr(generosity,happy)
     
-    logger.info("Pearson 1\n")
-    logger.info(f"Statistic:\n {pearson1.statistic}")
-    logger.info(f"P-value:\n {pearson1.pvalue}")
-    
-    logger.info("Pearson 2\n")
-    logger.info(f"Statistic:\n {pearson2.statistic}")
-    logger.info(f"P-value:\n {pearson2.pvalue}")
-    
-    logger.info("Pearson 3\n")
-    logger.info(f"Statistic:\n {pearson3.statistic}")
-    logger.info(f"P-value:\n {pearson3.pvalue}")
-    
-    logger.info("Pearson 4\n")
-    logger.info(f"Statistic:\n {pearson4.statistic}")
-    logger.info(f"P-value:\n {pearson4.pvalue}")
-    
-    logger.info("Pearson 5\n")
-    logger.info(f"Statistic:\n {pearson5.statistic}")
-    logger.info(f"P-value:\n {pearson5.pvalue}")
-    
-    logger.info("Pearson 6\n")
-    logger.info(f"Statistic:\n {pearson6.statistic}")
-    logger.info(f"P-value:\n {pearson6.pvalue}")
-    
-    logger.info("Pearson 7\n")
-    logger.info(f"Statistic:\n {pearson7.statistic}")
-    logger.info(f"P-value:\n {pearson7.pvalue}")
-    
     adjusted_alpha = 0.05/7
+    #List of results
+    correlations = [
+        ("Year", pearson1),
+        ("GDP per capita", pearson2),
+        ("Social support", pearson3),
+        ("Healthy life expectancy", pearson4),
+        ("Freedom to make life choices", pearson5),
+        ("Perceptions of corruption", pearson6),
+        ("Generosity", pearson7),
+    ]
     
-    logger.info(f"Pearson1 P-value: {pearson1.pvalue}")
-    logger.info(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: No
-    
-    logger.info(f"Pearson2 P-value: {pearson2.pvalue}")
-    logger.info(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
-    
-    logger.info(f"Pearson3 P-value: {pearson3.pvalue}")
-    logger.info(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
-    
-    logger.info(f"Pearson4 P-value: {pearson4.pvalue}")
-    logger.info(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
-
-    logger.info(f"Pearson5 P-value: {pearson5.pvalue}")
-    logger.info(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
-
-    logger.info(f"Pearson6 P-value: {pearson6.pvalue}")
-    logger.info(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
-
-    logger.info(f"Pearson7 P-value: {pearson7.pvalue}")
-    logger.info(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
+    # Loop over correlation name & result
+    for name, result in correlations:
+        print(f"\n{name}")
+        print(f"Correlation (r): {result.statistic:.3f}")
+        print(f"P-value: {result.pvalue:.6f}")
+        print(f"Adjusted alpha: {adjusted_alpha}")
+        
+        if result.pvalue < adjusted_alpha:
+            print("Significant after Bonferroni correlation: Yes\n")
+        else:
+            print("Significant after Bonferroni correlation: No\n")
 
 # Task 5
 @task(retries=3,retry_delay_seconds=2)
 def summary_report():
    logger = get_run_logger() 
-   logger.info("Merged dataset")
+   logger.info("Merged dataset\n")
    logger.info("Number of countries: 175")
    logger.info("Number of years: 10")
    
-   logger.info("Top 3 regions by mean happiness score:")
+   logger.info("\nTop 3 regions by mean happiness score:")
    logger.info("1. North America and ANZ 2. Western Europe 3. Latin America and Caribbean")
    
-   logger.info("Bottom 3 regions by mean happiness score:")
+   logger.info("\nBottom 3 regions by mean happiness score:")
    logger.info("1. Sub-Saharan Africa 2. South Asia 3. Middle East and North Africa")
    
-   logger.info("Average happiness scores changed between 2019 and 2020, suggesting that people's reported happiness was different after the start of the pandemic.")
-   logger.info("Social support had the strongest relationship with happiness score, even after using a stricter significance test.")
+   logger.info("\nAverage happiness scores changed between 2019 and 2020, suggesting that people's reported happiness was different after the start of the pandemic.")
+   logger.info("\nSocial support had the strongest relationship with happiness score, even after using a stricter significance test.")
 
 @flow(name="pipeline_flow")
 def happiness_pipeline():
