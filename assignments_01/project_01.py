@@ -29,7 +29,7 @@ paths = [
         ]
 
 
-#@task(retries=3,retry_delay_seconds=2)
+@task(retries=3,retry_delay_seconds=2)
 def happiness_data():
     final_dataframe = []          
 
@@ -57,7 +57,7 @@ def happiness_data():
     return happiness_merged
 
 # Task 2
-#@task(retries=3,retry_delay_seconds=2)
+@task(retries=3,retry_delay_seconds=2)
 def happy_stats(df):
     # A little cleanup
     df["Happiness score"] = df["Happiness score"].astype(float).round(2)
@@ -68,17 +68,17 @@ def happy_stats(df):
     happy_std = happy_score.std()
     happy_mean_grouped = df.groupby(["Year","Regional indicator"])["Happiness score"].mean()
     
-    #logger =get_run_logger() 
+    logger =get_run_logger() 
 
-    print(f"Mean:\n {happy_mean}")
-    print(f"\nMedian:\n {happy_median}")
-    print(f"\nStandard deviation:\n {happy_std}")
-    print(f"\nGrouped mean:\n {happy_mean_grouped}")
+    logger.info(f"Mean:\n {happy_mean}")
+    logger.info(f"\nMedian:\n {happy_median}")
+    logger.info(f"\nStandard deviation:\n {happy_std}")
+    logger.info(f"\nGrouped mean:\n {happy_mean_grouped}")
 
 # Task 3
-#@task(retries=3,retry_delay_seconds=2)
+@task(retries=3,retry_delay_seconds=2)
 def visuals(df):
-    #logger =get_run_logger()
+    logger =get_run_logger()
     happy = df["Happiness score"]
     years = df["Year"]
     
@@ -98,14 +98,14 @@ def visuals(df):
     
     plt.savefig(OUTPUT_DIR/"happiness_histogram.png",dpi=300)
     plt.show()
-    print("Saved histogram.")
+    logger.info("Saved histogram.")
     
     # Boxplot
     sns.boxplot(data=df, x="Year", y ="Happiness score")
     plt.title("Happiness Distribution by Years")
     plt.savefig(OUTPUT_DIR/"happiness_by_year.png",dpi=300)
     plt.show()
-    print("Saved boxplot.")
+    logger.info("Saved boxplot.")
     
     # Scatter Plot
     fig, ax = plt.subplots()
@@ -116,7 +116,7 @@ def visuals(df):
     
     plt.savefig(OUTPUT_DIR/"gdp_vs_happiness.png",dpi=300)
     plt.show()
-    print("Saved scatter plot.")
+    logger.info("Saved scatter plot.")
     
     # Heatmap
     numeric = df.select_dtypes(include="number")
@@ -127,20 +127,20 @@ def visuals(df):
     plt.title("Correlation Heatmap")
     plt.savefig(OUTPUT_DIR/"correlation_heatmap.png",dpi=300)
     plt.show()
-    print("Saved heatmap.")
+    logger.info("Saved heatmap.")
 
 # Task 4
-#@task(retries=3,retry_delay_seconds=2)
+@task(retries=3,retry_delay_seconds=2)
 def hypothesis(df):
     year1 = df[df['Year'] == 2019]["Happiness score"]
     year2 = df[df['Year'] == 2020]["Happiness score"]
     year_hypo = ttest_ind(year1,year2)
-    #logger =get_run_logger() 
+    logger =get_run_logger() 
 
-    print(f"Statistic: {year_hypo.statistic}\n")
-    print(f"Pvalue: {year_hypo.pvalue}\n")
-    print(f"Mean 2019: {year1.mean()}\n")
-    print(f"Mean 2020: {year2.mean()}")
+    logger.info(f"Statistic: {year_hypo.statistic}\n")
+    logger.info(f"Pvalue: {year_hypo.pvalue}\n")
+    logger.info(f"Mean 2019: {year1.mean()}\n")
+    logger.info(f"Mean 2020: {year2.mean()}")
     
     #Results:
     # The p-value is greater than or equal to 0.05, so the difference in
@@ -153,22 +153,22 @@ def hypothesis(df):
     country2 = df[df['Country'] == "United States"]["Happiness score"]
     country_hypo = ttest_ind(country1,country2)
     
-    print(f"Statistic: {country_hypo.statistic}\n")
-    print(f"Pvalue: {country_hypo.pvalue}\n")
-    print(f"Mean Switzerland: {country1.mean()}\n")
-    print(f"Mean United States: {country2.mean()}")
+    logger.info(f"Statistic: {country_hypo.statistic}\n")
+    logger.info(f"Pvalue: {country_hypo.pvalue}\n")
+    logger.info(f"Mean Switzerland: {country1.mean()}\n")
+    logger.info(f"Mean United States: {country2.mean()}")
     
     if country_hypo.pvalue < 0.05:
-        print(
+        logger.info(
             "The average happiness scores for Switzerland and the United States are significantly different."
         )
     else:
-        print(
+        logger.info(
             "There is no statistically significant difference between Switzerland and the United States."
         )
 
 # Task 5
-#@task(retries=3,retry_delay_seconds=2)
+@task(retries=3,retry_delay_seconds=2)
 def pearson_happiness(df):
     
     happy = df["Happiness score"]
@@ -178,8 +178,8 @@ def pearson_happiness(df):
     corruption = df["Perceptions of corruption"]
     generosity = df["Generosity"]
     
-    #logger =get_run_logger() 
-    print(df[["Year", "Happiness score"]].dtypes)
+    logger =get_run_logger() 
+    logger.info(df[["Year", "Happiness score"]].dtypes)
     
     pearson1 = pearsonr(gdp,happy)
     pearson2 = pearsonr(social_support,happy)
@@ -205,51 +205,51 @@ def pearson_happiness(df):
     
     # Loop over correlation name & result
     for name, result in correlations:
-        print(f"\n{name}")
-        print(f"Correlation (r): {result.statistic:.3f}")
-        print(f"P-value: {result.pvalue:.6f}")
-        print(f"Adjusted alpha: {adjusted_alpha}")
+        logger.info(f"\n{name}")
+        logger.info(f"Correlation (r): {result.statistic:.3f}")
+        logger.info(f"P-value: {result.pvalue:.6f}")
+        logger.info(f"Adjusted alpha: {adjusted_alpha}")
         
         if result.pvalue < adjusted_alpha:
-            print("Significant after Bonferroni correlation: Yes\n")
+            logger.info("Significant after Bonferroni correlation: Yes\n")
         else:
-            print("Significant after Bonferroni correlation: No\n")
+            logger.info("Significant after Bonferroni correlation: No\n")
 
 # Task 5
-#@task(retries=3,retry_delay_seconds=2)
+@task(retries=3,retry_delay_seconds=2)
 def summary_report(df):
-   #logger =get_run_logger() 
-   print("Merged dataset\n")
-   print(f"Number of countries: {df['Country'].nunique()}")
-   print(f"Number of years: {df['Year'].nunique()}")
+   logger =get_run_logger() 
+   logger.info("Merged dataset\n")
+   logger.info(f"Number of countries: {df['Country'].nunique()}")
+   logger.info(f"Number of years: {df['Year'].nunique()}")
    
    regional_means = (
        df.groupby("Regional indicator")["Happiness score"].mean().sort_values(ascending=False)
    )
-   print(f"\nTop 3 regions by mean happiness:")
+   logger.info(f"\nTop 3 regions by mean happiness:")
    for region, score in regional_means.head(3).items():
-       print(f"{region}: {score:.3f}")
+       logger.info(f"{region}: {score:.3f}")
        
-   print(f"\nBottom 3 regions by mean happiness:")
+   logger.info(f"\nBottom 3 regions by mean happiness:")
    for region, score in regional_means.tail(3).items():
-       print(f"{region}: {score:.3f}")
+       logger.info(f"{region}: {score:.3f}")
        
    mean_by_year = (
        df.groupby("Year")["Happiness score"].mean().sort_values(ascending=False)
    )
    
-   print(
+   logger.info(
     f"Mean happiness was {mean_by_year[2019]:.2f} in 2019 and "
     f"{mean_by_year[2020]:.2f} in 2020. "
     "Because the p-value (0.595) is greater than 0.05, the observed difference "
     "is not statistically significant."
     )
   
-   print(
+   logger.info(
     "Social support showed the strongest positive correlation with happiness score and remained statistically significant after applying the Bonferroni correction."
     )
 
-#@flow(name="pipeline_flow")
+@flow(name="pipeline_flow")
 def happiness_pipeline():
     df = happiness_data()
 
