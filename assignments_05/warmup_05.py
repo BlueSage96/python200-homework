@@ -46,3 +46,15 @@ print(f"\nTemperature 3:\n{response_temp3.choices[0].message.content}")
 #   and different from the response of the run before
 #2. I would choose the 1.5 temperature as it has produced the best names
 #   has the most variation each run.
+
+# API 03
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role":"user","content":"Give me a one-sentence fun fact about pandas (the animal, not the library)"}],
+    n=3,
+    temperature=1.0
+)
+
+for r in response.choices:
+    print(f"\nResponse:\n{r.message.content}")
+    
