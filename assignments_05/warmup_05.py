@@ -55,6 +55,17 @@ response = client.chat.completions.create(
     temperature=1.0
 )
 
+print(f"\nAPI 03:\n")
 for r in response.choices:
     print(f"\nResponse:\n{r.message.content}")
     
+# API 04
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role":"user","content":"Explain how neural networks work"}],
+    max_tokens=15
+)
+print(f"\nAPI 04:\n")
+print(f"Neural networks response:\n{response.choices[0].message.content}")
+#1. Setting max tokens means a long response will not be completed and would need more tokens.
+#2. Using max tokens in a real app will help with managing costs and token limits from an API.
