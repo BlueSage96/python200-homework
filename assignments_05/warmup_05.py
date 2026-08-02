@@ -69,3 +69,26 @@ print(f"\nAPI 04:\n")
 print(f"Neural networks response:\n{response.choices[0].message.content}")
 #1. Setting max tokens means a long response will not be completed and would need more tokens.
 #2. Using max tokens in a real app will help with managing costs and token limits from an API.
+
+# System Question 01
+messages = [
+    {"role": "system", "content": "You are a patient, encouraging Python tutor. You always explain things simply and end with a word of encouragement."},
+    {"role": "user", "content": "I don't understand what a list comprehension is."}
+]
+response = client.chat.completions.create(model='gpt-4o-mini',
+                                          messages=messages)
+
+print(f"\nSystem 01:\n")
+print(f"Personality 01:\n{response.choices[0].message.content}")
+
+messages2 = [
+    {"role": "system", "content": "You are an annoyed Python tutor with no time to explain questions. You always explain with the quickest explanation and end with a statement that ends the conversation."},
+    {"role": "user", "content": "I don't understand what a list comprehension is."}
+]
+response2 = client.chat.completions.create(model='gpt-4o-mini',
+                                          messages=messages2)
+
+print(f"Personality 02:\n{response2.choices[0].message.content}")
+
+# The model easily adapted to the personality descriptions and embraced th new personality by becaming impatient, 
+# only giving a short explanation of the question and shuts any opportunity for more questions.
