@@ -92,3 +92,18 @@ print(f"Personality 02:\n{response2.choices[0].message.content}")
 
 # The model easily adapted to the personality descriptions and embraced th new personality by becaming impatient, 
 # only giving a short explanation of the question and shuts any opportunity for more questions.
+
+#System Question 02
+print(f"\nSystem 02:\n")
+messages3 = [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "My name is Jordan and I'm learning Python."},
+    {"role": "assistant", "content": "Nice to meet you, Jordan! Python is a great choice. What would you like to work on?"},
+    {"role": "user", "content": "Can you remind me what my name is?"}
+]
+response3 = client.chat.completions.create(model='gpt-4o-mini',
+                                          messages=messages3)
+
+print(f"Personality 03:\n{response3.choices[0].message.content}")
+
+# The model is a chatbot that has memory built-in as the messages changes the model role from "system" to "assistant".
