@@ -107,3 +107,33 @@ response3 = client.chat.completions.create(model='gpt-4o-mini',
 print(f"Personality 03:\n{response3.choices[0].message.content}")
 
 # The model is a chatbot that has memory built-in as the messages changes the model role from "system" to "assistant".
+
+def get_completion(prompt: str, model="gpt-4o-mini", temperature=0):
+    """
+    Send a prompt to the model and return the assistant's text reply.
+    This helper keeps our examples clean and focused on the prompt itself.
+    """
+    response = client.chat.completions.create(
+        model=model,
+        messages=[{"role": "user", "content": prompt}], 
+        temperature=temperature,
+    )
+    return response.choices[0].message.content
+
+
+#Prompt 01 - Zero Shot
+reviews = [
+    "The onboarding process was smooth and the team was welcoming.",
+    "The software crashes constantly and support never responds.",
+    "Great price, but the documentation is nearly impossible to follow."
+]
+
+print(f"\nPrompt 01:\n")
+
+# No examples provided - model uses pre-trained knowledge
+p = 0
+for r in reviews:
+    p += 1
+    prompt = f"What is the sentiment of this review positive, negative, or mixed: {r}"
+    response = get_completion(prompt, temperature=0)
+    print(f"Review {p}:\n{response}")
