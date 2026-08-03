@@ -93,7 +93,7 @@ print(f"Personality 02:\n{response2.choices[0].message.content}")
 # The model easily adapted to the personality descriptions and embraced th new personality by becaming impatient, 
 # only giving a short explanation of the question and shuts any opportunity for more questions.
 
-#System Question 02
+# System Question 02
 print(f"\nSystem 02:\n")
 messages3 = [
     {"role": "system", "content": "You are a helpful assistant."},
@@ -121,7 +121,7 @@ def get_completion(prompt: str, model="gpt-4o-mini", temperature=0):
     return response.choices[0].message.content
 
 
-#Prompt 01 - Zero Shot
+# Prompt 01 - Zero Shot
 reviews = [
     "The onboarding process was smooth and the team was welcoming.",
     "The software crashes constantly and support never responds.",
@@ -137,3 +137,16 @@ for r in reviews:
     prompt = f"What is the sentiment of this review positive, negative, or mixed: {r}"
     response = get_completion(prompt, temperature=0)
     print(f"Review {p}:\n{response}")
+    
+# Prompt 02 - One Shot
+print(f"\nPrompt 02:\n")
+for r in reviews:
+    p += 1
+    prompt = f"""
+    Example: The new laptop turns on but has a blank screen.
+    Review: What is the sentiment of this review positive, negative, or mixed: {r}
+    """
+    response = get_completion(prompt, temperature=0)
+    print(f"Review {p}:\n{response}")
+
+# Adding an example did not affect the bot's responses.
