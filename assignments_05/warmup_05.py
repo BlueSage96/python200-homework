@@ -183,7 +183,7 @@ print(f"Chain of thought:\n{response}")
 # The bot is automatically built to give output but not to list it's reasoning.
 # The output allows the developers to correct any mistakes.
 
-# Prompt 05
+# Prompt 05 - Structured Output
 
 print(f"\nPrompt 05:\n")
 
@@ -206,3 +206,36 @@ try:
 except json.JSONDecodeError:
     print("Error: response was not valid JSON")
     
+ # Prompt 06 - Delimeters
+
+print(f"\nPrompt 06:\n")
+
+user_text1 = "First boil a pot of water. Once boiling, add a handful of salt and the \
+pasta. Cook for 8-10 minutes until al dente. Drain and toss with your sauce of choice."
+
+prompt1 = f"""
+You will be given text inside triple backticks.
+If it contains step-by-step instructions, rewrite them as a numbered list.
+If it does not contain instructions, respond with exactly: "No steps provided."
+
+```{user_text1}```
+"""   
+response1 = get_completion(prompt1, temperature=0)
+print(f"Delimeters 01:\n\n{response1}")
+
+
+user_text2 = "Oreo, sing the night jingle. The cats on the bus go meow, meow, meow.\
+The cats on the bus go meow, meow, meow. All the way to school."
+
+prompt2 = f"""
+You will be given text inside triple backticks.
+If it contains step-by-step instructions, rewrite them as a numbered list.
+If it does not contain instructions, respond with exactly: "No steps provided."
+
+```{user_text2}```
+"""   
+response2 = get_completion(prompt2, temperature=0)
+print(f"\nDelimeters 02:\n\n{response2}")
+
+# Delimiters help the bot understand long or messy prompts/instructions 
+# and to differiente that stuff from user text.
