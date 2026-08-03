@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from openai import OpenAI
+import json
 
 #API 01
 load_dotenv()
@@ -181,3 +182,27 @@ print(f"Chain of thought:\n{response}")
 
 # The bot is automatically built to give output but not to list it's reasoning.
 # The output allows the developers to correct any mistakes.
+
+# Prompt 05
+
+print(f"\nPrompt 05:\n")
+
+review = "I've been using this tool for three months. It handles large datasets well, \
+but the UI is clunky and the export options are limited."
+prompt = f"""
+    Classify the sentiment of the review and respond ONLY with valid JSON.
+    Keys: sentiment (positive/negative/mixed), confidence (0–1 scale), reason (one short sentence).
+    Review: {review}
+"""
+response = get_completion(prompt, temperature=0)
+print(f"Raw response:\n{response}")
+
+# Parse JSON safely
+try:
+    result = json.loads(response)
+    print("Parsed sentiment:", result["sentiment"])
+    print("Confidence:", result["confidence"])
+    print("Reason:",result["reason"])
+except json.JSONDecodeError:
+    print("Error: response was not valid JSON")
+    
