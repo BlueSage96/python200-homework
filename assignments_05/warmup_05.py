@@ -167,3 +167,17 @@ for r in reviews:
 #1. I would choose no shot for a quick chat, i.e. Create some lottery tickets numbers for me.
 #2. I would use one shot when the request is not difficult but I still have to specific.
 #3. The few-shot for my complicated chats especially ones that involve programming or critical thinking
+
+# Prompt 04 - Chain of Thought
+prompt = f"""
+    Show your step-by-step reasoning, then give the final answer on its own line labelled: Final answer: <value>
+    
+    Problem: A data engineer earns $85,000 per year. She gets a 12% raise, then 6 months later
+    takes a new job that pays $7,500 more per year than her post-raise salary.
+    What is her final annual salary?
+"""
+response = get_completion(prompt, temperature=0)
+print(f"Chain of thought:\n{response}")
+
+# The bot is automatically built to give output but not to list it's reasoning.
+# The output allows the developers to correct any mistakes.
