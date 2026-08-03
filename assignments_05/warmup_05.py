@@ -149,4 +149,21 @@ for r in reviews:
     response = get_completion(prompt, temperature=0)
     print(f"Review {p}:\n{response}")
 
-# Adding an example did not affect the bot's responses.
+# Adding an example did not affect the bot's responses because the temperature = 0.
+
+# Prompt 03 - Few-Shot
+print(f"\nPrompt 03:\n")
+for r in reviews:
+    p += 1
+    prompt = f"""
+    Example 1: My cat greeted me with a kiss.
+    Example 2: I took a physical and did not pass.
+    Example: The new laptop turns on but has a blank screen.
+    Review: What is the sentiment of this review positive, negative, or mixed: {r}
+    """
+    response = get_completion(prompt, temperature=0)
+    print(f"Review {p}:\n{response}")
+    
+#1. I would choose no shot for a quick chat, i.e. Create some lottery tickets numbers for me.
+#2. I would use one shot when the request is not difficult but I still have to specific.
+#3. The few-shot for my complicated chats especially ones that involve programming or critical thinking
