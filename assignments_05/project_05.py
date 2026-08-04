@@ -141,3 +141,39 @@ print(f"Cover Letter Generator:\n{cover}")
    The output feels tailored to the specific user without inventing credientals not mentioned.
    I changed the default infomration with another job title & background with the same result.
 '''
+
+# Task 04
+print(f"\nTask 04:\n")
+
+def is_safe(text: str) -> bool:
+    result = client.moderations.create(
+        model="omni-moderation-latest",
+        input=text
+    )
+    flagged = result.results[0].flagged
+    # print("Flagged categories:\n",result.results[0].categories)
+    if not flagged:
+        return True
+    
+    else:
+        print("Your response has been flagged for harmful language.")
+        return False
+        
+input = "I love my cat and I want to hold him!"
+checker = is_safe(input)
+print(f"Moderation Checker 01:\n{checker}")        
+
+# Prints AFTER print statement in function!
+input2 = "I want to kill my professor! She's terrible at her job!"
+checker2 = is_safe(input2)
+print(f"\nModeration Checker 02:\n{checker2}") 
+
+input3 = "I'm outside of my favorite celebrite's house and I'm ready to jump on her!" 
+checker3 = is_safe(input3)
+print(f"\nModeration Checker 03:\n{checker3}")    
+
+'''
+    My first two test cases were moderated correctly after I was more explicit.
+    My safe test case passed without triggering a warning.
+    My borderline phrase always returns true despite trying to trigger certain categories.
+'''
