@@ -89,3 +89,55 @@ print(f"Bullet Point Rewriter:\n{new_bullets}")
 
 # Addng try/catch didn't prevent errors! 
 # I don't know how to fix the issue!!
+
+# Task 03
+def generate_cover_letter(job_title: str, background: str) -> str:
+    prompt = f"""
+    You write strong cover letter opening paragraphs for career changers.
+    The paragraph should be 3-5 sentences: confident, specific, and free of clichés.
+
+    Here are two examples of the style and tone you should match:
+
+    Example 1:
+    Role: Data Analyst at a healthcare nonprofit
+    Background: Seven years as a registered nurse, recently completed a data analytics bootcamp.
+    Opening: After seven years as a registered nurse, I've spent my career making decisions
+    under pressure using incomplete information — which turns out to be excellent training for
+    data analysis. I recently completed a data analytics program where I built dashboards
+    tracking patient outcomes across departments. I'm excited to bring that combination of
+    clinical context and technical skill to [Company]'s mission-driven work.
+
+    Example 2:
+    Role: Junior Software Engineer at a fintech startup
+    Background: Ten years in retail banking operations, self-taught Python developer for two years.
+    Opening: I spent a decade on the operations side of banking, watching technology decisions
+    get made by people who had never processed a wire transfer or resolved a failed ACH batch.
+    That frustration turned into curiosity, and two years of self-teaching Python later, I'm
+    ready to be on the other side of those decisions. I'm applying to [Company] because your
+    work on payment infrastructure is exactly where my domain expertise and new technical skills
+    intersect.
+
+    Now write an opening paragraph for this person:
+    Role: {job_title}
+    Background: {background}
+    Opening:
+    """
+
+    messages = [{"role": "user", "content": prompt}]
+    response = get_completion(messages,temperature=0)
+    return response
+
+job_title = "Junior Video Game Developer"
+background = "eight years of experience as a IT analyst; recently completed \
+a game development course and built a small game in Unreal Engine 5."
+
+cover = generate_cover_letter(job_title,background)
+
+
+print(f"\nTask 03:\n")
+print(f"Cover Letter Generator:\n{cover}")
+
+'''
+   The output feels tailored to the specific user without inventing credientals not mentioned.
+   I changed the default infomration with another job title & background with the same result.
+'''
