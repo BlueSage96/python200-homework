@@ -43,10 +43,12 @@ response_temp3 = client.chat.completions.create(
 )
 print(f"\nTemperature 3:\n{response_temp3.choices[0].message.content}")
 
-#1. Each time the code is ran, each response is different from one another 
-#   and different from the response of the run before
-#2. I would choose the 1.5 temperature as it has produced the best names
-#   has the most variation each run.
+'''
+1. Each time the code is ran, each response is different from one another 
+   and different from the response of the run before
+2. I would choose the 1.5 temperature as it has produced the best names
+   has the most variation each run.
+'''
 
 # API 03
 response = client.chat.completions.create(
@@ -68,6 +70,7 @@ response = client.chat.completions.create(
 )
 print(f"\nAPI 04:\n")
 print(f"Neural networks response:\n{response.choices[0].message.content}")
+
 #1. Setting max tokens means a long response will not be completed and would need more tokens.
 #2. Using max tokens in a real app will help with managing costs and token limits from an API.
 
@@ -239,3 +242,28 @@ print(f"\nDelimeters 02:\n\n{response2}")
 
 # Delimiters help the bot understand long or messy prompts/instructions 
 # and to differiente that stuff from user text.
+
+# Ollama 01
+prompt = f"""
+Review: Explain what a large language model is in two sentences.
+"""
+response = get_completion(prompt, temperature=0)
+print(f"\nOllama 01:\n {response}")
+
+'''
+Ollama response:
+A large language model is an AI system trained on vast datasets to understand 
+and generate human-like text, enabling it to process context and learn complex 
+patterns for real-time interactions.
+'''
+
+'''
+1. Both responses are similar but Ollama was more concise and to the point.
+
+2. An advantage of running a local AI is privacy and security since the 
+   model is not connected to a third party nor the cloud.
+   
+3. A disadvantage is having a computer that can handle the high hardware, 
+   storage, and ram usage requirements. These requirements may lead to having to
+   upgrade existing computers.
+'''
