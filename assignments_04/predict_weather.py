@@ -55,19 +55,21 @@ for i, (_, row) in enumerate(new_days.iterrows()):
     print(f"Probability(good)  : {probability:.2%}")
     
 #Task 03
-#1. Day 4 is my borderline example because the weather is close to my
-#   running thresholds. The model predicted approximately 0.52,
-#   which is only slightly above the default cutoff. I would describe
-#   this prediction as uncertain. In a real application I would
-#   probably show a message such as "Conditions are borderline—check
-#   the detailed forecast before running."
+'''
+1. Day 4 is my borderline example because the weather is close to my
+  running thresholds. The model predicted approximately 0.52,
+  which is only slightly above the default cutoff. I would describe
+  this prediction as uncertain. In a real application I would
+  probably show a message such as "Conditions are borderline—check
+  the detailed forecast before running."
 
-#2. If predict_weather.py is run before train_weather_classifier.py,
-#   the saved model and metadata files will not exist and joblib.load()
-#   will raise a FileNotFoundError. I would catch this exception and
-#   display a helpful message telling the user to run
-#   train_weather_classifier.py first to create the required files.
+2. If predict_weather.py is run before train_weather_classifier.py,
+  the saved model and metadata files will not exist and joblib.load()
+  will raise a FileNotFoundError. I would catch this exception and
+  display a helpful message telling the user to run
+  train_weather_classifier.py first to create the required files.
 
-#3. The prediction script would be modified to automatically fetch the
-#   next day's weather forecast, extract the required features, create a
-#   DataFrame with those values, and use the trained model to make a prediction.
+3. The prediction script would be modified to automatically fetch the
+  next day's weather forecast, extract the required features, create a
+  DataFrame with those values, and use the trained model to make a prediction.
+  '''

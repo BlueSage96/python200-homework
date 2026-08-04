@@ -62,9 +62,11 @@ df["good_for_running"] = df.apply(label_running_day, axis=1)
 print(df)
 print("Good for running:", df["good_for_running"].sum())
 
-#The days labeled "good for running" is 148 days or 41%.
-#I would say the percentage should be higher for my area, 
-# but I don't know where to find the feature data for my town.
+'''
+The days labeled "good for running" is 148 days or 41%.
+I would say the percentage should be higher for my area, 
+but I don't know where to find the feature data for my town.
+'''
 
 FEATURES = [
     "temperature_2m_max",
@@ -112,23 +114,24 @@ ax.set_title("Weather Logistic Regression ROC")
 plt.savefig("outputs/weather_roc.png")
 plt.show()
 
-# 1. The model achieved a very high AUC score, which means it can
-#    distinguish good running days from bad running days very well.
-#    This was slightly better than I expected considering only four
-#    weather variables were used to make predictions.
+'''
+1. The model achieved a very high AUC score, which means it can
+   distinguish good running days from bad running days very well.
+   This was slightly better than I expected considering only four
+   weather variables were used to make predictions.
 
-# 2. Looking at the classification report, false negatives occur more
-#    often than false positives. In practice this means the model may
-#    occasionally tell someone to skip running when the weather is
-#    actually acceptable. I would rather have this type of error than
-#    recommend running during unsafe weather.
+2. Looking at the classification report, false negatives occur more
+   often than false positives. In practice this means the model may
+   occasionally tell someone to skip running when the weather is
+   actually acceptable. I would rather have this type of error than
+   recommend running during unsafe weather.
 
-# 3. # If this were a real application, I would probably increase the
-#      threshold slightly above 0.5 so the app is a little more cautious
-#      before recommending a run.
+3. # If this were a real application, I would probably increase the
+     threshold slightly above 0.5 so the app is a little more cautious
+     before recommending a run.
+'''
 
 #Save model and metadata
-
 joblib.dump(best_pipe,"models/weather_classifier.pkl")
 print("Pipeline saved to file")
 
