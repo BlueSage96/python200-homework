@@ -133,7 +133,6 @@ a game development course and built a small game in Unreal Engine 5."
 
 cover = generate_cover_letter(job_title,background)
 
-
 print(f"\nTask 03:\n")
 print(f"Cover Letter Generator:\n{cover}")
 
@@ -159,8 +158,8 @@ def is_safe(text: str) -> bool:
         print("Your response has been flagged for harmful language.")
         return False
         
-input = "I love my cat and I want to hold him!"
-checker = is_safe(input)
+input1 = "I love my cat and I want to hold him!"
+checker = is_safe(input1)
 print(f"Moderation Checker 01:\n{checker}")        
 
 # Prints AFTER print statement in function!
@@ -177,3 +176,88 @@ print(f"\nModeration Checker 03:\n{checker3}")
     My safe test case passed without triggering a warning.
     My borderline phrase always returns true despite trying to trigger certain categories.
 '''
+
+# Task 05
+print(f"\nTask 05:\n")
+
+def run_chatbot():
+    # 1. Initialize conversation history with your system prompt
+    messages = [
+        {"role": "system", "content": "You are required to maintain a professional tone while talking to users."}
+    ]
+    
+    response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=messages,
+    temperature=1.0
+    )
+    
+    print("=" * 50)
+    print("Job Application Helper")
+    print("=" * 50)
+    print("I can help you with:")
+    print("  1. Rewriting resume bullet points")
+    print("  2. Drafting a cover letter opening")
+    print("  3. Any other questions about your application")
+    print("\nType 'quit' at any time to exit.\n")
+
+    while True:
+        user_input = input("You: ").strip()
+        print("Input:",user_input)
+        # 2. Handle exit
+        if user_input.lower() in {"quit", "exit"}:
+            print("\nJob Application Helper: Good luck with your applications!")
+            break
+
+        # 3. Skip empty input
+        if not user_input:
+            continue
+
+        # 4. Run moderation check before doing anything else
+        if not is_safe(user_input):
+            continue  # is_safe() already printed the warning message
+
+        # 5. Check if the user wants to rewrite bullets
+        #    (hint: look for keywords like "bullet" or "resume" in user_input.lower())
+        if "bullet" in user_input.lower() or "resume" in user_input.lower():
+            print("\nJob Application Helper: Paste your bullet points below, one per line.")
+            print("When you're done, type 'DONE' on its own line.\n")
+            
+            raw_bullets = []
+            while True:
+                line = input().strip()
+                if line.upper() == "DONE":
+                    break
+                if line:
+                    raw_bullets.append(line)
+                    
+            # YOUR CODE: call rewrite_bullets() and print the results
+            new_raw_bullets = rewrite_bullets(raw_bullets)
+            print(f"Bullet Point Rewriter:\n{new_raw_bullets}")
+            
+        # 6. Check if the user wants a cover letter
+        elif "cover letter" in user_input.lower():
+            job_title = input("Job Application Helper: What is the job title? ").strip()
+            background = input("Job Application Helper: Briefly describe your background: ").strip()
+            letter = generate_cover_letter(job_title,background)
+            print(f"My cover letter:\n{letter}")
+        # 7. Otherwise, handle it as a regular chat turn
+        else:
+            # - Append the user's message to `messages`
+            messages.append({
+                "role": "user",
+                "content":user_input
+                })
+            # - Call get_completion(messages)
+            response = get_completion(messages,temperature=0)
+            # - Print the reply
+            print(f"\nUser responses:\n{response}")
+            # - Append the reply to `messages` as an assistant message
+            messages.append({
+                "role": "assistant",
+                "content": response
+            })
+            pass
+
+if __name__ == "__main__":
+    run_chatbot()
