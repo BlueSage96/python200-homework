@@ -30,8 +30,10 @@ print(f"\nScikit Learn 01:\n")
 print(f"1D shape:\n {x.shape}")
 print(f"2D shape:\n {new_x.shape}")
 
-#Leaving x as an 1D array will cause errors when calling .fit() and .predict()
-#Making x as 2D is important because scikit assumes every row is one observation 
+'''
+Leaving x as an 1D array will cause errors when calling .fit() and .predict()
+Making x as 2D is important because scikit assumes every row is one observation 
+'''
 
 #scikit learn Q3
 X_clusters, _ = make_blobs(n_samples=120, centers=3, cluster_std=0.8, random_state=7)
@@ -68,8 +70,10 @@ plt.ylabel("Cost")
 plt.savefig("outputs/cost_vs_age.png")
 plt.show()
 
-#There are two distinct groups visible and the age of the smoker 
-# shows that as the patient gets older, their healthcare cost will rise
+'''
+There are two distinct groups visible and the age of the smoker 
+shows that as the patient gets older, their healthcare cost will rise
+'''
 
 # Linear Regression 02
 X = age.reshape(-1,1)
@@ -112,9 +116,11 @@ print("age coefficient:", model_full.coef_[0])
 print("smoker coefficient: ", model_full.coef_[1])
 print(f"R2:{model_full.score(X_test2, y_test2)}\n")
 
-# How does the smoker feature influence the predicted medical cost?
-# Adding the smoker flag helps R2 significantly by going from 0.07 to 0.77
-# The smoker coefficient represents the predicted cost of healthcare for all 100 patients
+'''
+How does the smoker feature influence the predicted medical cost?
+Adding the smoker flag helps R2 significantly by going from 0.07 to 0.77
+The smoker coefficient represents the predicted cost of healthcare for all 100 patients
+'''
 
 # Linear Regression 05
 plt.scatter(y_pred2,y_test2,color="orange",cmap="coolwarm")
