@@ -116,6 +116,7 @@ ax[2].set_title("Capital Length Total")
 plt.savefig("outputs/spam_ham_comparisons")
 plt.show()
 
+'''
 #1. The differences between Word frequency free and Character Frequency are subtle, 
 # but the differences for each against Capital Run Length Total are dramatic 
 # given that capital has a long numeric range than the other two classes.
@@ -128,12 +129,15 @@ plt.show()
 
 #4. The training and test data will contain drastic skews so there may be 
 # a need to normalize some of the data before training and testing.
+'''
 
 #Task 02
 
-#Data prep - Standardize the features because they have different scales
-# like capital_run_length_total that has much larger values
-# than the other features), which helps Logistic Regression perform better.
+'''
+Data prep - Standardize the features because they have different scales
+like capital_run_length_total that has much larger values
+than the other features), which helps Logistic Regression perform better.
+'''
 
 #Remove spam_label for X data 
 X = df.drop("spam_label",axis=1)
@@ -253,8 +257,10 @@ print(f"\nDecision Tree 04:\n")
 print(f"Train Accuracy: {train_accuracy_dtc4}")
 print(f"Test Accuracy: {test_accuracy_dtc4}")
 
-#1. The test accuracy doesn't increase as fast as the train accuracy does.
-#2. I would use no depth as it has the best train accuracy
+'''
+1. The test accuracy doesn't increase as fast as the train accuracy does.
+2. I would use no depth as it has the best train accuracy
+'''
 
 print(f"\nDecision Tree 04 accuracy and report:\n")
 print(f"Test Accuracy: {test_accuracy_dtc4}")

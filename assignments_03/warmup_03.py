@@ -37,6 +37,7 @@ print("Mean of sepal length:", X_train_scaled[:,0].mean())
 print("Mean of sepal width:",X_train_scaled[:,1].mean())
 print("Mean of petal length:",X_train_scaled[:,2].mean())
 print("Mean of petal width:",X_train_scaled[:,3].mean())
+
 # Using X_train because the X_train contains the mean and std for only the training data.
 
 #KNN 01
@@ -61,6 +62,7 @@ score2 = accuracy_score(y_test, preds2)
 
 print(f"\nKNN 02:\n")
 print("Accuracy:", score2)
+
 # The accuracy is the same for unscaled and scaled data, so scaling makes no difference
 
 #KNN 03
@@ -72,9 +74,11 @@ print(f"Fold scores: {cv_scores}")
 print(f"Mean fold scores: {cv_scores.mean():.3f}")
 print(f"Standard deviation of fold scores: {cv_scores.std():.3f}")
 
-# The cross_val_score is more trustworthy than a single train/test 
-# split because each group of training data (fold) is evaluated 
-# and the average score is more stable than any single split.
+'''
+The cross_val_score is more trustworthy than a single train/test 
+split because each group of training data (fold) is evaluated 
+and the average score is more stable than any single split.
+'''
 
 #KNN 04
 print(f"\nKNN 04:\n")
@@ -84,6 +88,7 @@ for k in k_values:
     knn4 = KNeighborsClassifier(n_neighbors=5)
     cross = cross_val_score(knn4,X_train,y_train,cv=5)
     print(f"k={k:2d}: mean={cross.mean():.3f}")
+    
     # I would use k=15 as it has a wider range of neighbors to average than the other ks. \z
     
     
@@ -105,6 +110,7 @@ class_report2 = classification_report(y_test, preds3)
 print(f"\nDecision Trees 01:\n")
 print("Accuracy:", score3)
 print(class_report2)
+
 # KNN's accuracy is 1.0 while Decision Tree accuracy is 0.9666666666666667
 # No scaled vs. unscaled data would not affect the result.
 
@@ -172,11 +178,12 @@ plt.ylabel("Total Explained")
 
 plt.savefig("outputs/pca_variance_explained.png")
 plt.show()
-#The components are very small and would take 13 components to explain 80% of variance
+
+# The components are very small and would take 13 components to explain 80% of variance
 
 #PCA 04
 def reconstruct_digit(sample_idx,scores,pca,n_components):
-    #Reconstruct one digit using the first n_components principal components
+    # Reconstruct one digit using the first n_components principal components
     reconstruction = pca.mean_.copy()
     for i in range(n_components):
         reconstruction = reconstruction + scores[sample_idx,i] * pca.components_[i]
@@ -193,4 +200,5 @@ for row, n in enumerate(component_counts, start=1):
         axs[row][col].imshow(reconstruction, cmap="gray")
 plt.savefig("outputs/pca_reconstructions.png")
 plt.show()
-#Numbers become recognizable at n=40 and it matches where the variance curve levels off.
+
+# Numbers become recognizable at n=40 and it matches where the variance curve levels off.
