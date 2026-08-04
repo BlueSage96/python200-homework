@@ -7,6 +7,7 @@ from scipy.stats import ttest_ind,pearsonr
 import seaborn as sns
 
 from pathlib import Path
+
 # Folder containing project_01.py
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -50,12 +51,13 @@ def happiness_data():
     happiness_merged = pd.concat(final_dataframe)
     happiness_merged["Year"] = happiness_merged["Year"].astype(int)
     
-    # Save to the outputs folder inside assignments_01.
-    # Since this script runs from the assignments_01 directory,
-    # the correct relative path is "OUTPUT_DIR/...".
+    '''
+    Save to the outputs folder inside assignments_01.
+    Since this script runs from the assignments_01 directory,
+    the correct relative path is "OUTPUT_DIR/...".
     happiness_merged.to_csv(OUTPUT_DIR/"merged_happiness.csv", index=False)
     return happiness_merged
-
+    '''
 # Task 2
 @task(retries=3,retry_delay_seconds=2)
 def happy_stats(df):
@@ -142,12 +144,13 @@ def hypothesis(df):
     logger.info(f"Mean 2019: {year1.mean()}\n")
     logger.info(f"Mean 2020: {year2.mean()}")
     
-    #Results:
-    # The p-value is greater than or equal to 0.05, so the difference in
-    # average happiness scores between 2019 and 2020 is not statistically significant.
-    # This suggests there is not enough evidence to conclude that average
-    # global happiness scores changed between 2019 and 2020.
-    
+    '''
+    Results:
+    The p-value is greater than or equal to 0.05, so the difference in
+    average happiness scores between 2019 and 2020 is not statistically significant.
+    This suggests there is not enough evidence to conclude that average
+    global happiness scores changed between 2019 and 2020.
+    '''
     #Test of my choice
     country1 = df[df['Country'] == "Switzerland"]["Happiness score"]
     country2 = df[df['Country'] == "United States"]["Happiness score"]

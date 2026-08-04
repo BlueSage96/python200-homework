@@ -177,8 +177,12 @@ axs[1].set_title('Distribution Comparison')
 axs[1].boxplot(skewed_data,labels=["Exponential"],patch_artist=True,medianprops={'color':'blue'})
 plt.show()
 
-#The exponential distribution is more skewed. 
-#The median would provide a more appropriate measure of central tendency for each distribution.
+'''
+The exponential distribution is more skewed. 
+
+The median would provide a more appropriate measure 
+of central tendency for each distribution.
+'''
 
 # Descriptive Stats 05
 data1 = [10,12,12,16,18]
@@ -197,11 +201,12 @@ print(f"Data 2 median: {data2_df.median()}")
 print(f"Data 1 mode: {data1_df.mode()}")
 print(f"Data 2 mode: {data2_df.mode()}")
 
-# Data2 contains an outlier (150), which increases the mean.
-# The median stays the same as data1 because it is not affected much by extreme values.
-
+'''
+Data2 contains an outlier (150), which increases the mean.
+The median stays the same as data1 because it is not 
+affected much by extreme values.
+'''
 #_____________________________________________________________________________
-
 
 # Hypothesis Question 01
 group_a = [72,68,75,70,69,73,71,74]
