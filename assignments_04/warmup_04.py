@@ -57,9 +57,11 @@ knn_auc = roc_auc_score(y_test,knn_probs)
 
 print(f"AUC KNN: {knn_auc:.3f}")
 
-#KNN has an AUC of 0.939 while logistic regression has an AUC of 0.706.
-#Since KNN has a higher AUC, it can distinguish between two classes 
-# better than logistic regression.
+'''
+KNN has an AUC of 0.939 while logistic regression has an AUC of 0.706.
+Since KNN has a higher AUC, it can distinguish between two classes 
+better than logistic regression.
+'''
 
 #ROC 02
 fpr, tpr, thresholds = roc_curve(y_test, y_probs)
@@ -77,8 +79,11 @@ plt.tight_layout()
 plt.savefig("outputs/roc_comparison.png")
 plt.show()
 
-# At TPR = 0.80, KNN has a lower false positive rate than Logistic Regression.
-# This means KNN produces fewer false alarms while still correctly identifying 80% of the positive cases.
+'''
+At TPR = 0.80, KNN has a lower false positive rate than Logistic Regression.
+This means KNN produces fewer false alarms while still correctly 
+identifying 80% of the positive cases.
+'''
 
 #ROC 03
 best_f1 = 0
@@ -99,9 +104,11 @@ print(f"Optimal FPR: {best_fpr}")
 print(f"Optimal Threshold: {best_threshold}")
 print(f"Optimal F1: {best_f1}")
 
-#1. The optimal threshold is below 0.5 (it's 0.28)
-#2. In a real world application, I would choose a 
-# lower threshold than 0.5 to make sure I get the optimal threshold
+'''
+1. The optimal threshold is below 0.5 (it's 0.28)
+2. In a real world application, I would choose a 
+lower threshold than 0.5 to make sure I get the optimal threshold
+'''
 
 #GridSearch 01
 lr_pipe = Pipeline([
@@ -112,7 +119,6 @@ lr_pipe = Pipeline([
 param_grid = {
     "clf__C":[0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
 }
-
 
 grid_search = GridSearchCV(
     estimator=lr_pipe,
@@ -136,10 +142,12 @@ print(f"Best CV AUC: {grid_search.best_score_:.3f}")
 print(f"Test AUC: {auc_lr}")
 print(f"AUC change: {auc_change}")
 
-# GridSearch selected C=100.0 instead of the default C=1.0.
-# The default model had a test AUC of 0.706, while the tuned model
-# achieved 0.7093. This is an improvement of 0.003 AUC points, so
-# tuning provided a small performance gain.
+'''
+GridSearch selected C=100.0 instead of the default C=1.0.
+The default model had a test AUC of 0.706, while the tuned model
+achieved 0.7093. This is an improvement of 0.003 AUC points, so
+tuning provided a small performance gain.
+'''
 
 #GridSearch 02
 param_grid_dtc = {
@@ -165,10 +173,12 @@ print(f"Best Max Depth: {grid_search_dtc.best_params_['max_depth']}")
 print(f"Best CV AUC: {grid_search_dtc.best_score_:.3f}")
 print(f"Test AUC: {auc_dtc}")
 
-#1. I would bring the decision tree into further development 
-# since it's best AUC is larger than the logistic regression one.
+'''
+1. I would bring the decision tree into further development 
+since it's best AUC is larger than the logistic regression one.
 
-#2. I would decide not only by AUC but also threshold and F1.
+2. I would decide not only by AUC but also threshold and F1.
+'''
 
 #GridSearch 03
 print(f"\nGridSearch 03:\n")
@@ -227,5 +237,7 @@ for n, row in enumerate(new_samples):
     print(f"Predicted class: {prediction[0]}\n")
     print(f"Probability:\n {confidence:.3f}")
 
-# I expect the all-zeros row to predict class 0 since it's basically a
-# neutral example with no strong feature values.
+'''
+I expect the all-zeros row to predict class 0 since it's basically a
+neutral example with no strong feature values.
+'''
