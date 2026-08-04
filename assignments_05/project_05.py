@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from openai import OpenAI
+import json
 
 load_dotenv()
 client = OpenAI()
@@ -45,3 +46,46 @@ I deliberately chose to instruct the chatbot to stay focused on its job
 even if the user starts talking about personal stuff. That way there 
 is not a privacy or liability issue later on.
 '''
+
+# Task 02
+
+def rewrite_bullets(bullets: list[str]) -> list[dict]:
+    # Format the bullets into a delimited block
+    bullet_text = "\n".join(f"- {b}" for b in bullets)
+
+    prompt = f"""
+    You are a professional resume coach helping a career changer.
+    Rewrite each resume bullet point below to be more specific, results-oriented, and compelling.
+    Use strong action verbs. Do not invent facts that aren't implied by the original.
+
+    Respond ONLY with valid JSON, no other text.
+    Each item should have two keys:
+    "original" (the original bullet) and "improved" (your rewritten version).
+
+    Bullet points:
+    ```
+    {bullet_text}
+    ```
+    """
+
+    messages = [{"role": "user", "content": prompt}]
+    response = get_completion(messages,temperature=0)
+    try: 
+        result = json.loads(response)
+        return result
+    except json.JSONDecodeError:
+        print("Error: response is not valid JSON")
+
+bullets = [
+    "Helped customers with their problems",
+    "Made reports for the management team",
+    "Worked with a team to finish the project on time"
+]
+
+new_bullets = rewrite_bullets(bullets)
+
+print(f"\nTask 02:\n")
+print(f"Bullet Point Rewriter:\n{new_bullets}")
+
+# Addng try/catch didn't prevent errors! 
+# I don't know how to fix the issue!!
