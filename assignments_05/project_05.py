@@ -90,173 +90,172 @@ print(f"Bullet Point Rewriter:\n{new_bullets}")
 # The improvements are meaningful.
 
 # Task 03
-# def generate_cover_letter(job_title: str, background: str) -> str:
-#     prompt = f"""
-#     You write strong cover letter opening paragraphs for career changers.
-#     The paragraph should be 3-5 sentences: confident, specific, and free of clichés.
+def generate_cover_letter(job_title: str, background: str) -> str:
+    prompt = f"""
+    You write strong cover letter opening paragraphs for career changers.
+    The paragraph should be 3-5 sentences: confident, specific, and free of clichés.
 
-#     Here are two examples of the style and tone you should match:
+    Here are two examples of the style and tone you should match:
 
-#     Example 1:
-#     Role: Data Analyst at a healthcare nonprofit
-#     Background: Seven years as a registered nurse, recently completed a data analytics bootcamp.
-#     Opening: After seven years as a registered nurse, I've spent my career making decisions
-#     under pressure using incomplete information — which turns out to be excellent training for
-#     data analysis. I recently completed a data analytics program where I built dashboards
-#     tracking patient outcomes across departments. I'm excited to bring that combination of
-#     clinical context and technical skill to [Company]'s mission-driven work.
+    Example 1:
+    Role: Data Analyst at a healthcare nonprofit
+    Background: Seven years as a registered nurse, recently completed a data analytics bootcamp.
+    Opening: After seven years as a registered nurse, I've spent my career making decisions
+    under pressure using incomplete information — which turns out to be excellent training for
+    data analysis. I recently completed a data analytics program where I built dashboards
+    tracking patient outcomes across departments. I'm excited to bring that combination of
+    clinical context and technical skill to [Company]'s mission-driven work.
 
-#     Example 2:
-#     Role: Junior Software Engineer at a fintech startup
-#     Background: Ten years in retail banking operations, self-taught Python developer for two years.
-#     Opening: I spent a decade on the operations side of banking, watching technology decisions
-#     get made by people who had never processed a wire transfer or resolved a failed ACH batch.
-#     That frustration turned into curiosity, and two years of self-teaching Python later, I'm
-#     ready to be on the other side of those decisions. I'm applying to [Company] because your
-#     work on payment infrastructure is exactly where my domain expertise and new technical skills
-#     intersect.
+    Example 2:
+    Role: Junior Software Engineer at a fintech startup
+    Background: Ten years in retail banking operations, self-taught Python developer for two years.
+    Opening: I spent a decade on the operations side of banking, watching technology decisions
+    get made by people who had never processed a wire transfer or resolved a failed ACH batch.
+    That frustration turned into curiosity, and two years of self-teaching Python later, I'm
+    ready to be on the other side of those decisions. I'm applying to [Company] because your
+    work on payment infrastructure is exactly where my domain expertise and new technical skills
+    intersect.
 
-#     Now write an opening paragraph for this person:
-#     Role: {job_title}
-#     Background: {background}
-#     Opening:
-#     """
+    Now write an opening paragraph for this person:
+    Role: {job_title}
+    Background: {background}
+    Opening:
+    """
 
-#     messages = [{"role": "user", "content": prompt}]
-#     response = get_completion(messages,temperature=0)
-#     return response
+    messages = [{"role": "user", "content": prompt}]
+    response = get_completion(messages,temperature=0)
+    return response
 
-# job_title = "Junior Video Game Developer"
-# background = "eight years of experience as a IT analyst; recently completed \
-# a game development course and built a small game in Unreal Engine 5."
+job_title = "Junior Video Game Developer"
+background = "eight years of experience as a IT analyst; recently completed \
+a game development course and built a small game in Unreal Engine 5."
 
-# cover = generate_cover_letter(job_title,background)
+cover = generate_cover_letter(job_title,background)
 
-# print(f"\nTask 03:\n")
-# print(f"Cover Letter Generator:\n{cover}")
+print(f"\nTask 03:\n")
+print(f"Cover Letter Generator:\n{cover}")
 
-# '''
-#    The output feels tailored to the specific user without inventing credientals not mentioned.
-#    I changed the default infomration with another job title & background with the same result.
-# '''
+'''
+   The output feels tailored to the specific user without inventing credientals not mentioned.
+   I changed the default infomration with another job title & background with the same result.
+'''
 
-# # Task 04
-# print(f"\nTask 04:\n")
+# Task 04
+print(f"\nTask 04:\n")
 
-# def is_safe(text: str) -> bool:
-#     result = client.moderations.create(
-#         model="omni-moderation-latest",
-#         input=text
-#     )
-#     flagged = result.results[0].flagged
-#     # print("Flagged categories:\n",result.results[0].categories)
-#     if not flagged:
-#         return True
+def is_safe(text: str) -> bool:
+    result = client.moderations.create(
+        model="omni-moderation-latest",
+        input=text
+    )
+    flagged = result.results[0].flagged
+    # print("Flagged categories:\n",result.results[0].categories)
+    if not flagged:
+        return True
     
-#     else:
-#         print("Your response has been flagged for harmful language.")
-#         return False
+    else:
+        print("Your response has been flagged for harmful language.")
+        return False
         
-# input1 = "I love my cat and I want to hold him!"
-# checker = is_safe(input1)
-# print(f"Moderation Checker 01:\n{checker}")        
+input1 = "I love my cat and I want to hold him!"
+checker = is_safe(input1)
+print(f"Moderation Checker 01:\n{checker}")        
 
-# # Prints AFTER print statement in function!
-# input2 = "I want to kill my professor! She's terrible at her job!"
-# checker2 = is_safe(input2)
-# print(f"\nModeration Checker 02:\n{checker2}") 
+# Prints AFTER print statement in function!
+input2 = "I want to kill my professor! She's terrible at her job!"
+checker2 = is_safe(input2)
+print(f"\nModeration Checker 02:\n{checker2}") 
 
-# input3 = "I'm outside of my favorite celebrite's house and I'm ready to jump on her!" 
-# checker3 = is_safe(input3)
-# print(f"\nModeration Checker 03:\n{checker3}")    
+input3 = "I'm outside of my favorite celebrite's house and I'm ready to jump on her!" 
+checker3 = is_safe(input3)
+print(f"\nModeration Checker 03:\n{checker3}")    
 
-# '''
-#     My first two test cases were moderated correctly after I was more explicit.
-#     My safe test case passed without triggering a warning.
-#     My borderline phrase always returns true despite trying to trigger certain categories.
-# '''
+'''
+    My first two test cases were moderated correctly after I was more explicit.
+    My safe test case passed without triggering a warning.
+    My borderline phrase always returns true despite trying to trigger certain categories.
+'''
 
-# # Task 05
-# print(f"\nTask 05:\n")
+# Task 05
+print(f"\nTask 05:\n")
 
-# def run_chatbot():
-#     # 1. Initialize conversation history with your system prompt
-#     messages = [
-#         {"role": "system", "content": "You are required to maintain a professional tone while talking to users."}
-#     ]
+def run_chatbot():
+    # 1. Initialize conversation history with your system prompt
+    messages = [
+        {"role": "system", "content": "You are required to maintain a professional tone while talking to users."}
+    ]
     
-#     response = client.chat.completions.create(
-#     model="gpt-4o-mini",
-#     messages=messages,
-#     temperature=1.0
-#     )
+    response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=messages,
+    temperature=1.0
+    )
     
-#     print("=" * 50)
-#     print("Job Application Helper")
-#     print("=" * 50)
-#     print("I can help you with:")
-#     print("  1. Rewriting resume bullet points")
-#     print("  2. Drafting a cover letter opening")
-#     print("  3. Any other questions about your application")
-#     print("\nType 'quit' at any time to exit.\n")
+    print("=" * 50)
+    print("Job Application Helper")
+    print("=" * 50)
+    print("I can help you with:")
+    print("  1. Rewriting resume bullet points")
+    print("  2. Drafting a cover letter opening")
+    print("  3. Any other questions about your application")
+    print("\nType 'quit' at any time to exit.\n")
 
-#     while True:
-#         user_input = input("You: ").strip()
-#         print("Input:",user_input)
-#         # 2. Handle exit
-#         if user_input.lower() in {"quit", "exit"}:
-#             print("\nJob Application Helper: Good luck with your applications!")
-#             break
+    while True:
+        user_input = input("You: ").strip()
+        print("Input:",user_input)
+        # 2. Handle exit
+        if user_input.lower() in {"quit", "exit"}:
+            print("\nJob Application Helper: Good luck with your applications!")
+            break
 
-#         # 3. Skip empty input
-#         if not user_input:
-#             continue
+        # 3. Skip empty input
+        if not user_input:
+            continue
 
-#         # 4. Run moderation check before doing anything else
-#         if not is_safe(user_input):
-#             continue  # is_safe() already printed the warning message
+        # 4. Run moderation check before doing anything else
+        if not is_safe(user_input):
+            continue  # is_safe() already printed the warning message
 
-#         # 5. Check if the user wants to rewrite bullets
-#         #    (hint: look for keywords like "bullet" or "resume" in user_input.lower())
-#         if "bullet" in user_input.lower() or "resume" in user_input.lower():
-#             print("\nJob Application Helper: Paste your bullet points below, one per line.")
-#             print("When you're done, type 'DONE' on its own line.\n")
+        # 5. Check if the user wants to rewrite bullets
+        #    (hint: look for keywords like "bullet" or "resume" in user_input.lower())
+        if "bullet" in user_input.lower() or "resume" in user_input.lower():
+            print("\nJob Application Helper: Paste your bullet points below, one per line.")
+            print("When you're done, type 'DONE' on its own line.\n")
             
-#             raw_bullets = []
-#             while True:
-#                 line = input().strip()
-#                 if line.upper() == "DONE":
-#                     break
-#                 if line:
-#                     raw_bullets.append(line)
+            raw_bullets = []
+            while True:
+                line = input().strip()
+                if line.upper() == "DONE":
+                    break
+                if line:
+                    raw_bullets.append(line)
                     
-#             # YOUR CODE: call rewrite_bullets() and print the results
-#             new_raw_bullets = rewrite_bullets(raw_bullets)
-#             print(f"Bullet Point Rewriter:\n{new_raw_bullets}")
+            new_raw_bullets = rewrite_bullets(raw_bullets)
+            print(f"Bullet Point Rewriter:\n{new_raw_bullets}")
             
-#         # 6. Check if the user wants a cover letter
-#         elif "cover letter" in user_input.lower():
-#             job_title = input("Job Application Helper: What is the job title? ").strip()
-#             background = input("Job Application Helper: Briefly describe your background: ").strip()
-#             letter = generate_cover_letter(job_title,background)
-#             print(f"My cover letter:\n{letter}")
-#         # 7. Otherwise, handle it as a regular chat turn
-#         else:
-#             # - Append the user's message to `messages`
-#             messages.append({
-#                 "role": "user",
-#                 "content":user_input
-#                 })
-#             # - Call get_completion(messages)
-#             response = get_completion(messages,temperature=0)
-#             # - Print the reply
-#             print(f"\nUser responses:\n{response}")
-#             # - Append the reply to `messages` as an assistant message
-#             messages.append({
-#                 "role": "assistant",
-#                 "content": response
-#             })
-#             pass
+        # 6. Check if the user wants a cover letter
+        elif "cover letter" in user_input.lower():
+            job_title = input("Job Application Helper: What is the job title? ").strip()
+            background = input("Job Application Helper: Briefly describe your background: ").strip()
+            letter = generate_cover_letter(job_title,background)
+            print(f"My cover letter:\n{letter}")
+        # 7. Otherwise, handle it as a regular chat turn
+        else:
+            # - Append the user's message to `messages`
+            messages.append({
+                "role": "user",
+                "content":user_input
+                })
+            # - Call get_completion(messages)
+            response = get_completion(messages,temperature=0)
+            # - Print the reply
+            print(f"\nUser responses:\n{response}")
+            # - Append the reply to `messages` as an assistant message
+            messages.append({
+                "role": "assistant",
+                "content": response
+            })
+            pass
 
-# if __name__ == "__main__":
-#     run_chatbot()
+if __name__ == "__main__":
+    run_chatbot()
