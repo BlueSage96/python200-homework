@@ -174,22 +174,25 @@ def is_safe(text: str) -> bool:
         return True
     
     else:
-        print("""I'm sorry, but I can't help with that request.
-        Please rephrase it in a respectful and safe way.""")
+        print("I'm sorry, but I can't help with that request.")
+        print("Please rephrase it in a respectful and safe way.")
         return False
         
 input1 = "I love my cat and I want to hold him!"
 checker = is_safe(input1)
-print(f"Safe Input:\n{checker}")        
+print("Safe input:")
+print(checker)      
 
 # Prints AFTER print statement in function!
 input2 = "I want to kill my professor! She's terrible at her job!"
 checker2 = is_safe(input2)
-print(f"\nFlagged Input:\n{checker2}") 
+print("\nFlagged input:")
+print(checker2) 
 
 input3 = "I'm outside of my favorite celebrite's house and I'm ready to jump on her!" 
 checker3 = is_safe(input3)
-print(f"\nBorderline Input:\n{checker3}")    
+print("\nBorderline input:")
+print(checker3)  
 
 '''
     The safe test case passed the moderation check without being flagged. 
@@ -266,28 +269,31 @@ If you do not know industry-specific expectations, tell the user to use their ow
 
             assistant_reply = "Here are your improved resume bullet points:\n\n"
 
+            assistant_reply = "Here are your revised resume bullet points:\n\n"
+
             for bullet in new_raw_bullets:
                 assistant_reply += (
                     f"Original : {bullet['original']}\n"
-                    f"Improved: {bullet['improved']}\n"
-                    + "-" * 40 + "\n"
+                    f"Improved: {bullet['improved']}\n\n"
                 )
 
-            print(f"\n{assistant_reply}")
+            print(assistant_reply)
 
             messages.append({
                 "role": "assistant",
                 "content": assistant_reply
             })
-
         # Cover letter generator
         elif "cover letter" in user_input.lower():
 
             job_title = input("Job Application Helper: What is the job title? ").strip()
             background = input("Job Application Helper: Briefly describe your background: ").strip()
 
+            messages.append({
+                "role": "user",
+                "content": f"Job title: {job_title}\nBackground: {background}"
+            })
             letter = generate_cover_letter(job_title, background)
-
             print(f"\nJob Application Helper:\n{letter}")
 
             messages.append({
@@ -313,7 +319,7 @@ if __name__ == "__main__":
 # Comment block 
 
 '''
-Format Chosen: Written Reflection:
+Format Chosen: Written Reflection
 
 Q1. The chatbot's knowledge may be biased toward the IT and video game industries because
     the examples I provided focused on those fields. As a result, it may generate stronger

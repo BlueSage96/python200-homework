@@ -8,13 +8,14 @@ client = OpenAI()
 
 response = client.chat.completions.create(
     model = "gpt-4o-mini",
-    messages = [{"role":"user","content":"What is one thing that makes Python a good language for beginners?"}]
+    messages = [{"role":"user","content":
+        "What is one thing that makes Python a good language for beginners?"}]
 )
 
 print(f"API 01:\n")
 print(f"Response: \n{response.choices[0].message.content}")
 print(f"\nModel: {response.model}")
-print(f"\nTokens used:{response.usage.total_tokens}")
+print(f"\nTotal tokens:{response.usage.total_tokens}")
 
 #API 02
 print(f"\nAPI 02:\n")
@@ -77,11 +78,12 @@ print(f"\nAPI 04:\n")
 print(f"Neural networks response:\n{response.choices[0].message.content}")
 
 '''
-1. With max_tokens set to 15, the explanation was cut off before it could fully 
-   explain how neural networks work. This showed how limiting the token count can 
-   shorten or truncate a response.
-2. Using max_tokens in a real application helps control response length, reduce
-   API costs, and keep responses concise when a long explanation isn't necessary.
+    With max_tokens set to 15, the model's explanation was cut off before it could fully
+    answer the question. This demonstrated how limiting the token count truncates longer
+    responses.
+
+    Using max_tokens is useful because it helps control API costs, keeps responses concise,
+    and prevents the model from generating more text than an application needs.
 '''
 
 # System Question 01
@@ -192,9 +194,11 @@ for r in reviews:
     response = get_completion(prompt, temperature=0)
     print(f"Review {o}:\n{response}")
 '''
-The one-shot prompt gave the model a reference for the expected format. Although the results 
-were similar to the zero-shot responses for this task, providing an example can make the 
-output more consistent for more complex prompts.
+    The zero-shot prompt correctly classified all three reviews using the model's existing
+    knowledge, but the wording of the responses varied slightly. The one-shot example produced
+    more consistent formatting because the model had a reference to imitate. The few-shot
+    prompt produced the most consistent labels because multiple examples reinforced the
+    expected pattern.
 '''
 
 # Prompt 03 - Few-Shot
@@ -287,16 +291,19 @@ prompt = f"""
     """
 response = get_completion(prompt, temperature=0)
 
-try:
+print("Raw response:")
+print(response)
 
+try:
     result = json.loads(response)
+
     print("Sentiment:", result["sentiment"])
     print("Confidence:", result["confidence"])
     print("Reason:", result["reason"])
 
 except json.JSONDecodeError:
     print("JSON parsing failed.")
-    print("The model returned:")
+    print("Raw response:")
     print(response)
     
 
