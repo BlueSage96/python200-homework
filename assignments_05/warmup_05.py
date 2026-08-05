@@ -44,10 +44,12 @@ response_temp3 = client.chat.completions.create(
 print(f"\nTemperature 3:\n{response_temp3.choices[0].message.content}")
 
 '''
-1. Each time the code is ran, each response is different from one another 
-   and different from the response of the run before
-2. I would choose the 1.5 temperature as it has produced the best names
-   has the most variation each run.
+1. When I tested different temperature settings, the responses became more 
+   creative as the temperature increased. Temperature 0 produced the most 
+   consistent names, while 1.5 generated the most varied and unexpected 
+   suggestions.
+2. I would choose a temperature of 1.5 for brainstorming because it consistently 
+   gave me the most creative and unique consultancy names.
 '''
 
 # API 03
@@ -71,12 +73,20 @@ response = client.chat.completions.create(
 print(f"\nAPI 04:\n")
 print(f"Neural networks response:\n{response.choices[0].message.content}")
 
-#1. Setting max tokens means a long response will not be completed and would need more tokens.
-#2. Using max tokens in a real app will help with managing costs and token limits from an API.
+'''
+1. With max_tokens set to 15, the explanation was cut off before it could fully 
+   explain how neural networks work. This showed how limiting the token count can 
+   shorten or truncate a response.
+2. Using max_tokens in a real application helps control response length, reduce
+   API costs, and keep responses concise when a long explanation isn't necessary.
+'''
 
 # System Question 01
 messages = [
-    {"role": "system", "content": "You are a patient, encouraging Python tutor. You always explain things simply and end with a word of encouragement."},
+    {"role": "system", "content": 
+        """
+        You are a patient, encouraging Python tutor. 
+        You always explain things simply and end with a word of encouragement."""},
     {"role": "user", "content": "I don't understand what a list comprehension is."}
 ]
 response = client.chat.completions.create(model='gpt-4o-mini',
@@ -86,7 +96,10 @@ print(f"\nSystem 01:\n")
 print(f"Personality 01:\n{response.choices[0].message.content}")
 
 messages2 = [
-    {"role": "system", "content": "You are an annoyed Python tutor with no time to explain questions. You always explain with the quickest explanation and end with a statement that ends the conversation."},
+    {"role": "system", "content": """
+     You are an annoyed Python tutor with no time to explain questions. 
+     You always explain with the quickest explanation and end with a statement that 
+     ends the conversation."""},
     {"role": "user", "content": "I don't understand what a list comprehension is."}
 ]
 response2 = client.chat.completions.create(model='gpt-4o-mini',
@@ -94,8 +107,14 @@ response2 = client.chat.completions.create(model='gpt-4o-mini',
 
 print(f"Personality 02:\n{response2.choices[0].message.content}")
 
-# The model easily adapted to the personality descriptions and embraced th new personality by becaming impatient, 
-# only giving a short explanation of the question and shuts any opportunity for more questions.
+'''
+    The two system prompts produced noticeably different responses even though the user 
+    asked the exact same question. The first tutor gave a detailed, encouraging explanation 
+    and ended with positive encouragement, while the second tutor gave a much shorter, impatient 
+    response and ended the conversation instead of inviting further questions. This showed that 
+    the system prompt strongly influences the model’s tone, teaching style, and overall behavior.
+'''
+
 
 # System Question 02
 print(f"\nSystem 02:\n")
@@ -124,7 +143,6 @@ def get_completion(prompt: str, model="gpt-4o-mini", temperature=0):
     )
     return response.choices[0].message.content
 
-
 # Prompt 01 - Zero Shot
 reviews = [
     "The onboarding process was smooth and the team was welcoming.",
@@ -135,30 +153,36 @@ reviews = [
 print(f"\nPrompt 01:\n")
 
 # No examples provided - model uses pre-trained knowledge
-p = 0
+z = 0
 for r in reviews:
-    p += 1
+    z += 1
     prompt = f"What is the sentiment of this review positive, negative, or mixed: {r}"
     response = get_completion(prompt, temperature=0)
-    print(f"Review {p}:\n{response}")
+    print(f"Zero shot 0{z}:\n{response}")
     
 # Prompt 02 - One Shot
 print(f"\nPrompt 02:\n")
+o = 0
 for r in reviews:
-    p += 1
+    o += 1
     prompt = f"""
     Example: The new laptop turns on but has a blank screen.
     Review: What is the sentiment of this review positive, negative, or mixed: {r}
     """
     response = get_completion(prompt, temperature=0)
-    print(f"Review {p}:\n{response}")
+    print(f"One-Shot 0{o}:\n{response}")
 
-# Adding an example did not affect the bot's responses because the temperature = 0.
+'''
+The one-shot prompt gave the model a reference for the expected format. Although the results 
+were similar to the zero-shot responses for this task, providing an example can make the 
+output more consistent for more complex prompts.
+'''
 
+fs = 0
 # Prompt 03 - Few-Shot
 print(f"\nPrompt 03:\n")
 for r in reviews:
-    p += 1
+    fs += 1
     prompt = f"""
     Example 1: My cat greeted me with a kiss.
     Example 2: I took a physical and did not pass.
@@ -166,11 +190,26 @@ for r in reviews:
     Review: What is the sentiment of this review positive, negative, or mixed: {r}
     """
     response = get_completion(prompt, temperature=0)
-    print(f"Review {p}:\n{response}")
+    print(f"Few-Shot 0{fs}:\n{response}")
     
-#1. I would choose no shot for a quick chat, i.e. Create some lottery tickets numbers for me.
-#2. I would use one shot when the request is not difficult but I still have to specific.
-#3. The few-shot for my complicated chats especially ones that involve programming or critical thinking
+'''
+1. The zero-shot prompt worked well for this simple sentiment classification task 
+   because the model already understood the request without needing examples. It produced 
+   short and consistent labels for each review.
+
+2. The one-shot prompt gave the model a reference for the expected format. Although the 
+   results were similar to the zero-shot responses for this task, providing an example can 
+   make the output more consistent for more complex prompts.
+
+3. The few-shot prompt provided multiple examples, making the expected pattern even clearer. 
+   For this simple sentiment task, the answers were similar to the other approaches, but few-shot 
+   prompting is more useful when a task requires a specific style, format, or reasoning pattern.
+
+4. I would use zero-shot for simple, common tasks that the model already understands, such as 
+   sentiment classification or basic questions. I would use one-shot when I want to demonstrate 
+   the expected format with a single example. I would use few-shot for more complex tasks where 
+   several examples help the model produce more consistent and accurate responses.
+'''
 
 # Prompt 04 - Chain of Thought
 prompt = f"""
@@ -198,19 +237,17 @@ prompt = f"""
     Review: {review}
 """
 response = get_completion(prompt, temperature=0)
-print(f"Raw response:\n{response}")
 
 # Parse JSON safely
 try:
-    result = json.loads(response)
+    result = json.loads(response)   
     print("Parsed sentiment:", result["sentiment"])
     print("Confidence:", result["confidence"])
     print("Reason:",result["reason"])
 except json.JSONDecodeError:
-    print("Error: response was not valid JSON")
+    print(f"Error: Unable to parse the model's response as JSON. Raw response:{response}")
     
- # Prompt 06 - Delimeters
-
+# Prompt 06 - Delimeters
 print(f"\nPrompt 06:\n")
 
 user_text1 = "First boil a pot of water. Once boiling, add a handful of salt and the \
@@ -227,8 +264,9 @@ response1 = get_completion(prompt1, temperature=0)
 print(f"Delimeters 01:\n\n{response1}")
 
 
-user_text2 = "Oreo, sing the night jingle. The cats on the bus go meow, meow, meow.\
-The cats on the bus go meow, meow, meow. All the way to school."
+user_text2 = """Oreo is a domestic shorthair tuxedo cat and this is his bedtime lullaby. 
+The cats on the bus go meow, meow, meow.\
+The cats on the bus go meow, meow, meow. All the way to school."""
 
 prompt2 = f"""
 You will be given text inside triple backticks.
@@ -248,13 +286,13 @@ prompt = f"""
 Review: Explain what a large language model is in two sentences.
 """
 response = get_completion(prompt, temperature=0)
-print(f"\nOllama 01:\n {response}")
+print(f"\nOpenAI response:\n {response}")
 
+# Ollama
 '''
-Ollama response:
-A large language model is an AI system trained on vast datasets to understand 
-and generate human-like text, enabling it to process context and learn complex 
-patterns for real-time interactions.
+A large language model is a complex system that processes and generates human-like text, enabling it to 
+understand and respond to language in real time. It is trained on vast amounts of text, allowing it to learn 
+patterns and general knowledge, making it capable of tasks like writing, speaking, or even answering questions.
 '''
 
 '''
