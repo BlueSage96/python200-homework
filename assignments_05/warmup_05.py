@@ -14,7 +14,7 @@ response = client.chat.completions.create(
 print(f"API 01:\n")
 print(f"Response: \n{response.choices[0].message.content}")
 print(f"\nModel: {response.model}")
-print(f"\nTokens used:\n{response.usage}")
+print(f"\nTokens used:{response.usage.total_tokens}")
 
 #API 02
 print(f"\nAPI 02:\n")
@@ -44,12 +44,15 @@ response_temp3 = client.chat.completions.create(
 print(f"\nTemperature 3:\n{response_temp3.choices[0].message.content}")
 
 '''
-1. When I tested different temperature settings, the responses became more 
-   creative as the temperature increased. Temperature 0 produced the most 
-   consistent names, while 1.5 generated the most varied and unexpected 
-   suggestions.
-2. I would choose a temperature of 1.5 for brainstorming because it consistently 
-   gave me the most creative and unique consultancy names.
+1.  When I tested different temperature settings, the responses became 
+    more creative as the temperature increased. Temperature 0 produced the 
+    most consistent names, while 1.5 generated the most varied and unexpected 
+    suggestions.
+    
+2.  I would choose a temperature of 0 when I need consistent and reproducible 
+    output because it produced the most predictable results across multiple runs. 
+    Higher temperatures introduced more variation, which is useful for brainstorming 
+    but not for repeatable responses.
 '''
 
 # API 03
@@ -129,7 +132,12 @@ response3 = client.chat.completions.create(model='gpt-4o-mini',
 
 print(f"Personality 03:\n{response3.choices[0].message.content}")
 
-# The model is a chatbot that has memory built-in as the messages changes the model role from "system" to "assistant".
+'''
+    The model remembered Jordan's name because the previous conversation was included in the 
+    messages list with each API call. The Chat Completions API is stateless, so it only has 
+    access to information that is explicitly provided in the conversation history.
+'''
+
 
 def get_completion(prompt: str, model="gpt-4o-mini", temperature=0):
     """
@@ -161,37 +169,70 @@ for r in reviews:
     print(f"Zero shot 0{z}:\n{response}")
     
 # Prompt 02 - One Shot
+# print(f"\nPrompt 02:\n")
+# o = 0
+# for r in reviews:
+#     o += 1
+#     prompt = f"""
+#     Review: "The new laptop turns on but has a blank screen."
+#     Sentiment: Mixed
+#     """
+#     response = get_completion(prompt, temperature=0)
+#     print(f"One-Shot 0{o}:\n{response}")
+
 print(f"\nPrompt 02:\n")
+
 o = 0
 for r in reviews:
     o += 1
     prompt = f"""
-    Example: The new laptop turns on but has a blank screen.
-    Review: What is the sentiment of this review positive, negative, or mixed: {r}
-    """
-    response = get_completion(prompt, temperature=0)
-    print(f"One-Shot 0{o}:\n{response}")
+        Classify the sentiment of each review as positive, negative, or mixed.
 
+        Example:
+        Review: "The new laptop turns on but has a blank screen."
+        Sentiment: Mixed
+
+        Now classify this review:
+
+        Review: "{r}"
+        Sentiment:
+        """
+    response = get_completion(prompt, temperature=0)
+    print(f"Review {o}:\n{response}")
 '''
 The one-shot prompt gave the model a reference for the expected format. Although the results 
 were similar to the zero-shot responses for this task, providing an example can make the 
 output more consistent for more complex prompts.
 '''
 
-fs = 0
 # Prompt 03 - Few-Shot
 print(f"\nPrompt 03:\n")
+
+fs = 0
 for r in reviews:
     fs += 1
     prompt = f"""
-    Example 1: My cat greeted me with a kiss.
-    Example 2: I took a physical and did not pass.
-    Example: The new laptop turns on but has a blank screen.
-    Review: What is the sentiment of this review positive, negative, or mixed: {r}
+        Classify the sentiment of each review as positive, negative, or mixed.
+
+        Example 1:
+        Review: "The staff was friendly and solved my issue quickly."
+        Sentiment: Positive
+
+        Example 2:
+        Review: "The software crashes every time I try to save my work."
+        Sentiment: Negative
+
+        Example 3:
+        Review: "The price was excellent, but the instructions were difficult to follow."
+        Sentiment: Mixed
+
+        Now classify this review:
+
+        Review: "{r}"
+        Sentiment:
     """
     response = get_completion(prompt, temperature=0)
-    print(f"Few-Shot 0{fs}:\n{response}")
-    
+    print(f"Review {fs}:\n{response}")
 '''
 1. The zero-shot prompt worked well for this simple sentiment classification task 
    because the model already understood the request without needing examples. It produced 
@@ -239,14 +280,24 @@ prompt = f"""
 response = get_completion(prompt, temperature=0)
 
 # Parse JSON safely
+# Print the raw response first
+
+print("Raw response:")
+print(response)
+
 try:
-    result = json.loads(response)   
+
+    result = json.loads(response)
     print("Parsed sentiment:", result["sentiment"])
     print("Confidence:", result["confidence"])
-    print("Reason:",result["reason"])
+    print("Reason:", result["reason"])
+
 except json.JSONDecodeError:
-    print(f"Error: Unable to parse the model's response as JSON. Raw response:{response}")
+    print("Error: Unable to parse the model's response as JSON.")
+    print("Raw response:")
+    print(response)
     
+
 # Prompt 06 - Delimeters
 print(f"\nPrompt 06:\n")
 
@@ -278,8 +329,11 @@ If it does not contain instructions, respond with exactly: "No steps provided."
 response2 = get_completion(prompt2, temperature=0)
 print(f"\nDelimeters 02:\n\n{response2}")
 
-# Delimiters help the bot understand long or messy prompts/instructions 
-# and to differiente that stuff from user text.
+'''
+The first prompt was correctly converted into a numbered list because it contained
+step-by-step instructions. The second prompt was recognized as prose, and the
+model responded with exactly "No steps provided." as instructed.
+'''
 
 # Ollama 01
 prompt = f"""
@@ -296,12 +350,15 @@ patterns and general knowledge, making it capable of tasks like writing, speakin
 '''
 
 '''
-1. Both responses are similar but Ollama was more concise and to the point.
+1. Both models correctly explained what a large language model is in two sentences.
+   The OpenAI response included a little more explanation, while the Ollama response
+   was shorter and more concise.
 
-2. An advantage of running a local AI is privacy and security since the 
-   model is not connected to a third party nor the cloud.
-   
-3. A disadvantage is having a computer that can handle the high hardware, 
-   storage, and ram usage requirements. These requirements may lead to having to
-   upgrade existing computers.
+2. One advantage of running a local model is that prompts and responses stay on your
+   own computer, providing greater privacy and reducing reliance on an internet connection
+   or third-party service.
+
+3. One disadvantage of local models is that they require more powerful hardware,
+   storage, and memory than many cloud-based AI services, which can make them more
+   expensive to run.
 '''
