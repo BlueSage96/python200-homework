@@ -86,7 +86,7 @@ new_bullets = rewrite_bullets(bullets)
 print(f"\nTask 02:\n")
 print(f"Bullet Point Rewriter:\n{new_bullets}")
 
-# Both the original and updated bullets print ouot clearly.
+# Both the original and updated bullets print out clearly.
 # The improvements are meaningful.
 
 # Task 03
@@ -259,3 +259,21 @@ def run_chatbot():
 
 if __name__ == "__main__":
     run_chatbot()
+ 
+# Task 6  
+# Comment block 
+'''
+Q1. The chatbot's knowledge may be biased towards the IT and Video Game industries 
+    since I provided examples related to those industries. The bot may lack knowledge 
+    for other professions as a consequence.
+
+Q2. There could be spelling and grammar issues along specific bot "language" that
+    employers will recognize. These issues could prevent people from getting jobs and 
+    they may not understand what "bot language" is and how to check for it before 
+    submitting job applications.
+    
+Q3. I would consider guardrails such as a UI warning in red, moderation filters that
+    do not display inappropriate langauage in the chat, resume or cover letter, and a 
+    usage policy that would ban users from continuing to use the job application helper 
+    app if they continue using foul language.
+'''
