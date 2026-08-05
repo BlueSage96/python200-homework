@@ -165,8 +165,7 @@ z = 0
 for r in reviews:
     z += 1
     prompt = f"""Classify the sentiment of this review as Positive, Negative, or Mixed.
-                Review:
-                "{r}"
+                Review: "{r}"
                 Sentiment:
             """
     response = get_completion(prompt, temperature=0)
@@ -288,16 +287,10 @@ prompt = f"""
     """
 response = get_completion(prompt, temperature=0)
 
-# Parse JSON safely
-# Print the raw response first
-
-print("Raw response:")
-print(response)
-
 try:
 
     result = json.loads(response)
-    print("Parsed sentiment:", result["sentiment"])
+    print("Sentiment:", result["sentiment"])
     print("Confidence:", result["confidence"])
     print("Reason:", result["reason"])
 

@@ -91,10 +91,7 @@ def rewrite_bullets(bullets: list[str]) -> list[dict]:
     result = json.loads(response)
     
     for bullet in result:
-        print(f"Original: {bullet['original']}")
-        print(f"Improved: {bullet['improved']}")
-        print("-" * 40)
-
+        print(f"Original: {bullet['original']:<55} | Improved: {bullet['improved']}")
     return result
 
 bullets = [
@@ -207,18 +204,17 @@ print(f"\nBorderline Input:\n{checker3}")
 print(f"\nTask 05:\n")
 
 def run_chatbot():
-    # 1. Initialize conversation history with your system prompt
     messages = [
         {
             "role": "system",
             "content": """
-                You are a professional job application coach helping career changers.
-                Help users improve resumes, cover letters, and other job application materials.
-                Stay focused on job application topics.
-                Do not invent qualifications or work experience.
-                Always remind the user to review and edit your suggestions before submitting an application.
-                If you do not know industry-specific expectations, tell the user to use their own judgment.
-            """
+You are a professional job application coach helping career changers.
+Help users improve resumes, cover letters, and other job application materials.
+Stay focused on job application topics.
+Do not invent qualifications or work experience.
+Always remind the user to review and edit your suggestions before submitting an application.
+If you do not know industry-specific expectations, tell the user to use their own judgment.
+"""
         }
     ]
 
@@ -234,27 +230,24 @@ def run_chatbot():
     while True:
         user_input = input("You: ").strip()
 
-        # 2. Handle exit
         if user_input.lower() in {"quit", "exit"}:
             print("\nJob Application Helper: Good luck with your applications!")
             break
 
-        # 3. Skip empty input
         if not user_input:
             continue
 
-        # 4. Run moderation check
         if not is_safe(user_input):
             continue
 
-        # Save the user's message
         messages.append({
             "role": "user",
             "content": user_input
         })
 
-        # 5. Resume bullet rewriter
+        # Resume bullet rewriter
         if "bullet" in user_input.lower() or "resume" in user_input.lower():
+
             print("\nJob Application Helper: Paste your bullet points below, one per line.")
             print("When you're done, type 'DONE' on its own line.\n")
 
@@ -262,40 +255,49 @@ def run_chatbot():
 
             while True:
                 line = input().strip()
+
                 if line.upper() == "DONE":
                     break
+
                 if line:
                     raw_bullets.append(line)
 
             new_raw_bullets = rewrite_bullets(raw_bullets)
 
-            print("Bullet Point Rewriter:\n")
-          
-            formatted = "\n".join(
-                f"Original: {b['original']}\nImproved: {b['improved']}"
-                for b in new_raw_bullets
-            )
+            assistant_reply = "Here are your improved resume bullet points:\n\n"
+
+            for bullet in new_raw_bullets:
+                assistant_reply += (
+                    f"Original : {bullet['original']}\n"
+                    f"Improved: {bullet['improved']}\n"
+                    + "-" * 40 + "\n"
+                )
+
+            print(f"\n{assistant_reply}")
 
             messages.append({
                 "role": "assistant",
-                "content": formatted
+                "content": assistant_reply
             })
-        # 6. Cover letter generator
+
+        # Cover letter generator
         elif "cover letter" in user_input.lower():
+
             job_title = input("Job Application Helper: What is the job title? ").strip()
             background = input("Job Application Helper: Briefly describe your background: ").strip()
 
             letter = generate_cover_letter(job_title, background)
 
-            print(f"\nMy cover letter:\n{letter}")
+            print(f"\nJob Application Helper:\n{letter}")
 
             messages.append({
                 "role": "assistant",
                 "content": letter
             })
 
-        # 7. Regular chat
+        # Regular chat
         else:
+
             response = get_completion(messages)
 
             print(f"\nJob Application Helper:\n{response}")
