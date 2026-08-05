@@ -49,13 +49,18 @@ print(f"\nTask 01:\n")
 print(f"Job builder:\n{response.choices[0].message.content}")
 
 '''
-    I intentionally instructed the assistant to stay focused on job application 
-    materials, even if the user changes the subject. I chose this constraint to 
-    keep the conversation on task and make sure the assistant consistently provides 
-    resume and job application help instead of drifting into unrelated topics.
+I deliberately included the instruction "Never invent work experience, education,
+certifications, skills, or achievements that the user has not provided." I chose
+this constraint because inaccurate or fabricated information on a resume or cover
+letter could mislead employers and hurt a job applicant's credibility. This
+guardrail helps ensure the assistant improves the user's writing while keeping all
+content truthful and based only on information the user actually provides.
 '''
 
 # Task 02
+print("\nTask 02:\n")
+print("Bullet Point Rewriter:\n")
+
 def rewrite_bullets(bullets: list[str]) -> list[dict]:
     # Format the bullets into a delimited block
     bullet_text = "\n".join(f"- {b}" for b in bullets)
@@ -65,21 +70,31 @@ def rewrite_bullets(bullets: list[str]) -> list[dict]:
     Rewrite each resume bullet point below to be more specific, results-oriented, and compelling.
     Use strong action verbs. Do not invent facts that aren't implied by the original.
 
-    Return only a JSON array. Do not include explanation, summary, markdown fences, or any text outside the JSON.
-    Each item must be an object with exactly two keys:
-    - "original": the original bullet
-    - "improved": the rewritten bullet
+    Respond ONLY with valid JSON.
+    Do not include markdown.
+    Do not include explanations.
+
+    Do not include extra text.
+    Return a JSON array where every object contains ONLY these keys:
+
+    "original": "the original bullet",
+    "improved": "the rewritten bullet"
 
     Bullet points:
     ```
     {bullet_text}
     ```
     """
-    print("Bullets:", bullet_text)
     messages = [{"role": "user", "content": prompt}]
     response = get_completion(messages,temperature=0)
 
     result = json.loads(response)
+    
+    for bullet in result:
+        print(f"Original: {bullet['original']}")
+        print(f"Improved: {bullet['improved']}")
+        print("-" * 40)
+
     return result
 
 bullets = [
@@ -90,14 +105,6 @@ bullets = [
 
 new_bullets = rewrite_bullets(bullets)
 
-print("\nTask 02:\n")
-print("Bullet Point Rewriter:\n")
-
-for bullet in new_bullets:
-    print(f"Original: {bullet['original']}")
-    print(f"Improved: {bullet['improved']}")
-    print("-" * 40)
-
 # Both the original and updated bullets print out clearly.
 # The improvements are meaningful.
 
@@ -106,7 +113,9 @@ def generate_cover_letter(job_title: str, background: str) -> str:
     prompt = f"""
     You write strong cover letter opening paragraphs for career changers.
     The paragraph should be 3-5 sentences: confident, specific, and free of clichés.
-
+    
+    Do not copy the examples.
+    Use them only as examples of tone and structure.
     Here are two examples of the style and tone you should match:
 
     Example 1:
@@ -163,26 +172,27 @@ def is_safe(text: str) -> bool:
         input=text
     )
     flagged = result.results[0].flagged
-    # print("Flagged categories:\n",result.results[0].categories)
+
     if not flagged:
         return True
     
     else:
-        print("Please rephrase your request in a respectful and safe way.")
+        print("""I'm sorry, but I can't help with that request.
+        Please rephrase it in a respectful and safe way.""")
         return False
         
 input1 = "I love my cat and I want to hold him!"
 checker = is_safe(input1)
-print(f"Moderation Checker 01:\n{checker}")        
+print(f"Safe Input:\n{checker}")        
 
 # Prints AFTER print statement in function!
 input2 = "I want to kill my professor! She's terrible at her job!"
 checker2 = is_safe(input2)
-print(f"\nModeration Checker 02:\n{checker2}") 
+print(f"\nFlagged Input:\n{checker2}") 
 
 input3 = "I'm outside of my favorite celebrite's house and I'm ready to jump on her!" 
 checker3 = is_safe(input3)
-print(f"\nModeration Checker 03:\n{checker3}")    
+print(f"\nBorderline Input:\n{checker3}")    
 
 '''
     The safe test case passed the moderation check without being flagged. 
@@ -202,13 +212,13 @@ def run_chatbot():
         {
             "role": "system",
             "content": """
-You are a professional job application coach helping career changers.
-Help users improve resumes, cover letters, and other job application materials.
-Stay focused on job application topics.
-Do not invent qualifications or work experience.
-Always remind the user to review and edit your suggestions before submitting an application.
-If you do not know industry-specific expectations, tell the user to use their own judgment.
-"""
+                You are a professional job application coach helping career changers.
+                Help users improve resumes, cover letters, and other job application materials.
+                Stay focused on job application topics.
+                Do not invent qualifications or work experience.
+                Always remind the user to review and edit your suggestions before submitting an application.
+                If you do not know industry-specific expectations, tell the user to use their own judgment.
+            """
         }
     ]
 
@@ -260,16 +270,16 @@ If you do not know industry-specific expectations, tell the user to use their ow
             new_raw_bullets = rewrite_bullets(raw_bullets)
 
             print("Bullet Point Rewriter:\n")
-            for bullet in new_raw_bullets:
-                print(f"Original: {bullet['original']}")
-                print(f"Improved: {bullet['improved']}")
-                print("-" * 40)
+          
+            formatted = "\n".join(
+                f"Original: {b['original']}\nImproved: {b['improved']}"
+                for b in new_raw_bullets
+            )
 
             messages.append({
                 "role": "assistant",
-                "content": str(new_raw_bullets)
+                "content": formatted
             })
-
         # 6. Cover letter generator
         elif "cover letter" in user_input.lower():
             job_title = input("Job Application Helper: What is the job title? ").strip()
@@ -286,7 +296,7 @@ If you do not know industry-specific expectations, tell the user to use their ow
 
         # 7. Regular chat
         else:
-            response = get_completion(messages, temperature=0)
+            response = get_completion(messages)
 
             print(f"\nJob Application Helper:\n{response}")
 
@@ -301,6 +311,8 @@ if __name__ == "__main__":
 # Comment block 
 
 '''
+Format Chosen: Written Reflection:
+
 Q1. The chatbot's knowledge may be biased toward the IT and video game industries because
     the examples I provided focused on those fields. As a result, it may generate stronger
     suggestions for technical careers than for professions in healthcare, education, or

@@ -159,29 +159,22 @@ reviews = [
 ]
 
 print(f"\nPrompt 01:\n")
-
+print("Zero Shot")
 # No examples provided - model uses pre-trained knowledge
 z = 0
 for r in reviews:
     z += 1
-    prompt = f"What is the sentiment of this review positive, negative, or mixed: {r}"
+    prompt = f"""Classify the sentiment of this review as Positive, Negative, or Mixed.
+                Review:
+                "{r}"
+                Sentiment:
+            """
     response = get_completion(prompt, temperature=0)
-    print(f"Zero shot 0{z}:\n{response}")
+    print(f"Review {z}:\n{response}")
     
 # Prompt 02 - One Shot
-# print(f"\nPrompt 02:\n")
-# o = 0
-# for r in reviews:
-#     o += 1
-#     prompt = f"""
-#     Review: "The new laptop turns on but has a blank screen."
-#     Sentiment: Mixed
-#     """
-#     response = get_completion(prompt, temperature=0)
-#     print(f"One-Shot 0{o}:\n{response}")
-
 print(f"\nPrompt 02:\n")
-
+print("One-Shot")
 o = 0
 for r in reviews:
     o += 1
@@ -207,7 +200,7 @@ output more consistent for more complex prompts.
 
 # Prompt 03 - Few-Shot
 print(f"\nPrompt 03:\n")
-
+print("Few-Shot")
 fs = 0
 for r in reviews:
     fs += 1
@@ -273,10 +266,26 @@ print(f"\nPrompt 05:\n")
 review = "I've been using this tool for three months. It handles large datasets well, \
 but the UI is clunky and the export options are limited."
 prompt = f"""
-    Classify the sentiment of the review and respond ONLY with valid JSON.
-    Keys: sentiment (positive/negative/mixed), confidence (0–1 scale), reason (one short sentence).
-    Review: {review}
-"""
+        Classify the sentiment of the review.
+
+        Return ONLY valid JSON.
+
+        Do not include markdown.
+        Do not include code fences.
+        Do not include explanations.
+        Do not include any text before or after the JSON.
+
+        Return exactly this structure:
+
+        {{
+            "sentiment": "positive | negative | mixed",
+            "confidence": 0.0,
+            "reason": "one short sentence"
+        }}
+
+        Review:
+        {review}
+    """
 response = get_completion(prompt, temperature=0)
 
 # Parse JSON safely
@@ -293,8 +302,8 @@ try:
     print("Reason:", result["reason"])
 
 except json.JSONDecodeError:
-    print("Error: Unable to parse the model's response as JSON.")
-    print("Raw response:")
+    print("JSON parsing failed.")
+    print("The model returned:")
     print(response)
     
 
@@ -342,10 +351,12 @@ Review: Explain what a large language model is in two sentences.
 response = get_completion(prompt, temperature=0)
 print(f"\nOpenAI response:\n {response}")
 
-# Ollama
+# Ollama terminal output
 '''
-A large language model is a complex system that processes and generates human-like text, enabling it to 
-understand and respond to language in real time. It is trained on vast amounts of text, allowing it to learn 
+Ollama terminal output:
+
+A large language model is a complex system that processes and generates human-like text, enabling it to
+understand and respond to language in real time. It is trained on vast amounts of text, allowing it to learn
 patterns and general knowledge, making it capable of tasks like writing, speaking, or even answering questions.
 '''
 
