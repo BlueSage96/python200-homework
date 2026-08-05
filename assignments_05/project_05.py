@@ -18,17 +18,24 @@ def get_completion(messages, model="gpt-4o-mini", temperature=0.7):
 messages_task1 = [
     {"role":"system","content":
       """
-      You are a job application coach and you need to help job seekers 
-      with polishing their resumes.
-      
-      Stay focused on the job application materials, even if the user 
-      starts talking about personal stuff. 
-      
-      Always remind the user to review and edit your output before 
-      submitting the resume anywhere.
-      
-      Even if you do not kow what the user's specific industry
-      norms are, the user should use their own judgment.
+     You are an experienced job application coach who helps job seekers improve 
+     their resumes, cover letters, and other job application materials.
+
+     Provide professional, constructive, and encouraging feedback that helps the user 
+     present their skills and experience clearly.
+
+     Stay focused only on job application materials. If the user changes the subject, 
+     politely redirect the conversation back to resumes, cover letters, or other 
+     application documents.
+
+     Never invent work experience, education, certifications, skills, or achievements 
+     that the user has not provided.
+
+     Always remind the user to review and edit your suggestions before submitting any 
+     job application.
+
+     You may not know the expectations of every industry or employer, so remind the user 
+     to use their own judgment and tailor the final document to their specific field.
       """
       }
 ]
@@ -42,9 +49,10 @@ print(f"\nTask 01:\n")
 print(f"Job builder:\n{response.choices[0].message.content}")
 
 '''
-I deliberately chose to instruct the chatbot to stay focused on its job 
-even if the user starts talking about personal stuff. That way there 
-is not a privacy or liability issue later on.
+    I intentionally instructed the assistant to stay focused on job application 
+    materials, even if the user changes the subject. I chose this constraint to 
+    keep the conversation on task and make sure the assistant consistently provides 
+    resume and job application help instead of drifting into unrelated topics.
 '''
 
 # Task 02
@@ -136,8 +144,10 @@ print(f"\nTask 03:\n")
 print(f"Cover Letter Generator:\n{cover}")
 
 '''
-   The output feels tailored to the specific user without inventing credientals not mentioned.
-   I changed the default infomration with another job title & background with the same result.
+   I chose examples from two different career changes to show the model how to connect previous 
+   professional experience to a new technical role. Both examples demonstrate a confident, specific 
+   writing style without exaggerating qualifications, which encouraged the model to write a personalized 
+   cover letter that matched the provided job title and background while avoiding invented credentials.
 '''
 
 # Task 04
@@ -154,7 +164,8 @@ def is_safe(text: str) -> bool:
         return True
     
     else:
-        print("Your response has been flagged for harmful language.")
+        print("""Your message may contain harmful or unsafe language. Please rephrase it in a 
+              respectful and non-harmful way before trying again.""")
         return False
         
 input1 = "I love my cat and I want to hold him!"
@@ -171,9 +182,12 @@ checker3 = is_safe(input3)
 print(f"\nModeration Checker 03:\n{checker3}")    
 
 '''
-    My first two test cases were moderated correctly after I was more explicit.
-    My safe test case passed without triggering a warning.
-    My borderline phrase always returns true despite trying to trigger certain categories.
+    The safe test case passed the moderation check without being flagged. 
+    The harmful test case was correctly flagged, and the program displayed a message 
+    asking the user to rephrase their request respectfully. I also tested a borderline 
+    example to see how the moderation model would respond, and it showed that not every 
+    concerning statement is automatically flagged, depending on the context and the model's 
+    safety criteria.
 '''
 
 # Task 05
