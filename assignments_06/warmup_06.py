@@ -37,3 +37,39 @@ else:
     arrogrant because it thinks it is a medical professional, not 
     a sentient 
 """
+
+# Concepts 03
+
+"""
+  Original:
+    steps = [
+        "Generate a response from the LLM",
+        "Extract text from source documents",
+        "Receive the user's query",
+        "Retrieve the most relevant chunks",
+        "Convert text chunks into embeddings",
+        "Inject retrieved chunks into the prompt",
+        "Split text into chunks",
+        "Embed the user's query",
+    ]
+
+ Fixed:
+ 
+    steps = [
+        "Receive the user's query",
+        "Embed the user's query",
+        "Extract text from source documents",
+        "Split text into chunks",
+        "Retrieve the most relevant chunks",
+        "Convert text chunks into embeddings",
+        "Inject retrieved chunks into the prompt",
+         "Generate a response from the LLM",
+    ]
+
+ Conclusion:
+ 
+ The RAG steps breaks large files of data into digestable 
+ chunks that only contains the most important information so 
+ that the model can give the most accurate response to the 
+ user's query.
+"""
