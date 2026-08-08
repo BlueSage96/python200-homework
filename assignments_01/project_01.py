@@ -219,11 +219,15 @@ def pearson_happiness(df):
         logger.info(f"P-value: {result.pvalue:.6f}")
         logger.info(f"Adjusted alpha: {adjusted_alpha}")
         
-        if result.pvalue < adjusted_alpha:
-            logger.info("Significant after Bonferroni correlation: Yes\n")
+        if result.pvalue < 0.05:
+            logger.info("Significant at alpha = 0.05: Yes")
         else:
-            logger.info("Significant after Bonferroni correlation: No\n")
+            logger.info("Significant at alpha = 0.05: No")
 
+        if result.pvalue < adjusted_alpha:
+            logger.info("Significant after Bonferroni correction: Yes")
+        else:
+            logger.info("Significant after Bonferroni correction: No")
 # Task 6
 @task(retries=3,retry_delay_seconds=2)
 def summary_report(df):

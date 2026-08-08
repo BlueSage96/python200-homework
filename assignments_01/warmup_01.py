@@ -222,10 +222,10 @@ alpha = 0.05
 res_pvalue = res.pvalue
 print(f"\nHypothesis Question 02:\n")
 
-if (res_pvalue >= alpha):
-    print(f"Statistically significant based on p-value: {alpha}")
+if res_pvalue < alpha:
+    print(f"Statistically significant based on p-value: {res_pvalue}")
 else:
-    print(f"Not statistically significant based on p-value: {alpha}")
+    print(f"Not statistically significant based on p-value: {res_pvalue}")
     
 # Hypothesis Question 03
 before = [60,65,70,58,62,67,63,66]
@@ -244,16 +244,19 @@ print(f"Statistic: {new_scores.statistic}")
 print(f"Pvalue: {new_scores.pvalue}")
 
 # Hypothesis Question 05
-res2 = ttest_ind(group_a, stats.norm.cdf, alternative='greater')
+res2 = ttest_ind(group_a, group_b, alternative='greater')
 print(f"\nHypothesis Question 05:\n")
 print(f"Pvalue: {res2.pvalue}")
 
 # Hypothesis Question 06
 print(f"\nHypothesis Question 06:\n")
 print(
-    "Group B had a higher average score than Group A.\n"
-    "Because the p-value is much smaller than 0.05, the difference is unlikely to be due to chance."
+    f"Group A had a lower average score than Group B. "
+    f"The two-tailed p-value from Question 1 was {res.pvalue:.6f}, "
+    f"while the one-tailed p-value from Question 5 was {res2.pvalue:.6f}. "
+    f"Both results are statistically significant at alpha = 0.05."
 )
+
 
 #_____________________________________________________________________________
 
