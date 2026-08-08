@@ -35,12 +35,18 @@ def happiness_data():
     final_dataframe = []          
 
     for path in paths:
-        read_path = pd.read_csv(path, sep=";")
-        #Replace commas with periods
+        read_path = pd.read_csv(path, sep=";",decimal=',')
+
+        # Raw files use commas for decimal values.
+        # Convert decimal commas to periods so numeric columns can be used in analysis.
         object_cols = read_path.select_dtypes(include="object").columns
         read_path[object_cols] = read_path[object_cols].replace(",", ".", regex=True)
-        read_path = read_path.apply(pd.to_numeric,errors="ignore")
-        read_path = read_path.rename(columns={"Ladder score":"Happiness score"})
+
+        # Convert cleaned numeric values to numeric types.
+        read_path = read_path.apply(pd.to_numeric, errors="ignore")
+        read_path = read_path.rename(
+            columns={"Ladder score": "Happiness score"}
+        )
         
         #Grab last piece of the filename instead of hardcoding an index
         year = int(path.stem.split("_")[-1])
@@ -50,13 +56,13 @@ def happiness_data():
     # merge all info into one csv --> go's to output folder
     happiness_merged = pd.concat(final_dataframe)
     happiness_merged["Year"] = happiness_merged["Year"].astype(int)
-    
+    happiness_merged.to_csv(OUTPUT_DIR/"merged_happiness.csv", index=False)
+    return happiness_merged
+
     '''
     Save to the outputs folder inside assignments_01.
     Since this script runs from the assignments_01 directory,
     the correct relative path is "OUTPUT_DIR/...".
-    happiness_merged.to_csv(OUTPUT_DIR/"merged_happiness.csv", index=False)
-    return happiness_merged
     '''
 # Task 2
 @task(retries=3,retry_delay_seconds=2)
@@ -68,29 +74,27 @@ def happy_stats(df):
     happy_mean = happy_score.mean()
     happy_median = happy_score.median()
     happy_std = happy_score.std()
-    happy_mean_grouped = df.groupby(["Year","Regional indicator"])["Happiness score"].mean()
     
-    logger =get_run_logger() 
+    happy_mean_year = df.groupby("Year")["Happiness score"].mean()
+    happy_mean_region = df.groupby("Regional indicator")["Happiness score"].mean()
+    logger = get_run_logger() 
 
     logger.info(f"Mean:\n {happy_mean}")
     logger.info(f"\nMedian:\n {happy_median}")
     logger.info(f"\nStandard deviation:\n {happy_std}")
-    logger.info(f"\nGrouped mean:\n {happy_mean_grouped}")
+    
+    logger.info(f"\nGrouped mean:\n {happy_mean_year}")
+    logger.info(f"\nGrouped mean:\n {happy_mean_region}")
 
 # Task 3
 @task(retries=3,retry_delay_seconds=2)
 def visuals(df):
     logger =get_run_logger()
     happy = df["Happiness score"]
-    years = df["Year"]
     
     #Cleanup
     gdp = df["GDP per capita"]
     gdp = gdp.astype(float)
-    
-    heat_cols = df[["Happiness score","GDP per capita","Social support",
-                       "Healthy life expectancy","Freedom to make life choices",
-                       "Generosity", "Perceptions of corruption","Year"]]
     
     # Histogram
     plt.hist(df["Happiness score"],bins=20,color="red",alpha=0.9)
@@ -181,7 +185,7 @@ def pearson_happiness(df):
     corruption = df["Perceptions of corruption"]
     generosity = df["Generosity"]
     
-    logger =get_run_logger() 
+    logger = get_run_logger() 
     logger.info(df[["Year", "Happiness score"]].dtypes)
     
     pearson1 = pearsonr(gdp,happy)
@@ -195,7 +199,7 @@ def pearson_happiness(df):
     pearson5 = pearsonr(corruption,happy)
     pearson6 = pearsonr(generosity,happy)
     
-    adjusted_alpha = 0.05/7
+    
     #List of results
     correlations = [
         ("GDP per capita", pearson1),
@@ -205,6 +209,8 @@ def pearson_happiness(df):
         ("Perceptions of corruption", pearson5),
         ("Generosity", pearson6),
     ]
+    
+    adjusted_alpha = 0.05/len(correlations)
     
     # Loop over correlation name & result
     for name, result in correlations:
@@ -218,7 +224,7 @@ def pearson_happiness(df):
         else:
             logger.info("Significant after Bonferroni correlation: No\n")
 
-# Task 5
+# Task 6
 @task(retries=3,retry_delay_seconds=2)
 def summary_report(df):
    logger =get_run_logger() 
@@ -248,9 +254,17 @@ def summary_report(df):
     "is not statistically significant."
     )
   
-   logger.info(
-    "Social support showed the strongest positive correlation with happiness score and remained statistically significant after applying the Bonferroni correction."
-    )
+   happy = df["Happiness score"]
+   social_support = df["Social support"]
+   pearson2 = pearsonr(social_support, happy)
+   adjusted_alpha = 0.05 / 6
+
+   if pearson2.pvalue < adjusted_alpha:
+      logger.info(
+            f"""Social support showed the strongest positive correlation with
+            happiness score (r = {pearson2.statistic:.3f}) and remained 
+            statistically significant after applying the Bonferroni correction."""
+        )
 
 @flow(name="pipeline_flow")
 def happiness_pipeline():
