@@ -32,12 +32,9 @@ def pipeline_flow():
 if __name__ == "__main__":
     pipeline_flow()
 
-'''  
-1. The compute time would become sluggish should the data becomes more complex.
-
-2. Prefect can be used for automation tasks: 
-
-add Slack and email notifications
-use cloud providers such as AWS, GCP, Azure, or Snowflake
-integrate with Docker or Kubernetes infrastructure
-'''
+# 1. The compute time would become sluggish should the data become more complex.
+#
+# 2. Prefect can be used for automation tasks:
+#    - Add Slack and email notifications.
+#    - Use cloud providers such as AWS, GCP, Azure, or Snowflake.
+#    - Integrate with Docker or Kubernetes infrastructure.

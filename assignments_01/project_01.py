@@ -83,9 +83,9 @@ def happy_stats(df):
     logger.info(f"\nMedian:\n {happy_median}")
     logger.info(f"\nStandard deviation:\n {happy_std}")
     
-    logger.info(f"\nGrouped mean:\n {happy_mean_year}")
-    logger.info(f"\nGrouped mean:\n {happy_mean_region}")
-
+    logger.info(f"\nMean happiness by year:\n{happy_mean_year}")
+    logger.info(f"\nMean happiness by region:\n{happy_mean_region}")
+    
 # Task 3
 @task(retries=3,retry_delay_seconds=2)
 def visuals(df):
@@ -261,10 +261,10 @@ def summary_report(df):
 
    if pearson2.pvalue < adjusted_alpha:
       logger.info(
-            f"""Social support showed the strongest positive correlation with
-            happiness score (r = {pearson2.statistic:.3f}) and remained 
-            statistically significant after applying the Bonferroni correction."""
-        )
+         f"Social support showed the strongest positive correlation with "
+         f"happiness score (r = {pearson2.statistic:.3f}) and remained "
+         f"statistically significant after applying the Bonferroni correction."
+     )
 
 @flow(name="pipeline_flow")
 def happiness_pipeline():
