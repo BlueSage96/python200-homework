@@ -35,20 +35,11 @@ def happiness_data():
     final_dataframe = []          
 
     for path in paths:
-        read_path = pd.read_csv(path, sep=";",decimal=',')
-
-        # Raw files use commas for decimal values.
-        # Convert decimal commas to periods so numeric columns can be used in analysis.
-        object_cols = read_path.select_dtypes(include="object").columns
-        read_path[object_cols] = read_path[object_cols].replace(",", ".", regex=True)
-
-        # Convert cleaned numeric values to numeric types.
-        read_path = read_path.apply(pd.to_numeric, errors="ignore")
+        read_path = pd.read_csv(path, sep=";", decimal=",")
         read_path = read_path.rename(
             columns={"Ladder score": "Happiness score"}
         )
-        
-        #Grab last piece of the filename instead of hardcoding an index
+
         year = int(path.stem.split("_")[-1])
         final_path = read_path.assign(Year=year)
         final_dataframe.append(final_path)
@@ -148,12 +139,16 @@ def hypothesis(df):
     logger.info(f"Mean 2019: {year1.mean()}\n")
     logger.info(f"Mean 2020: {year2.mean()}")
     
-    logger.info(
-        "The p-value is greater than or equal to 0.05, so the difference in"
-        "average happiness scores between 2019 and 2020 is not statistically significant."
-        "This suggests there is not enough evidence to conclude that average"
-        "global happiness scores changed between 2019 and 2020."
+    if year_hypo.pvalue < 0.05:
+        logger.info(
+            "The difference in average happiness scores between 2019 and 2020 "
+            "is statistically significant."
     )
+    else:
+        logger.info(
+            "The difference in average happiness scores between 2019 and 2020 "
+            "is not statistically significant."
+        )
     #Test of my choice
     country1 = df[df['Country'] == "Switzerland"]["Happiness score"]
     country2 = df[df['Country'] == "United States"]["Happiness score"]
@@ -250,12 +245,23 @@ def summary_report(df):
        df.groupby("Year")["Happiness score"].mean().sort_values(ascending=False)
    )
    
-   logger.info(
-    f"Mean happiness was {mean_by_year[2019]:.2f} in 2019 and "
-    f"{mean_by_year[2020]:.2f} in 2020. "
-    "Because the p-value (0.595) is greater than 0.05, the observed difference "
-    "is not statistically significant."
-    )
+   year1 = df[df["Year"] == 2019]["Happiness score"]
+   year2 = df[df["Year"] == 2020]["Happiness score"]
+   year_hypo = ttest_ind(year1, year2)
+
+   if year_hypo.pvalue < 0.05:
+     logger.info(
+        f"Mean happiness was {mean_by_year[2019]:.2f} in 2019 and "
+        f"{mean_by_year[2020]:.2f} in 2020. "
+        "The difference is statistically significant at alpha = 0.05."
+     )
+
+   else:
+      logger.info(
+        f"Mean happiness was {mean_by_year[2019]:.2f} in 2019 and "
+        f"{mean_by_year[2020]:.2f} in 2020. "
+        "The difference is not statistically significant at alpha = 0.05."
+      )
   
    happy = df["Happiness score"]
    social_support = df["Social support"]
