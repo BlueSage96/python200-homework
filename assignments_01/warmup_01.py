@@ -244,7 +244,7 @@ print(f"Statistic: {new_scores.statistic}")
 print(f"Pvalue: {new_scores.pvalue}")
 
 # Hypothesis Question 05
-res2 = kstest(group_a, stats.norm.cdf, alternative='greater')
+res2 = ttest_ind(group_a, stats.norm.cdf, alternative='greater')
 print(f"\nHypothesis Question 05:\n")
 print(f"Pvalue: {res2.pvalue}")
 
@@ -266,7 +266,8 @@ print(f"\nCorrelation Question 01:\n")
 print(f"Correlation matrix: {pearson}")
 print(f"Correlation coefficient: {pearson[0,1]}")
 
-# I expect the correlation to be 1 because x1, y1, x2, and y2 are all 1 
+# I expect the correlation to be 1 because y increases proportionally
+# with x, creating a perfect positive linear relationship.
 
 # Correlation Question 02
 x = [1,  2,  3,  4,  5,  6,  7,  8,  9, 10]
