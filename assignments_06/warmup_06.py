@@ -25,3 +25,15 @@ else:
     For a small report, prompt engineering is the best option as the data analyst
     can give a detailed prompt and let the model answer.
 """
+
+# Concepts 02
+
+"""
+    AI hallucination can be harmful if the human asks for medical advice.
+    If the AI confidently gives the user the wrong medical advice, 
+    the person would possibly get hurt or killed. Even worse, the 
+    confident bot can insist on the user to take the medical advice
+    and it could reject any corrections. The bot's tone would be
+    arrogrant because it thinks it is a medical professional, not 
+    a sentient 
+"""
