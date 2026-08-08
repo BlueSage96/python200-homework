@@ -165,16 +165,10 @@ plt.show()
 normal_data = np.random.normal(50,5,200)
 skewed_data = np.random.exponential(10, 200)
 
-# Creates subplots
-fig, axs = plt.subplots(1, 2, figsize=(15, 5))
-
 # Plots Boxplot for Data 1
-axs[0].set_title('Distribution Comparison')
-axs[0].boxplot(normal_data,labels=["Normal"],patch_artist=True,medianprops={'color':'red'})
-
-# Plots Boxplot for Data 2
-axs[1].set_title('Distribution Comparison')
-axs[1].boxplot(skewed_data,labels=["Exponential"],patch_artist=True,medianprops={'color':'blue'})
+plt.title('Distribution Comparison')
+plt.boxplot([normal_data, skewed_data],labels=["Normal","Exponential"],
+            patch_artist=True,medianprops={'color':'red'})
 plt.show()
 
 '''
@@ -192,14 +186,14 @@ data2 = [10,12,12,16,150]
 data2_df = pd.DataFrame(data2)
 
 print("\nDescriptive Stats 05:\n")
-print(f"Data 1 mean: {data1_df.mean()}")
-print(f"Data 2 mean: {data2_df.mean()}")
+print(f"Data 1 mean: {data1_df[0].mean()}")
+print(f"Data 2 mean: {data2_df[0].mean()}")
 
-print(f"Data 1 median: {data1_df.median()}")
-print(f"Data 2 median: {data2_df.median()}")
+print(f"Data 1 median: {data1_df[0].median()}")
+print(f"Data 2 median: {data2_df[0].median()}")
 
-print(f"Data 1 mode: {data1_df.mode()}")
-print(f"Data 2 mode: {data2_df.mode()}")
+print(f"Data 1 mode: {data1_df[0].mode()[0]}")
+print(f"Data 2 mode: {data2_df[0].mode()[0]}")
 
 '''
 Data2 contains an outlier (150), which increases the mean.
@@ -244,7 +238,7 @@ print(f"Statistic: {new_scores.statistic}")
 print(f"Pvalue: {new_scores.pvalue}")
 
 # Hypothesis Question 05
-res2 = ttest_ind(group_a, group_b, alternative='greater')
+res2 = ttest_ind(group_a, group_b, alternative='less')
 print(f"\nHypothesis Question 05:\n")
 print(f"Pvalue: {res2.pvalue}")
 

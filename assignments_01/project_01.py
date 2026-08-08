@@ -89,7 +89,7 @@ def happy_stats(df):
 # Task 3
 @task(retries=3,retry_delay_seconds=2)
 def visuals(df):
-    logger =get_run_logger()
+    logger = get_run_logger()
     happy = df["Happiness score"]
     
     #Cleanup
@@ -141,20 +141,19 @@ def hypothesis(df):
     year1 = df[df['Year'] == 2019]["Happiness score"]
     year2 = df[df['Year'] == 2020]["Happiness score"]
     year_hypo = ttest_ind(year1,year2)
-    logger =get_run_logger() 
+    logger = get_run_logger() 
 
     logger.info(f"Statistic: {year_hypo.statistic}\n")
     logger.info(f"Pvalue: {year_hypo.pvalue}\n")
     logger.info(f"Mean 2019: {year1.mean()}\n")
     logger.info(f"Mean 2020: {year2.mean()}")
     
-    '''
-    Results:
-    The p-value is greater than or equal to 0.05, so the difference in
-    average happiness scores between 2019 and 2020 is not statistically significant.
-    This suggests there is not enough evidence to conclude that average
-    global happiness scores changed between 2019 and 2020.
-    '''
+    logger.info(
+        "The p-value is greater than or equal to 0.05, so the difference in"
+        "average happiness scores between 2019 and 2020 is not statistically significant."
+        "This suggests there is not enough evidence to conclude that average"
+        "global happiness scores changed between 2019 and 2020."
+    )
     #Test of my choice
     country1 = df[df['Country'] == "Switzerland"]["Happiness score"]
     country2 = df[df['Country'] == "United States"]["Happiness score"]
@@ -231,7 +230,7 @@ def pearson_happiness(df):
 # Task 6
 @task(retries=3,retry_delay_seconds=2)
 def summary_report(df):
-   logger =get_run_logger() 
+   logger = get_run_logger() 
    logger.info("Merged dataset\n")
    logger.info(f"Number of countries: {df['Country'].nunique()}")
    logger.info(f"Number of years: {df['Year'].nunique()}")
