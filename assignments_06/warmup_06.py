@@ -178,3 +178,16 @@ print(keywords)
        have some mild similarity to one another for the model to still associate them together.
     3. Even if the relevant chunks do not share text with one another, they can have a similar meaning.
 """
+
+# Semantic 02
+
+"""
+    | Feature                    | Keyword RAG                       | Semantic RAG |
+|----------------------------|-----------------------------------|----------------------------|
+| What is compared?          | Exact word overlap                | Meanings via embedding     |
+| What is retrieved?         | Full document                     | Chunks of text             |
+| Can it handle synonyms?    | No                                | Yes                        |
+| Storage format             | Plain text dictionary             | LlamaIndex's storage index |
+| Relevance score            | Number of overlapping keywords    | Cosine similarity          |
+
+"""
