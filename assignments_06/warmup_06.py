@@ -123,10 +123,8 @@ def simple_keyword_retrieval(query, documents, verbose=True):
 query = "What are your hours on weekends?"
 
 documents = {
-    "menu.txt": """We serve espresso, lattes, cappuccinos, and cold brew. Pastries include croissants and muffins baked fresh daily. 
-    Oat milk and almond milk are available.""",
-    "hours.txt": """We are open Monday through Friday from 7am to 7pm. On weekends we open at 8am and close at 5pm. 
-    We are closed on Thanksgiving and Christmas Day.""",
+    "menu.txt": "We serve espresso, lattes, cappuccinos, and cold brew. Pastries include croissants and muffins baked fresh daily. Oat milk and almond milk are available.",
+    "hours.txt": "We are open Monday through Friday from 7am to 7pm. On weekends we open at 8am and close at 5pm. We are closed on Thanksgiving and Christmas Day.",
     "hiring.txt": "We are currently hiring baristas and shift supervisors. Send your resume to jobs@groundworkcoffee.com.",
     "loyalty.txt": "Join our loyalty program to earn one point per dollar spent. Redeem 100 points for a free drink of your choice.",
 }
@@ -135,3 +133,17 @@ keywords = simple_keyword_retrieval(query, documents, verbose=True)
 print(keywords)
 # loyalty.txt because the documents are being ranked based on the number of exact keyword matches with the query. 
 # In this case, the keyword is "your".
+
+# Keywords 02
+
+query2 = "Do you have anything without caffeine?"
+documents = {
+    "menu.txt": "We serve espresso, lattes, cappuccinos, and cold brew. Pastries include croissants and muffins baked fresh daily. Oat milk and almond milk are available.",
+    "hours.txt": "We are open Monday through Friday from 7am to 7pm. On weekends we open at 8am and close at 5pm. We are closed on Thanksgiving and Christmas Day.",
+    "hiring.txt": "We are currently hiring baristas and shift supervisors. Send your resume to jobs@groundworkcoffee.com.",
+    "loyalty.txt": "Join our loyalty program to earn one point per dollar spent. Redeem 100 points for a free drink of your choice.",
+}
+keywords = simple_keyword_retrieval(query2, documents, verbose=True)
+print(keywords)
+
+# There were no overlapping keywords found so keyword RAG was wrong for this query. Fine-tuning would be more appropriate for this example.
