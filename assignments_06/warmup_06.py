@@ -130,20 +130,42 @@ documents = {
 }
 
 keywords = simple_keyword_retrieval(query, documents, verbose=True)
+print(f"Keywords 01:\n")
 print(keywords)
 # loyalty.txt because the documents are being ranked based on the number of exact keyword matches with the query. 
 # In this case, the keyword is "your".
 
 # Keywords 02
 
-query2 = "Do you have anything without caffeine?"
+query = "Do you have anything without caffeine?"
 documents = {
     "menu.txt": "We serve espresso, lattes, cappuccinos, and cold brew. Pastries include croissants and muffins baked fresh daily. Oat milk and almond milk are available.",
     "hours.txt": "We are open Monday through Friday from 7am to 7pm. On weekends we open at 8am and close at 5pm. We are closed on Thanksgiving and Christmas Day.",
     "hiring.txt": "We are currently hiring baristas and shift supervisors. Send your resume to jobs@groundworkcoffee.com.",
     "loyalty.txt": "Join our loyalty program to earn one point per dollar spent. Redeem 100 points for a free drink of your choice.",
 }
-keywords = simple_keyword_retrieval(query2, documents, verbose=True)
+keywords = simple_keyword_retrieval(query, documents, verbose=True)
+print(f"\nKeywords 02:\n")
 print(keywords)
 
 # There were no overlapping keywords found so keyword RAG was wrong for this query. Fine-tuning would be more appropriate for this example.
+
+# Keywords 03
+
+"""
+    Prediction: My first pick would be loyalty.txt as its 
+    content is more aligned with the query below. 
+    But I have a feeling it would be hiring or hours instead.
+"""
+query = "How do I sign up for rewards?"
+documents = {
+    "menu.txt": "We serve espresso, lattes, cappuccinos, and cold brew. Pastries include croissants and muffins baked fresh daily. Oat milk and almond milk are available.",
+    "hours.txt": "We are open Monday through Friday from 7am to 7pm. On weekends we open at 8am and close at 5pm. We are closed on Thanksgiving and Christmas Day.",
+    "hiring.txt": "We are currently hiring baristas and shift supervisors. Send your resume to jobs@groundworkcoffee.com.",
+    "loyalty.txt": "Join our loyalty program to earn one point per dollar spent. Redeem 100 points for a free drink of your choice.",
+}
+keywords = simple_keyword_retrieval(query, documents, verbose=True)
+print(f"\nKeywords 03:\n")
+print(keywords)
+
+# My prediction was wrong because there were no overlapping keywords, so no document could be selected.
