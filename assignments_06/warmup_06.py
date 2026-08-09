@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import os
+import string
 
 if load_dotenv():
     print("API key loaded successfully.")
@@ -73,3 +74,64 @@ else:
  that the model can give the most accurate response to the 
  user's query.
 """
+
+
+
+def simple_keyword_retrieval(query, documents, verbose=True):
+    """Keyword retrieval using token overlap scoring."""
+    stopwords = {
+        "a", "an", "the", "and", "or", "in", "on", "of", "for", "to", "is",
+        "are", "was", "were", "by", "with", "at", "from", "that", "this",
+        "as", "be", "it", "its", "their", "they", "we", "you", "our"
+    }
+    translator = str.maketrans("", "", string.punctuation)
+
+    query_words = {
+        w.translate(translator)
+        for w in query.lower().split()
+        if w not in stopwords
+    }
+    if verbose:
+        print(f"\nQuery tokens (filtered): {sorted(query_words)}")
+
+    scores = []
+    for name, content in documents.items():
+        content_words = {
+            w.translate(translator)
+            for w in content.lower().split()
+            if w not in stopwords
+        }
+        overlap = query_words & content_words
+        score = len(overlap)
+        scores.append((score, name, content))
+        if verbose:
+            print(f"[{name}] overlap={score} -> {sorted(overlap)}")
+
+    scores.sort(reverse=True)
+    best = next(((name, content) for score, name, content in scores if score > 0), None)
+    if best:
+        if verbose:
+            print(f"\nSelected best match: {best[0]}")
+        return [best]
+    else:
+        if verbose:
+            print("\nNo overlapping keywords found.")
+        return [("None found", "No relevant content.")]
+    
+# Keywords 01
+
+query = "What are your hours on weekends?"
+
+documents = {
+    "menu.txt": """We serve espresso, lattes, cappuccinos, and cold brew. Pastries include croissants and muffins baked fresh daily. 
+    Oat milk and almond milk are available.""",
+    "hours.txt": """We are open Monday through Friday from 7am to 7pm. On weekends we open at 8am and close at 5pm. 
+    We are closed on Thanksgiving and Christmas Day.""",
+    "hiring.txt": "We are currently hiring baristas and shift supervisors. Send your resume to jobs@groundworkcoffee.com.",
+    "loyalty.txt": "Join our loyalty program to earn one point per dollar spent. Redeem 100 points for a free drink of your choice.",
+}
+
+keywords = simple_keyword_retrieval(query, documents, verbose=True)
+print(keywords)
+# loyalty.txt because the documents are being ranked based on the number of exact keyword matches with the query. 
+# In this case, the keyword is "your".
