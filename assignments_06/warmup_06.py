@@ -169,3 +169,12 @@ print(f"\nKeywords 03:\n")
 print(keywords)
 
 # My prediction was wrong because there were no overlapping keywords, so no document could be selected.
+
+# Semantic 01
+
+"""
+    1. A vector embedding is the process where chunks of data is converted to numbers by the embedding model.
+    2. The score of 0.85 is more relevant as it is closest to being similar (almost 1). Both scores (0.85 & 0.30)
+       have some mild similarity to one another for the model to still associate them together.
+    3. Even if the relevant chunks do not share text with one another, they can have a similar meaning.
+"""
