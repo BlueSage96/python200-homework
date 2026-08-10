@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import os
 import string
+from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
 
 if load_dotenv():
     print("API key loaded successfully.")
@@ -190,4 +191,38 @@ print(keywords)
 | Storage format             | Plain text dictionary             | LlamaIndex's storage index |
 | Relevance score            | Number of overlapping keywords    | Cosine similarity          |
 
+"""
+
+# LlamaIndex 01
+
+# Load documents directly from PDFs in the folder
+docs = SimpleDirectoryReader("brightleaf_pdfs").load_data()
+
+# Build a vector index automatically (handles chunking + embeddings)
+index = VectorStoreIndex.from_documents(docs)
+
+query_engine = index.as_query_engine(similarity_top_k=3)
+questions = [
+    "What employee benefits does BrightLeaf offer?",
+    "What are BrightLeaf's security policies?",
+]
+
+print(f"\nLlamaIndex 01:\n")
+
+for q in questions:
+    # Q & A
+    print(f"\nQ: {q}")
+    response = query_engine.query(q)
+    print(f"\nA: {response}")
+    
+    for node_with_score in response.source_nodes:
+        # Retrieve 3 retreived source nodes
+        print(f"\nNODE ID: {node_with_score.node_id}")
+        print(f"\nSimilarity Score: {node_with_score.score:.4f}")
+        print(f"\nText Snippet: {node_with_score.node.get_content()[:150]}")
+        print("-" * 30)
+        
+"""
+    The answers to each question are specific and relevant to the questions.
+    The tone of the answers are professional. There no unexpected outputs.
 """
