@@ -2,6 +2,8 @@ from dotenv import load_dotenv
 import os
 import string
 from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
+from llama_index.llms.openai import OpenAI
+from llama_index.core.evaluation import FaithfulnessEvaluator, RelevancyEvaluator
 
 if load_dotenv():
     print("API key loaded successfully.")
@@ -308,4 +310,59 @@ for q in questions:
     not exist in the pdfs with the exception of the last question which provided
     one accurate chunk. I would have the system pull directly from the pdfs and
     give an answer and clarify where the actual information can from in its answer. 
+"""
+
+# LlamaIndex 04
+print(f"\nLlamaIndex 04:\n")
+
+# Create Judge LLM
+llm = OpenAI(model="gpt-4o-mini", temperature=0.2)
+
+# Define evaluator
+faithfulness_evaluator = FaithfulnessEvaluator(llm=llm)
+relevancy_evaluator = RelevancyEvaluator(llm=llm)
+
+print(f"\nLlamaIndex 04 employee benefits:\n")
+# Get response to query
+q = "What employee benefits does BrightLeaf offer?"
+response = query_engine.query(q)
+
+# Evaluate faithfulness and relevancy
+faithfulness_result = faithfulness_evaluator.evaluate_response(query=q, response=response)
+print("Faithfulness Evaluation: " + str(faithfulness_result.score))
+
+relevancy_result = relevancy_evaluator.evaluate_response(query=q, response=response)
+print("Relevancy Result: " + str(relevancy_result.score))
+
+print(f"\nLlamaIndex 04 produce feedback:\n")
+# Get response to query
+q = "What is the product feedback from BrightLeaf's customers?"
+response = query_engine.query(q)
+
+# Evaluate faithfulness and relevancy
+faithfulness_result = faithfulness_evaluator.evaluate_response(query=q, response=response)
+print("Faithfulness Evaluation: " + str(faithfulness_result.score))
+
+relevancy_result = relevancy_evaluator.evaluate_response(query=q, response=response)
+print("Relevancy Result: " + str(relevancy_result.score))
+
+
+"""
+    1. A faithfulness score of 1 means the response is very faithful to the
+       retrieved contexts, and a score of 0 represents no faith with the 
+       retrieved contexts.
+       
+    2. A relevancy score measures if the response is relevant to the query
+       via the retrieved contents.
+       
+    3. The scores for relevancy and faithfullness both went from 1 to 0
+       after changing the query and producing a lower-quality response.
+       I think the evaluator failed to find any relevant chunks to answer
+       my question, so it defaulted to a 0.
+       
+    4. The "LLM-as-a-judge" approach means the evaluation metrics are 
+       calculated by an external LLM that is able to assess the subjective
+       metrics fast compared to multiple human experts. The "LLM-as-a-judge"
+       provides a more accurate and relevant evaluation than a simple
+       accuracy metric.
 """
