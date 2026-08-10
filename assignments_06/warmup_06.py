@@ -277,3 +277,35 @@ for q in questions:
     k=1, k=3, and k=5 are consistent with one another. More retrieved
     context is not always better.
 """
+
+# LlamaIndex 03
+print(f"\nLlamaIndex 03:\n")
+query_engine = index.as_query_engine(similarity_top_k=3)
+questions = [
+    "What is the product feedback from BrightLeaf's customers?",
+    "What type of benefits are missing from BrightLeaf's employee benefits?",
+    "Does BrightLeaf's security policy involve any mention of AI enhanced security measures?"
+]
+
+
+for q in questions:
+    # Q & A
+    print(f"\nQ: {q}")
+    response = query_engine.query(q)
+    print(f"\nA: {response}")
+    
+    for node_with_score in response.source_nodes:
+        # Retrieve 3 retreived source nodes
+        print(f"\nNODE ID: {node_with_score.node_id}")
+        print(f"\nSimilarity Score: {node_with_score.score:.4f}")
+        print(f"\nText Snippet: {node_with_score.node.get_content()[:150]}")
+        print("-" * 30)
+        
+"""
+    I was expecting the model to give a "I don't have that information" for 
+    each question, but it instead answered the questions with a relevant answer;
+    however, the chunks did not produce exact context as this information does 
+    not exist in the pdfs with the exception of the last question which provided
+    one accurate chunk. I would have the system pull directly from the pdfs and
+    give an answer and clarify where the actual information can from in its answer. 
+"""
