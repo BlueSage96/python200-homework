@@ -11,7 +11,7 @@ else:
     print("Warning: could not load API key. Check your .env file.")
     
 # Step 2
-print(f"\nStep 02:\n")
+print(f"\nStep 2:\n")
 
 docs_dir = Path("./resources/groundwork_docs")
 assert docs_dir.exists(), f"Document directory not found: {docs_dir}"
@@ -23,3 +23,11 @@ dr = 0
 for d in docs:
     dr += 1
     print(f"File {dr}: {d.metadata["file_name"]}")
+    
+# Step 3
+print(f"\nStep 3:\n")
+index = VectorStoreIndex.from_documents(docs)
+query_engine = index.as_query_engine(similarity_top_k=3)
+
+if query_engine and index:
+    print("Index built successfully. Ready to answer your questions")
