@@ -226,3 +226,54 @@ for q in questions:
     The answers to each question are specific and relevant to the questions.
     The tone of the answers are professional. There no unexpected outputs.
 """
+
+# LlamaIndex 02
+print(f"\nLlamaIndex 02 k=1:\n")
+
+query_engine = index.as_query_engine(similarity_top_k=1)
+questions = [
+    "What employee benefits does BrightLeaf offer?",
+    "What are BrightLeaf's security policies?",
+]
+
+for q in questions:
+    # Q & A
+    print(f"\nQ: {q}")
+    response = query_engine.query(q)
+    print(f"\nA: {response}")
+    
+    for node_with_score in response.source_nodes:
+        # Retrieve 3 retreived source nodes
+        print(f"\nNODE ID: {node_with_score.node_id}")
+        print(f"\nSimilarity Score: {node_with_score.score:.4f}")
+        print(f"\nText Snippet: {node_with_score.node.get_content()[:150]}")
+        print("-" * 30)
+        
+print(f"\nLlamaIndex 02 k=5:\n")
+
+query_engine = index.as_query_engine(similarity_top_k=5)
+questions = [
+    "What employee benefits does BrightLeaf offer?",
+    "What are BrightLeaf's security policies?",
+]
+
+for q in questions:
+    # Q & A
+    print(f"\nQ: {q}")
+    response = query_engine.query(q)
+    print(f"\nA: {response}")
+    
+    for node_with_score in response.source_nodes:
+        # Retrieve 3 retreived source nodes
+        print(f"\nNODE ID: {node_with_score.node_id}")
+        print(f"\nSimilarity Score: {node_with_score.score:.4f}")
+        print(f"\nText Snippet: {node_with_score.node.get_content()[:150]}")
+        print("-" * 30)
+        
+"""
+    k=1 produced the most relevant chunk while k=5 produced 5 chunks, 
+    some of them not as relevant. Semantic RAG shows the most relevant
+    chunk followed by the less relevant ones. The similarity scores for
+    k=1, k=3, and k=5 are consistent with one another. More retrieved
+    context is not always better.
+"""
