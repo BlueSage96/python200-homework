@@ -106,3 +106,16 @@ for q in questions:
     4. I would train the AI to always admit that the information is not available instead of guessing.
        Also, I would change its tone to be uncertain to give it some "human" personality traits.
 """
+
+# Step 6
+"""
+    1. My LlamaIndex code is 41 lines, and I believe it would have taken two times the code
+       if I did semantic RAG manually. Using a framework saves a lot of time and headache
+       especially for beginners.
+       
+    2. This system would work for any small business, like a small game studio, as the 
+       chatbot is not intended to use for more complex questions.
+
+    3. RAG cannot fully prevent the chatbot from providing misinformation for some queries.
+"""
+
