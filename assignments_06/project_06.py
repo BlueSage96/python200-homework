@@ -67,3 +67,42 @@ for q in questions:
       
     There were no "surprising" answers, just two bad ones.
 """
+
+# Step 5
+print(f"\nStep 5:\n")
+questions = [
+    "Is Groundwork open on New Years Day?",
+    "Do you offer any gluten-free food options?",
+]
+
+query_engine = index.as_query_engine(similarity_top_k=1)
+
+for q in questions:
+    print(f"\nQuestion: {q}")
+    response = query_engine.query(q)
+    print(f"\nAnswer: {response}\n")
+    
+    for node_with_score in response.source_nodes:
+        # Retrieve the top retreived source node
+        print(f"\nNODE ID: {node_with_score.node_id}")
+        print(f"\nSimilarity Score: {node_with_score.score:.4f}")
+        print(f"\nText Snippet: {node_with_score.node.get_content()[:200]}")
+        print("-" * 30)
+        
+"""
+    1. I asked:  "Is Groundwork open on New Years Day?" and "Do you offer any gluten-free food options?".
+       I made the query hard by changing a couple of questions for stuff not listed.
+       
+    2. For the first answer, the chatbot admitted it didn't know the answer and the chunk
+       used (Our Story) was not relevant to the question.
+       
+       For the second answer, the chatbot fabricated the answer instead of saying it didn't
+       know like it did for the first question. It also added the chunk for seasonal specials
+       instead of the menu.
+       
+    3. The AI's tone remained remained matter-of-fact even when the answers were not available.
+       AI-generated responses should always be vetted by humans to prevent harm from false information.
+       
+    4. I would train the AI to always admit that the information is not available instead of guessing.
+       Also, I would change its tone to be uncertain to give it some "human" personality traits.
+"""
