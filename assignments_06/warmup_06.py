@@ -355,7 +355,7 @@ print("Relevancy Result: " + str(relevancy_result.score))
 
 print(f"\nLlamaIndex 04 produce feedback:\n")
 # Get response to query
-q = "What is the product feedback from BrightLeaf's customers?"
+q = "Do you think Grand Theft Auto VI be delayed again?"
 response = query_engine.query(q)
 
 # Evaluate faithfulness and relevancy
