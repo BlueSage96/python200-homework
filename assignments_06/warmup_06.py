@@ -16,31 +16,31 @@ else:
 
 """
     Scenario A:
-    RAG makes the most sense since there are hundreds of PDFs that are updated.
-    The team can train the AI with their internal library and retrieve outside 
-    documents when necessary.
+    RAG makes the most sense because there are hundreds of PDFs that are frequently
+    updated. The system can retrieve relevant information from the current internal
+    documents when answering a user's question without retraining the model.
 
     Scenario B:
-    Since the startup has produced a lot of information from internal files,
-    fine tuning is the way because they want the AI to adopt a certain 
-    style/personality. Another reason would be to accomodate internalize patterns 
-    that are too complex to express in a prompt. 
-    
+    Fine-tuning makes the most sense because the startup wants the AI to consistently
+    adopt a particular style and personality. Fine-tuning can teach the model desired
+    patterns and behaviors that would be difficult to express entirely through prompts.
+
     Scenario C:
-    For a small report, prompt engineering is the best option as the data analyst
-    can give a detailed prompt and let the model answer.
+    Prompt engineering makes the most sense because the data analyst only needs to
+    work with a small report. A carefully written prompt can provide the necessary
+    instructions and context without requiring RAG or fine-tuning.
 """
 
 # Concepts 02
 
 """
-    AI hallucination can be harmful if the human asks for medical advice.
-    If the AI confidently gives the user the wrong medical advice, 
-    the person would possibly get hurt or killed. Even worse, the 
-    confident bot can insist on the user to take the medical advice
-    and it could reject any corrections. The bot's tone would be
-    arrogrant because it thinks it is a medical professional, not 
-    a sentient 
+    AI hallucination can be harmful if a person asks an AI for medical advice.
+    If the AI confidently gives incorrect medical advice, the person could follow
+    the advice and become seriously injured or even die. A confident tone can
+    increase trust because users may interpret certainty as a sign that the AI
+    knows what it is talking about. This can make users less likely to question
+    or verify the response, increasing the chance that they will act on false
+    information.
 """
 
 # Concepts 03
@@ -59,17 +59,20 @@ else:
     ]
 
  Fixed:
- 
-    steps = [
-        "Receive the user's query",
-        "Embed the user's query",
-        "Extract text from source documents",
-        "Split text into chunks",
-        "Retrieve the most relevant chunks",
-        "Convert text chunks into embeddings",
-        "Inject retrieved chunks into the prompt",
-         "Generate a response from the LLM",
-    ]
+
+   steps = [
+
+    "Receive the user's query — The system receives the question the user wants answered.",
+    "Embed the user's query — The query is converted into an embedding so it can be compared with document embeddings.",
+    "Extract text from source documents — Text is extracted from the documents that will provide information for the response.",
+    "Split text into chunks — The extracted text is divided into smaller chunks that can be searched efficiently.",
+    "Retrieve the most relevant chunks — The system finds the document chunks that are most similar to the user's query.",
+    "Convert text chunks into embeddings — The document chunks are converted into embeddings so their meaning can be compared with the query.",
+    "Inject retrieved chunks into the prompt — The relevant chunks are added to the prompt as context for the LLM.",
+    "Generate a response from the LLM — The LLM uses the user's question and retrieved context to generate the final response."
+
+   ]
+
 
  Conclusion:
  
@@ -136,8 +139,14 @@ documents = {
 keywords = simple_keyword_retrieval(query, documents, verbose=True)
 print(f"Keywords 01:\n")
 print(keywords)
-# loyalty.txt because the documents are being ranked based on the number of exact keyword matches with the query. 
-# In this case, the keyword is "your".
+
+"""
+    loyalty.txt was selected because keyword retrieval found one exact keyword
+    match in loyalty.txt ("your"). hours.txt also had one matching keyword
+    ("weekends"), so the keyword-based method could not distinguish which
+    document was more relevant.
+"""
+
 
 # Keywords 02
 
@@ -152,9 +161,12 @@ keywords = simple_keyword_retrieval(query, documents, verbose=True)
 print(f"\nKeywords 02:\n")
 print(keywords)
 
-# There were no overlapping keywords found so keyword RAG was wrong for this query. Fine-tuning would be more appropriate for this example.
+"""
+     Keyword RAG struggled because there were no overlapping keywords.
+     Semantic retrieval would work better because embeddings can identify similar
+     meanings even when the query and document use different words.
+"""
 
-# Keywords 03
 
 """
     Prediction: My first pick would be loyalty.txt as its 
@@ -177,23 +189,29 @@ print(keywords)
 # Semantic 01
 
 """
-    1. A vector embedding is the process where chunks of data is converted to numbers by the embedding model.
-    2. The score of 0.85 is more relevant as it is closest to being similar (almost 1). Both scores (0.85 & 0.30)
-       have some mild similarity to one another for the model to still associate them together.
-    3. Even if the relevant chunks do not share text with one another, they can have a similar meaning.
+    1. A vector embedding is a numerical representation of the meaning of text,
+    created by an embedding model so that text can be compared mathematically.
+
+    2. A cosine similarity score of 0.85 indicates greater semantic similarity
+    than a score of 0.30. Therefore, the chunk with a score of 0.85 is more
+    relevant to the query.
+
+    3. Semantic retrieval can find relevant chunks even when the query and the
+    retrieved text do not contain the same exact words because their meanings
+    can still be similar.
 """
 
 # Semantic 02
 
 """
-    | Feature                    | Keyword RAG                       | Semantic RAG |
-|----------------------------|-----------------------------------|----------------------------|
-| What is compared?          | Exact word overlap                | Meanings via embedding     |
-| What is retrieved?         | Full document                     | Chunks of text             |
-| Can it handle synonyms?    | No                                | Yes                        |
-| Storage format             | Plain text dictionary             | LlamaIndex's storage index |
-| Relevance score            | Number of overlapping keywords    | Cosine similarity          |
 
+| Feature                    | Keyword RAG                              | Semantic RAG                                      |
+|----------------------------|------------------------------------------|---------------------------------------------------|
+| What is compared?         | Exact words in the query and documents  | Vector embeddings representing meaning              |
+| What is retrieved?        | Matching document/content               | Most semantically similar text chunks               |
+| Can it handle synonyms?   | No                                       | Yes                                                |
+| Storage format             | Dictionary of documents and text        | Vector index containing document chunk embeddings  |
+| Relevance score            | Number of matching keywords              | Cosine similarity between embeddings              |
 """
 
 # LlamaIndex 01
@@ -204,7 +222,7 @@ docs = SimpleDirectoryReader("brightleaf_pdfs").load_data()
 # Build a vector index automatically (handles chunking + embeddings)
 index = VectorStoreIndex.from_documents(docs)
 
-query_engine = index.as_query_engine(similarity_top_k=3)
+query_engine_k3 = index.as_query_engine(similarity_top_k=3)
 questions = [
     "What employee benefits does BrightLeaf offer?",
     "What are BrightLeaf's security policies?",
@@ -215,7 +233,7 @@ print(f"\nLlamaIndex 01:\n")
 for q in questions:
     # Q & A
     print(f"\nQ: {q}")
-    response = query_engine.query(q)
+    response = query_engine_k3.query(q)
     print(f"\nA: {response}")
     
     for node_with_score in response.source_nodes:
@@ -233,7 +251,7 @@ for q in questions:
 # LlamaIndex 02
 print(f"\nLlamaIndex 02 k=1:\n")
 
-query_engine = index.as_query_engine(similarity_top_k=1)
+query_engine_k1 = index.as_query_engine(similarity_top_k=1)
 questions = [
     "What employee benefits does BrightLeaf offer?",
     "What are BrightLeaf's security policies?",
@@ -242,7 +260,7 @@ questions = [
 for q in questions:
     # Q & A
     print(f"\nQ: {q}")
-    response = query_engine.query(q)
+    response = query_engine_k1.query(q)
     print(f"\nA: {response}")
     
     for node_with_score in response.source_nodes:
@@ -254,7 +272,7 @@ for q in questions:
         
 print(f"\nLlamaIndex 02 k=5:\n")
 
-query_engine = index.as_query_engine(similarity_top_k=5)
+query_engine_k5 = index.as_query_engine(similarity_top_k=5)
 questions = [
     "What employee benefits does BrightLeaf offer?",
     "What are BrightLeaf's security policies?",
@@ -263,7 +281,7 @@ questions = [
 for q in questions:
     # Q & A
     print(f"\nQ: {q}")
-    response = query_engine.query(q)
+    response = query_engine_k5.query(q)
     print(f"\nA: {response}")
     
     for node_with_score in response.source_nodes:
