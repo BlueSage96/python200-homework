@@ -13,8 +13,8 @@ else:
 # Step 2
 print(f"\nStep 2:\n")
 
-docs_dir = Path("./resources/groundwork_docs")
-assert docs_dir.exists(), f"Document directory not found: {docs_dir}"
+docs_dir = "./resources/groundwork_docs"
+assert os.path.exists(docs_dir), "Groundwork documents directory does not exist."
 
 docs = SimpleDirectoryReader(docs_dir).load_data()
 print(f"Documents loaded: {len(docs)}\n") 
@@ -42,19 +42,18 @@ questions = [
     "Do you offer catering or wholesale orders?",
 ]
 
-query_engine = index.as_query_engine(similarity_top_k=1)
+query_engine = index.as_query_engine(similarity_top_k=3)
 
 for q in questions:
     print(f"\nQuestion: {q}")
     response = query_engine.query(q)
     print(f"\nAnswer: {response}\n")
-    
-    for node_with_score in response.source_nodes:
-        # Retrieve the top retreived source node
-        print(f"\nNODE ID: {node_with_score.node_id}")
-        print(f"\nSimilarity Score: {node_with_score.score:.4f}")
-        print(f"\nText Snippet: {node_with_score.node.get_content()[:200]}")
-        print("-" * 30)
+
+    top_node = response.source_nodes[0]
+    print(f"Document: {top_node.node.metadata.get('file_name')}")
+    print(f"Similarity Score: {top_node.score:.4f}")
+    print(f"Text Snippet: {top_node.node.get_content()[:200]}")
+    print("-" * 30)
         
 
 # The chatbot was very confident and accurate, giving concise answers.
@@ -82,7 +81,7 @@ for q in questions:
     print(f"\nAnswer: {response}\n")
     
     for node_with_score in response.source_nodes:
-        # Retrieve the top retreived source node
+        # Print all three retrieved source nodes required for the failure analysis.
         print(f"\nNODE ID: {node_with_score.node_id}")
         print(f"\nSimilarity Score: {node_with_score.score:.4f}")
         print(f"\nText Snippet: {node_with_score.node.get_content()[:200]}")
@@ -95,29 +94,27 @@ for q in questions:
 # documents do not provide information about holiday hours, so I expected
 # the system to struggle with the question.
 
-# The retrieval returned documents that were related to Groundwork but did not
-# contain the answer to the question. The model therefore did not have reliable
-# information from the retrieved documents to answer the question.
+# The retrieved documents did not contain the answer. The model acknowledged 
+# the missing information saying that there is no information on New Year's
+# Day.
 
-# The model's response should be examined to see whether it acknowledged that
-# the information was unavailable or confidently generated an answer anyway.
-# If it sounded confident despite lacking supporting information, this shows
-# that a confident tone does not necessarily mean an AI response is accurate
-# and that users should verify important information.
+#The model remained confident when explaining that the information was
+# unavailable. This shows that an AI can sound confident even when 
+# the retrieved information does not support its answer, so users should 
+# verify important information rather than relying on confidence alone.
 
-# I would improve the system by adding better safeguards for questions that
-# cannot be answered from the retrieved documents, such as requiring a minimum
-# similarity score or having the system respond that it does not have enough
-# information when the retrieved context does not support an answer.
+# I would improve the system by adding a similarity threshold or a
+# "not enough information" safeguard so that the system can decline to
+# answer when the retrieved documents do not provide sufficient evidence.
 
 
 # Step 6
 
 # 1. My LlamaIndex code is 41 lines, and I believe it would have taken two times the code
-#     if I did semantic RAG manually. Using a framework saves a lot of time and headache
-#     especially for beginners.
+#    if I did semantic RAG manually. Using a framework saves a lot of time and headache
+#    especially for beginners.
     
 # 2. This system would work for any small business, like a small game studio, as the 
-#     chatbot is not intended to use for more complex questions.
+#    chatbot is not intended to use for more complex questions.
 
 # 3. RAG cannot fully prevent the chatbot from providing misinformation for some queries.
