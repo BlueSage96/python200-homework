@@ -14,74 +14,69 @@ else:
     
 # Concepts 01
 
-"""
-    Scenario A:
-    RAG makes the most sense because there are hundreds of PDFs that are frequently
-    updated. The system can retrieve relevant information from the current internal
-    documents when answering a user's question without retraining the model.
+# Scenario A:
+# RAG makes the most sense because there are hundreds of PDFs that are frequently
+# updated. The system can retrieve relevant information from the current internal
+# documents when answering a user's question without retraining the model.
 
-    Scenario B:
-    Fine-tuning makes the most sense because the startup wants the AI to consistently
-    adopt a particular style and personality. Fine-tuning can teach the model desired
-    patterns and behaviors that would be difficult to express entirely through prompts.
+# Scenario B:
+# Fine-tuning makes the most sense because the startup wants the AI to consistently
+# adopt a particular style and personality. Fine-tuning can teach the model desired
+# patterns and behaviors that would be difficult to express entirely through prompts.
 
-    Scenario C:
-    Prompt engineering makes the most sense because the data analyst only needs to
-    work with a small report. A carefully written prompt can provide the necessary
-    instructions and context without requiring RAG or fine-tuning.
-"""
+# Scenario C:
+# Prompt engineering makes the most sense because the data analyst only needs to
+# work with a small report. A carefully written prompt can provide the necessary
+# instructions and context without requiring RAG or fine-tuning.
+
 
 # Concepts 02
 
-"""
-    AI hallucination can be harmful if a person asks an AI for medical advice.
-    If the AI confidently gives incorrect medical advice, the person could follow
-    the advice and become seriously injured or even die. A confident tone can
-    increase trust because users may interpret certainty as a sign that the AI
-    knows what it is talking about. This can make users less likely to question
-    or verify the response, increasing the chance that they will act on false
-    information.
-"""
+# AI hallucination can be harmful if a person asks an AI for medical advice.
+# If the AI confidently gives incorrect medical advice, the person could follow
+# the advice and become seriously injured or even die. A confident tone can
+# increase trust because users may interpret certainty as a sign that the AI
+# knows what it is talking about. This can make users less likely to question
+# or verify the response, increasing the chance that they will act on false
+# information.
+
 
 # Concepts 03
 
-"""
-  Original:
-    steps = [
-        "Generate a response from the LLM",
-        "Extract text from source documents",
-        "Receive the user's query",
-        "Retrieve the most relevant chunks",
-        "Convert text chunks into embeddings",
-        "Inject retrieved chunks into the prompt",
-        "Split text into chunks",
-        "Embed the user's query",
-    ]
+# Original:
+#     steps = [
+#         "Generate a response from the LLM",
+#         "Extract text from source documents",
+#         "Receive the user's query",
+#         "Retrieve the most relevant chunks",
+#         "Convert text chunks into embeddings",
+#         "Inject retrieved chunks into the prompt",
+#         "Split text into chunks",
+#         "Embed the user's query",
+#     ]
 
- Fixed:
+#  Fixed:
 
-   steps = [
+#    steps = [
 
-    "Receive the user's query — The system receives the question the user wants answered.",
-    "Embed the user's query — The query is converted into an embedding so it can be compared with document embeddings.",
-    "Extract text from source documents — Text is extracted from the documents that will provide information for the response.",
-    "Split text into chunks — The extracted text is divided into smaller chunks that can be searched efficiently.",
-    "Retrieve the most relevant chunks — The system finds the document chunks that are most similar to the user's query.",
-    "Convert text chunks into embeddings — The document chunks are converted into embeddings so their meaning can be compared with the query.",
-    "Inject retrieved chunks into the prompt — The relevant chunks are added to the prompt as context for the LLM.",
-    "Generate a response from the LLM — The LLM uses the user's question and retrieved context to generate the final response."
+#     "Receive the user's query — The system receives the question the user wants answered.",
+#     "Embed the user's query — The query is converted into an embedding so it can be compared with document embeddings.",
+#     "Extract text from source documents — Text is extracted from the documents that will provide information for the response.",
+#     "Split text into chunks — The extracted text is divided into smaller chunks that can be searched efficiently.",
+#     "Retrieve the most relevant chunks — The system finds the document chunks that are most similar to the user's query.",
+#     "Convert text chunks into embeddings — The document chunks are converted into embeddings so their meaning can be compared with the query.",
+#     "Inject retrieved chunks into the prompt — The relevant chunks are added to the prompt as context for the LLM.",
+#     "Generate a response from the LLM — The LLM uses the user's question and retrieved context to generate the final response."
 
-   ]
+#    ]
 
 
- Conclusion:
+#  Conclusion:
  
- The RAG steps breaks large files of data into digestable 
- chunks that only contains the most important information so 
- that the model can give the most accurate response to the 
- user's query.
-"""
-
+#  The RAG steps breaks large files of data into digestable 
+#  chunks that only contains the most important information so 
+#  that the model can give the most accurate response to the 
+#  user's query.
 
 
 def simple_keyword_retrieval(query, documents, verbose=True):
@@ -140,13 +135,10 @@ keywords = simple_keyword_retrieval(query, documents, verbose=True)
 print(f"Keywords 01:\n")
 print(keywords)
 
-"""
-    loyalty.txt was selected because keyword retrieval found one exact keyword
-    match in loyalty.txt ("your"). hours.txt also had one matching keyword
-    ("weekends"), so the keyword-based method could not distinguish which
-    document was more relevant.
-"""
-
+# loyalty.txt was selected because keyword retrieval found one exact keyword
+# match in loyalty.txt ("your"). hours.txt also had one matching keyword
+# ("weekends"), so the keyword-based method could not distinguish which
+# document was more relevant.
 
 # Keywords 02
 
@@ -161,18 +153,16 @@ keywords = simple_keyword_retrieval(query, documents, verbose=True)
 print(f"\nKeywords 02:\n")
 print(keywords)
 
-"""
-     Keyword RAG struggled because there were no overlapping keywords.
-     Semantic retrieval would work better because embeddings can identify similar
-     meanings even when the query and document use different words.
-"""
+
+# Keyword RAG struggled because there were no overlapping keywords.
+# Semantic retrieval would work better because embeddings can identify similar
+# meanings even when the query and document use different words.
 
 
-"""
-    Prediction: My first pick would be loyalty.txt as its 
-    content is more aligned with the query below. 
-    But I have a feeling it would be hiring or hours instead.
-"""
+# Prediction: My first pick would be loyalty.txt as its 
+# content is more aligned with the query below. 
+# But I have a feeling it would be hiring or hours instead.
+
 query = "How do I sign up for rewards?"
 documents = {
     "menu.txt": "We serve espresso, lattes, cappuccinos, and cold brew. Pastries include croissants and muffins baked fresh daily. Oat milk and almond milk are available.",
@@ -188,31 +178,29 @@ print(keywords)
 
 # Semantic 01
 
-"""
-    1. A vector embedding is a numerical representation of the meaning of text,
-    created by an embedding model so that text can be compared mathematically.
 
-    2. A cosine similarity score of 0.85 indicates greater semantic similarity
-    than a score of 0.30. Therefore, the chunk with a score of 0.85 is more
-    relevant to the query.
+# 1. A vector embedding is a numerical representation of the meaning of text,
+# created by an embedding model so that text can be compared mathematically.
 
-    3. Semantic retrieval can find relevant chunks even when the query and the
-    retrieved text do not contain the same exact words because their meanings
-    can still be similar.
-"""
+# 2. A cosine similarity score of 0.85 indicates greater semantic similarity
+# than a score of 0.30. Therefore, the chunk with a score of 0.85 is more
+# relevant to the query.
+
+# 3. Semantic retrieval can find relevant chunks even when the query and the
+# retrieved text do not contain the same exact words because their meanings
+# can still be similar.
+
 
 # Semantic 02
 
-"""
+# | Feature                    | Keyword RAG                              | Semantic RAG                                      |
+# |----------------------------|------------------------------------------|---------------------------------------------------|
+# | What is compared?         | Exact words in the query and documents  | Vector embeddings representing meaning              |
+# | What is retrieved?        | Matching document/content               | Most semantically similar text chunks               |
+# | Can it handle synonyms?   | No                                       | Yes                                                |
+# | Storage format             | Dictionary of documents and text        | Vector index containing document chunk embeddings  |
+# | Relevance score            | Number of matching keywords              | Cosine similarity between embeddings              |
 
-| Feature                    | Keyword RAG                              | Semantic RAG                                      |
-|----------------------------|------------------------------------------|---------------------------------------------------|
-| What is compared?         | Exact words in the query and documents  | Vector embeddings representing meaning              |
-| What is retrieved?        | Matching document/content               | Most semantically similar text chunks               |
-| Can it handle synonyms?   | No                                       | Yes                                                |
-| Storage format             | Dictionary of documents and text        | Vector index containing document chunk embeddings  |
-| Relevance score            | Number of matching keywords              | Cosine similarity between embeddings              |
-"""
 
 # LlamaIndex 01
 
@@ -243,10 +231,10 @@ for q in questions:
         print(f"\nText Snippet: {node_with_score.node.get_content()[:150]}")
         print("-" * 30)
         
-"""
-    The answers to each question are specific and relevant to the questions.
-    The tone of the answers are professional. There no unexpected outputs.
-"""
+
+# The answers to each question are specific and relevant to the questions.
+# The tone of the answers are professional. There no unexpected outputs.
+
 
 # LlamaIndex 02
 print(f"\nLlamaIndex 02 k=1:\n")
@@ -291,13 +279,11 @@ for q in questions:
         print(f"\nText Snippet: {node_with_score.node.get_content()[:150]}")
         print("-" * 30)
         
-"""
-    k=1 produced the most relevant chunk while k=5 produced 5 chunks, 
-    some of them not as relevant. Semantic RAG shows the most relevant
-    chunk followed by the less relevant ones. The similarity scores for
-    k=1, k=3, and k=5 are consistent with one another. More retrieved
-    context is not always better.
-"""
+# k=1 produced the most relevant chunk while k=5 produced 5 chunks, 
+# some of them not as relevant. Semantic RAG shows the most relevant
+# chunk followed by the less relevant ones. The similarity scores for
+# k=1, k=3, and k=5 are consistent with one another. More retrieved
+# context is not always better.
 
 # LlamaIndex 03
 print(f"\nLlamaIndex 03:\n")
@@ -307,7 +293,6 @@ questions = [
     "What type of benefits are missing from BrightLeaf's employee benefits?",
     "Does BrightLeaf's security policy involve any mention of AI enhanced security measures?"
 ]
-
 
 for q in questions:
     # Q & A
@@ -322,14 +307,13 @@ for q in questions:
         print(f"\nText Snippet: {node_with_score.node.get_content()[:150]}")
         print("-" * 30)
         
-"""
-    I was expecting the model to give a "I don't have that information" for 
-    each question, but it instead answered the questions with a relevant answer;
-    however, the chunks did not produce exact context as this information does 
-    not exist in the pdfs with the exception of the last question which provided
-    one accurate chunk. I would have the system pull directly from the pdfs and
-    give an answer and clarify where the actual information can from in its answer. 
-"""
+
+# I was expecting the model to give a "I don't have that information" for 
+# each question, but it instead answered the questions with a relevant answer;
+# however, the chunks did not produce exact context as this information does 
+# not exist in the pdfs with the exception of the last question which provided
+# one accurate chunk. I would have the system pull directly from the pdfs and
+# give an answer and clarify where the actual information can from in its answer. 
 
 # LlamaIndex 04
 print(f"\nLlamaIndex 04:\n")
@@ -365,23 +349,20 @@ print("Faithfulness Evaluation: " + str(faithfulness_result.score))
 relevancy_result = relevancy_evaluator.evaluate_response(query=q, response=response)
 print("Relevancy Result: " + str(relevancy_result.score))
 
-
-"""
-    1. A faithfulness score of 1 means the response is very faithful to the
-       retrieved contexts, and a score of 0 represents no faith with the 
-       retrieved contexts.
-       
-    2. A relevancy score measures if the response is relevant to the query
-       via the retrieved contents.
-       
-    3. The scores for relevancy and faithfullness both went from 1 to 0
-       after changing the query and producing a lower-quality response.
-       I think the evaluator failed to find any relevant chunks to answer
-       my question, so it defaulted to a 0.
-       
-    4. The "LLM-as-a-judge" approach means the evaluation metrics are 
-       calculated by an external LLM that is able to assess the subjective
-       metrics fast compared to multiple human experts. The "LLM-as-a-judge"
-       provides a more accurate and relevant evaluation than a simple
-       accuracy metric.
-"""
+# 1. A faithfulness score of 1 means the response is very faithful to the
+#    retrieved contexts, and a score of 0 represents no faith with the 
+#    retrieved contexts.
+    
+# 2. A relevancy score measures if the response is relevant to the query
+#    via the retrieved contents.
+    
+# 3. The scores for relevancy and faithfullness both went from 1 to 0
+#    after changing the query and producing a lower-quality response.
+#    I think the evaluator failed to find any relevant chunks to answer
+#    my question, so it defaulted to a 0.
+    
+# 4. The "LLM-as-a-judge" approach means the evaluation metrics are 
+#    calculated by an external LLM that is able to assess the subjective
+#    metrics fast compared to multiple human experts. The "LLM-as-a-judge"
+#    provides a more accurate and relevant evaluation than a simple
+#    accuracy metric.

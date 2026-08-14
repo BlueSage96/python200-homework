@@ -56,17 +56,17 @@ for q in questions:
         print(f"\nText Snippet: {node_with_score.node.get_content()[:200]}")
         print("-" * 30)
         
-"""
-    The chatbot was very confident and accurate, giving concise answers.
-    There were two issues with a couple of the responses:
+
+# The chatbot was very confident and accurate, giving concise answers.
+# There were two issues with a couple of the responses:
+
+# Answer two should have come from the menu.txt as there are non-seasonal
+# dairy-free drinks.
+# Answer five is vague about the catering and wholesale orders and 
+# could have briefly explained them better.
     
-    - Answer two should have come from the menu.txt as there are non-seasonal
-      dairy-free drinks.
-    - Answer five is vague about the catering and wholesale orders and 
-      could have briefly explained them better.
-      
-    There were no "surprising" answers, just two bad ones.
-"""
+# There were no "surprising" answers, just two bad ones.
+
 
 # Step 5
 print(f"\nStep 5:\n")
@@ -88,38 +88,36 @@ for q in questions:
         print(f"\nText Snippet: {node_with_score.node.get_content()[:200]}")
         print("-" * 30)
         
-""""
-    Step 5 Reflection:
 
-    I asked, "Is Groundwork open on New Year's Day?" because the Groundwork
-    documents do not provide information about holiday hours, so I expected
-    the system to struggle with the question.
+# Step 5 Reflection:
 
-    The retrieval returned documents that were related to Groundwork but did not
-    contain the answer to the question. The model therefore did not have reliable
-    information from the retrieved documents to answer the question.
+# I asked, "Is Groundwork open on New Year's Day?" because the Groundwork
+# documents do not provide information about holiday hours, so I expected
+# the system to struggle with the question.
 
-    The model's response should be examined to see whether it acknowledged that
-    the information was unavailable or confidently generated an answer anyway.
-    If it sounded confident despite lacking supporting information, this shows
-    that a confident tone does not necessarily mean an AI response is accurate
-    and that users should verify important information.
+# The retrieval returned documents that were related to Groundwork but did not
+# contain the answer to the question. The model therefore did not have reliable
+# information from the retrieved documents to answer the question.
 
-    I would improve the system by adding better safeguards for questions that
-    cannot be answered from the retrieved documents, such as requiring a minimum
-    similarity score or having the system respond that it does not have enough
-    information when the retrieved context does not support an answer.
-"""
+# The model's response should be examined to see whether it acknowledged that
+# the information was unavailable or confidently generated an answer anyway.
+# If it sounded confident despite lacking supporting information, this shows
+# that a confident tone does not necessarily mean an AI response is accurate
+# and that users should verify important information.
+
+# I would improve the system by adding better safeguards for questions that
+# cannot be answered from the retrieved documents, such as requiring a minimum
+# similarity score or having the system respond that it does not have enough
+# information when the retrieved context does not support an answer.
+
 
 # Step 6
-"""
-    1. My LlamaIndex code is 41 lines, and I believe it would have taken two times the code
-       if I did semantic RAG manually. Using a framework saves a lot of time and headache
-       especially for beginners.
-       
-    2. This system would work for any small business, like a small game studio, as the 
-       chatbot is not intended to use for more complex questions.
 
-    3. RAG cannot fully prevent the chatbot from providing misinformation for some queries.
-"""
+# 1. My LlamaIndex code is 41 lines, and I believe it would have taken two times the code
+#     if I did semantic RAG manually. Using a framework saves a lot of time and headache
+#     especially for beginners.
+    
+# 2. This system would work for any small business, like a small game studio, as the 
+#     chatbot is not intended to use for more complex questions.
 
+# 3. RAG cannot fully prevent the chatbot from providing misinformation for some queries.
