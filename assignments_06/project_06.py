@@ -50,7 +50,7 @@ for q in questions:
     print(f"\nAnswer: {response}\n")
 
     top_node = response.source_nodes[0]
-    print(f"Document: {top_node.node.metadata.get('file_name')}")
+    print(f"Top Retrieved Document: {top_node.node.metadata.get('file_name')}")
     print(f"Similarity Score: {top_node.score:.4f}")
     print(f"Text Snippet: {top_node.node.get_content()[:200]}")
     print("-" * 30)
@@ -82,7 +82,7 @@ for q in questions:
     
     for node_with_score in response.source_nodes:
         # Print all three retrieved source nodes required for the failure analysis.
-        print(f"\nNODE ID: {node_with_score.node_id}")
+        print(f"\nDocument: {node_with_score.node.metadata.get('file_name')}")
         print(f"\nSimilarity Score: {node_with_score.score:.4f}")
         print(f"\nText Snippet: {node_with_score.node.get_content()[:200]}")
         print("-" * 30)
