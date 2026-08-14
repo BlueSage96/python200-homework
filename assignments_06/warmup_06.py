@@ -154,15 +154,17 @@ keywords = simple_keyword_retrieval(query, documents, verbose=True)
 print(f"\nKeywords 02:\n")
 print(keywords)
 
+# No document was selected because there were no overlapping keywords between
+# the query and the documents. Keyword RAG struggled because it relies on
+# exact word matches. Semantic retrieval would work better because embeddings
+# can identify similar meanings even when the query and document use different
+# words.
 
-# Keyword RAG struggled because there were no overlapping keywords.
-# Semantic retrieval would work better because embeddings can identify similar
-# meanings even when the query and document use different words.
 
+# Keywords 03
 
-# Prediction: My first pick would be loyalty.txt as its 
-# content is more aligned with the query below. 
-# But I have a feeling it would be hiring or hours instead.
+# Prediction: I expected loyalty.txt to be selected because the query is about
+# signing up for rewards, which relates to the loyalty program.
 
 query = "How do I sign up for rewards?"
 documents = {
@@ -175,10 +177,10 @@ keywords = simple_keyword_retrieval(query, documents, verbose=True)
 print(f"\nKeywords 03:\n")
 print(keywords)
 
-# My prediction was wrong because there were no overlapping keywords, so no document could be selected.
+# Actual result: No document was selected because none of the filtered query
+# tokens overlapped with the document text. My prediction was incorrect.
 
 # Semantic 01
-
 
 # 1. A vector embedding is a numerical representation of the meaning of text,
 # created by an embedding model so that text can be compared mathematically.
@@ -361,17 +363,19 @@ print("Faithfulness Evaluation: " + str(faithfulness_result.score))
 relevancy_result = relevancy_evaluator.evaluate_response(query=q, response=response)
 print("Relevancy Result: " + str(relevancy_result.score))
 
-# Reflection:
 
+# Reflection:
+#
 # For the employee-benefits query, the faithfulness score was 1 and the
 # relevancy score was 1. For the unrelated GTA VI query, the faithfulness
 # score was 0 and the relevancy score was 0.
-
-# The lower scores on the unrelated query show that the retrieved BrightLeaf
-# context did not provide useful evidence for answering the question.
+#
 # Faithfulness measures whether the response is supported by the retrieved
 # context, while relevancy measures whether the response addresses the query.
-
-# This demonstrates why evaluator scores can help identify when a RAG system
-# is producing responses that are poorly supported or unrelated to its
-# source documents.
+# The lower scores for the unrelated query show that the BrightLeaf context
+# did not provide useful evidence for answering that question.
+#
+# LLM-as-a-judge means using another language model to evaluate the quality
+# of a RAG response instead of relying only on human evaluation. In this
+# case, the evaluator LLM judges whether the response is faithful to the
+# retrieved context and relevant to the user's question.
