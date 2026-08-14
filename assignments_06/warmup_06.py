@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import os
 import string
+from pathlib import Path
 
 from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
 from llama_index.llms.openai import OpenAI
@@ -205,7 +206,8 @@ print(keywords)
 # LlamaIndex 01
 
 # Load documents directly from PDFs in the folder
-docs = SimpleDirectoryReader("brightleaf_pdfs").load_data()
+brightleaf_dir = Path(__file__).resolve().parent / "brightleaf_pdfs"
+docs = SimpleDirectoryReader(brightleaf_dir).load_data()
 
 # Build a vector index automatically (handles chunking + embeddings)
 index = VectorStoreIndex.from_documents(docs)
@@ -237,7 +239,7 @@ for q in questions:
 
 
 # LlamaIndex 02
-print(f"\nLlamaIndex 02 k=1:\n")
+print(f"\n========== LlamaIndex 02: similarity_top_k=1 ==========\n")
 
 query_engine_k1 = index.as_query_engine(similarity_top_k=1)
 questions = [
@@ -258,7 +260,7 @@ for q in questions:
         print(f"\nText Snippet: {node_with_score.node.get_content()[:150]}")
         print("-" * 30)
         
-print(f"\nLlamaIndex 02 k=5:\n")
+print(f"\n========== LlamaIndex 02: similarity_top_k=5 ==========\n")
 
 query_engine_k5 = index.as_query_engine(similarity_top_k=5)
 questions = [
@@ -279,8 +281,8 @@ for q in questions:
         print(f"\nText Snippet: {node_with_score.node.get_content()[:150]}")
         print("-" * 30)
         
-# k=1 produced the most relevant chunk while k=5 produced 5 chunks, 
-# some of them not as relevant. Semantic RAG shows the most relevant
+# k=1 produced the most relevant chunk, while k=5 produced 5 chunks,
+# some of them less relevant. Semantic RAG shows the most relevant
 # chunk followed by the less relevant ones. The similarity scores for
 # k=1, k=3, and k=5 are consistent with one another. More retrieved
 # context is not always better.
@@ -308,12 +310,22 @@ for q in questions:
         print("-" * 30)
         
 
-# I was expecting the model to give a "I don't have that information" for 
-# each question, but it instead answered the questions with a relevant answer;
-# however, the chunks did not produce exact context as this information does 
-# not exist in the pdfs with the exception of the last question which provided
-# one accurate chunk. I would have the system pull directly from the pdfs and
-# give an answer and clarify where the actual information can from in its answer. 
+# Reflection:
+
+# I expected these questions to be difficult because the BrightLeaf PDFs
+# do not contain direct information about customer product feedback, missing
+# employee benefits, or AI-enhanced security measures.
+
+# The first two questions produced responses that were not directly supported
+# by the retrieved documents. The third question retrieved a security-related
+# chunk that was relevant to the topic, but it did not establish that
+# BrightLeaf uses AI-enhanced security measures.
+
+# This shows that retrieving text that is related to a question does not
+# guarantee that the text actually answers the question. I would improve
+# the system by requiring stronger evidence from the retrieved chunks and
+# having it say that the information is unavailable when the documents do
+# not support an answer.
 
 # LlamaIndex 04
 print(f"\nLlamaIndex 04:\n")
@@ -349,20 +361,17 @@ print("Faithfulness Evaluation: " + str(faithfulness_result.score))
 relevancy_result = relevancy_evaluator.evaluate_response(query=q, response=response)
 print("Relevancy Result: " + str(relevancy_result.score))
 
-# 1. A faithfulness score of 1 means the response is very faithful to the
-#    retrieved contexts, and a score of 0 represents no faith with the 
-#    retrieved contexts.
-    
-# 2. A relevancy score measures if the response is relevant to the query
-#    via the retrieved contents.
-    
-# 3. The scores for relevancy and faithfullness both went from 1 to 0
-#    after changing the query and producing a lower-quality response.
-#    I think the evaluator failed to find any relevant chunks to answer
-#    my question, so it defaulted to a 0.
-    
-# 4. The "LLM-as-a-judge" approach means the evaluation metrics are 
-#    calculated by an external LLM that is able to assess the subjective
-#    metrics fast compared to multiple human experts. The "LLM-as-a-judge"
-#    provides a more accurate and relevant evaluation than a simple
-#    accuracy metric.
+# Reflection:
+
+# For the employee-benefits query, the faithfulness score was 1 and the
+# relevancy score was 1. For the unrelated GTA VI query, the faithfulness
+# score was 0 and the relevancy score was 0.
+
+# The lower scores on the unrelated query show that the retrieved BrightLeaf
+# context did not provide useful evidence for answering the question.
+# Faithfulness measures whether the response is supported by the retrieved
+# context, while relevancy measures whether the response addresses the query.
+
+# This demonstrates why evaluator scores can help identify when a RAG system
+# is producing responses that are poorly supported or unrelated to its
+# source documents.
