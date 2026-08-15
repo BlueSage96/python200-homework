@@ -427,5 +427,135 @@ class CsvManager:
         plt.show()
         
         return f"Plotted {y} vs {x} as a {plot_type}."
+
+    def compute_correlation(self, col1: str, col2: str):
+        """
+        Compute the Pearson correlation between two columns in the loaded DataFrame.
+        Returns the correlation coefficient and p-value.
+        """
+        pearson_r = pearsonr(col1,col2)
+        p_value = pearson_r.pvalue
+        
+        if not col1 or not col2:
+            return{"error": "No column is found nor is a CSV loaded."}
+        else:
+            return f"{col1: col1:.4f}, {col2: col2:.4f},{pearson_r: pearson_r:.4f}, {p_value: p_value:.4f}"
 print("Class defined")
 
+# Q4
+
+csv_backend = CsvManager(RESOURCES_DIR)
+
+node_tools = {
+    "list_csv_files": csv_backend.list_csv_files,
+    "load_csv": csv_backend.load_csv,
+    "get_columns": csv_backend.get_columns,
+    "summarize_columns": csv_backend.summarize_columns,
+    "describe_column": csv_backend.describe_column,
+    "plot_data": csv_backend.plot_data,
+    "compute_correlation": csv_backend.compute_correlation,
+}
+
+tools_schema = [
+    {
+        "type": "function",
+        "function": {
+            "name": "list_csv_files",
+            "description": "List available CSV files in the resources/ folder.",
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "load_csv",
+            "description": "Load a CSV file from the resources/ folder and make it the active dataset.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "filename": {
+                        "type": "string",
+                        "description": "CSV filename in resources/, e.g. 'bike_commute.csv'.",
+                    }
+                },
+                "required": ["filename"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_columns",
+            "description": "Get the column names of the currently loaded CSV.",
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "summarize_columns",
+            "description": "Show basic summary statistics for columns (uses pandas.describe).",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "columns": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Optional list of column names. If omitted, summarize all columns.",
+                    }
+                },
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "describe_column",
+            "description": "Show basic summary statistics for a single column (uses pandas.describe).",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "column": {
+                        "type": "string",
+                        "description": "Column name to describe.",
+                    }
+                },
+                "required": ["column"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "plot_data",
+            "description": "Plot data from the active CSV. If only y is provided, plot y vs row index.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "y": {"type": "string", "description": "Column name for y-axis."},
+                    "x": {"type": "string", "description": "Optional column name for x-axis."},
+                    "plot_type": {
+                        "type": "string",
+                        "enum": ["scatter", "line"],
+                        "description": "Type of plot to create.",
+                    },
+                },
+                "required": ["y"],
+            },
+        },
+    }, 
+    {
+        "type": "function",
+        "function": {
+            "name": "compute_correlation",
+            "description": "Compute the Pearson correlation between two columns in the loaded DataFrame.",
+            "parameters": {
+                "type":"object",
+                "properties":{
+                    "col1": {"type":"string","description":"First column."},
+                    "col2": {"type":"string","description":"Second column."},
+                    "pearson_r": {"type":"string","description":"pearsonr value"},
+                    "p_value": {"type":"string","description":"p_value"}
+                }
+            }
+        }
+    }
+]
