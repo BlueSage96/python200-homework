@@ -1,8 +1,14 @@
 # --- Lesson 02 ---
 import json
 import os
+import matplotlib.pyplot as plt 
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import pandas as pd
 from dotenv import load_dotenv
 from openai import OpenAI
+from scipy.stats import pearsonr
 
 if load_dotenv():
     print('Successfully loaded environment variables from .env')
@@ -246,3 +252,180 @@ print(f"\nResponse A: {response_a}\n")
 response_b = run_agent("What is the boiling point of water in plain English?")
 print(f"\nResponse B: {response_b}\n")
 # No tools were needed to respond. There was no calculations needed.
+
+RESOURCES_DIR = Path("resources")
+RESOURCES_DIR
+
+class CsvManager:
+    def __init__(self, resources_dir: Path):
+        self.resources_dir = resources_dir
+        self.df = None
+        self.csv_name = None
+
+    # --- Small internal helpers --------------------------------------
+
+    def _normalize_csv_name(self, filename: str) -> str:
+        if not filename.lower().endswith(".csv"):
+            return filename + ".csv"
+        return filename
+
+    def _available_csv_files(self) -> list[str]:
+        if not self.resources_dir.exists():
+            return []
+        return sorted(
+            [
+                p.name
+                for p in self.resources_dir.iterdir()
+                if p.is_file() and p.suffix.lower() == ".csv"
+            ]
+        )
+
+    def _ensure_loaded(self):
+        if self.df is None:
+            files = self._available_csv_files()
+            example = files[0] if files else "your_file.csv"
+            return {
+                "error": (
+                    "No CSV is loaded yet. First load one from resources/. "
+                    f"For example: load_csv '{example}'."
+                )
+            }
+        return None
+
+    # --- Tools (public methods) --------------------------------------
+
+    def list_csv_files(self):
+        """
+        List available CSV files in resources/.
+        """
+        files = self._available_csv_files()
+        if not files:
+            return {
+                "message": (
+                    "No CSV files found in resources/. "
+                    "Create a resources/ folder and put one or more .csv files inside it."
+                ),
+                "files": [],
+            }
+        return {"files": files}
+
+    def load_csv(self, filename: str):
+        """
+        Load a CSV file from resources/ and make it the active dataset.
+
+        filename can be "bike_commute" or "bike_commute.csv".
+        """
+        filename = self._normalize_csv_name(filename)
+        path = self.resources_dir / filename
+
+        if not path.exists():
+            return {
+                "error": f"Could not find '{filename}' in resources/.",
+                "available_files": self._available_csv_files(),
+            }
+
+        self.df = pd.read_csv(path)
+        self.csv_name = filename
+
+        return {
+            "message": f"Loaded {filename} with shape {self.df.shape}.",
+            "columns": self.df.columns.tolist(),
+        }
+
+    def get_columns(self):
+        """
+        Return column names for the currently loaded CSV.
+        """
+        error = self._ensure_loaded()
+        if error:
+            return error
+        return self.df.columns.tolist()
+
+    def summarize_columns(self, columns: list[str] | None = None):
+        """
+        Return basic summary stats for one or more columns.
+
+        If columns is None, summarize all columns.
+        Uses pandas.describe(include="all") to stay simple and readable.
+        """
+        error = self._ensure_loaded()
+        if error:
+            return error
+
+        if columns is None:
+            data = self.df
+        else:
+            missing = [c for c in columns if c not in self.df.columns]
+            if missing:
+                return {"error": f"These columns are not in the data: {missing}"}
+            data = self.df[columns]
+
+        summary = data.describe(include="all").transpose().round(3)
+        return summary.to_dict()
+
+    def describe_column(self, column: str):
+        """
+        Simple summary for a single column using pandas.describe().
+        """
+        error = self._ensure_loaded()
+        if error:
+            return error
+
+        if column not in self.df.columns:
+            return {"error": f"'{column}' is not a column. Options: {self.df.columns.tolist()}"}
+
+        s = self.df[column]
+        summary = s.describe().to_dict()
+
+        cleaned = {}
+        for key, value in summary.items():
+            if isinstance(value, (int, float)):
+                cleaned[key] = round(value, 3)
+            else:
+                cleaned[key] = value
+
+        return cleaned
+
+    def plot_data(self, y: str, x: str | None = None, plot_type: str = "line"):
+        """
+        Plot from the active CSV.
+    
+        - If x is None: plot y vs row index.
+        - If x is provided: plot y vs x.
+        """
+        error = self._ensure_loaded()
+        if error:
+            return error
+    
+        if plot_type not in ["scatter", "line"]:
+            return "Error: I can only do 'scatter' or 'line'."
+    
+        if y not in self.df.columns:
+            return f"Error: column '{y}' is not in {self.df.columns.tolist()}"
+    
+        # If someone accidentally passes x == y, treat it like "plot y"
+        if x == y:
+            x = None
+    
+        # Scatter needs x
+        if plot_type == "scatter" and x is None:
+            return "Error: scatter plots need both x and y columns."
+    
+        title_csv = self.csv_name or "current CSV"
+    
+        if x is None:
+            ax = self.df[y].plot(kind="line")
+            ax.set_title(f"{title_csv} | Line plot: {y} vs row index")
+            plt.show()
+            return f"Plotted {y} vs row index as a line plot."
+    
+        if x not in self.df.columns:
+            return f"Error: column '{x}' is not in {self.df.columns.tolist()}"
+    
+        ax = self.df.plot(x=x, y=y, kind=plot_type)
+        ax.set_title(f"{title_csv} | {plot_type.title()} plot: {y} vs {x}")
+        plt.show()
+        
+        return f"Plotted {y} vs {x} as a {plot_type}."
+print("Class defined")
+
