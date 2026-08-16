@@ -662,3 +662,18 @@ SYSTEM_PROMPT = (
 messages = [{"role": "system", "content": SYSTEM_PROMPT}]
 result = run_agent_cycle(messages, "Load bike_commute.csv and compute the correlation between avg_traffic_density and avg_speed_kmh.")
 print(f"\nResult: {result}\n")
+
+# Q6
+print(f"\nQ6:\n")
+
+# Roles:
+#   system -- defines the purpose/personality of the model
+
+#   user -- give the bot the user prompt
+
+#   assistant -- sometimes used for more complex queries
+
+#   tool -- what tools the model should craft its answers from.
+#   Only calls tools if they are neccessary
+
+print(json.dumps(messages, indent=2, default=str))
