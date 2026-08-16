@@ -23,18 +23,18 @@ print(f"Prediction 1:\n {predict1}")
 print(f"Prediction 2:\n {predict2}")
 
 # Scikit Learn Q2
+'''
+Scikit-learn expects X to be a 2D feature matrix, where each row is an
+observation and each column is a feature. The original x array is 1D,
+so reshape(-1,1) changes it into a 2D array with one feature column.
+'''
+
 x = np.array([10,20,30,40,50])
 new_x = np.array([10,20,30,40,50]).reshape(-1,1)
 
 print(f"\nScikit Learn Q2:\n")
 print(f"1D shape:\n {x.shape}")
 print(f"2D shape:\n {new_x.shape}")
-
-'''
-Scikit-learn expects X to be a 2D feature matrix, where each row is an
-observation and each column is a feature. The original x array is 1D,
-so reshape(-1,1) changes it into a 2D array with one feature column.
-'''
 
 # Scikit Learn Q3
 X_clusters, _ = make_blobs(n_samples=120, centers=3, cluster_std=0.8, random_state=7)

@@ -54,9 +54,12 @@ print(f"\nOriginal dataset:\n {pearson1}")
 pearson2 = pearsonr(students_df2["absences"],students_df2["G3"])
 print(f"\nUpdated dataset:\n {pearson2}")
 
-# Removing students with G3 = 0 changed the relationship between absences and final grade 
-# from almost no correlation to a weak negative correlation. After filtering, students with 
-# more absences tended to have slightly lower final grades.
+'''
+G3 = 0 represents students who did not receive a final exam grade.
+Keeping these rows could distort the regression because a 0 does not
+represent a normal final grade. Removing these rows allows the model
+to learn from students who actually received a final grade.
+'''
 
 # Task 3
 print(f"\nTask 3:\n")
@@ -96,11 +99,6 @@ plt.title("students Heatmap")
 plt.savefig("outputs/students_heatmap.png")
 plt.show()
 
-'''
-G1 has a "positive" (0.6-0.75) relationship with both G2 and G3
-G1-G3 has the weakest relationships with Medu, Fedu, and studytime
-Failures and Age hardly any relationship with one another.
-'''
 # Pearson correlation bar chart
 features = [item[0] for item in sorted_pearson]
 correlations = [item[1].statistic for item in sorted_pearson]
@@ -148,7 +146,7 @@ failures by itself does not explain much of the variation in final grades.
 # Task 5
 feature_cols = ["failures","Medu","Fedu","studytime","higher","schoolsup",
                 "internet","sex","freetime","activities","traveltime", 
-                "abscenses","goout","walc"]
+                "absences","goout","Walc"]
 X = students_df2[feature_cols].values
 y = students_df2["G3"].values
 
@@ -188,7 +186,7 @@ while internet access had the largest positive coefficient.
 
 # Task 6
 plt.plot( [0,20],[0,20], color="black")
-plt.scatter(y_pred,y_test,color="green",cmap="coolwarm")
+plt.scatter(y_pred,y_test,color="green")
 
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
@@ -202,28 +200,27 @@ plt.show()
 The filtered dataset contains 357 students, and the test set contains
 72 students.
 
-The model's RMSE is about 2.86. Since G3 is scored from 0 to 20, this
-means the model's predictions are typically about 2.86 grade points away
-from the actual final grade.
+The model's RMSE is about 2.67. Since G3 is scored from 0 to 20, this
+means the model's typical prediction is about 2.67 grade points away
+from the student's actual final grade. The test R2 is about 0.26,
+meaning the model explains about 26% of the variation in final grades.
 
-The test R2 is about 0.15, meaning the model explains about 15% of the
-variation in students' final grades.
+The largest positive coefficient is internet at about +1.09. Holding
+the other features constant, internet access is associated with a
+higher predicted G3. The largest negative coefficient is schoolsup at
+about -2.13. Holding the other features constant, school support is
+associated with a lower predicted G3. This does not mean school support
+causes lower grades; students who are already struggling may be more
+likely to receive school support.
 
-The largest positive coefficient is internet at about +0.83. The largest
-negative coefficient is schoolsup at about -2.06. These coefficients show
-the direction and size of each feature's relationship with the predicted
-G3 while the other features are held constant.
-
-I was surprised that schoolsup had the largest negative coefficient.
-School support would seem like it should be associated with better grades,
-but students who are already struggling may be more likely to receive
-additional school support.
+I was surprised that school support had the largest negative coefficient,
+while internet access had the largest positive coefficient.
 '''
 
 # Extra: G1
 feature_cols = ["failures","Medu","Fedu","studytime","higher","schoolsup",
                 "internet","sex","freetime","activities","traveltime", 
-                "abscenses","goout","walc","G1"]
+                "absences","goout","Walc","G1"]
 X = students_df2[feature_cols].values
 y = students_df2["G3"].values
 
@@ -239,10 +236,14 @@ print(f"Train R2:",model.score(X_train, y_train))
 print(f"Test R2:",model.score(X_test, y_test))
 
 '''
-Adding G1 greatly increases the model's R2, showing that G1 is a strong
-predictor of G3. However, a high R2 does not mean that G1 causes G3.
-The two grades are strongly related because they measure student
-performance at different points during the school year.
+Adding G1 greatly increases the model's test R2 from about 0.26 to about
+0.75, showing that G1 is a very strong predictor of G3. The RMSE is about
+1.54, meaning the model's predictions are typically about 1.54 grade
+points away from the actual G3 score on a 0-20 scale.
+
+However, a high R2 does not mean that G1 causes G3. The two grades are
+strongly related because they measure student performance at different
+points during the school year.
 
 This model could be useful for identifying students who may struggle
 with G3 once G1 is available, allowing educators to provide additional
