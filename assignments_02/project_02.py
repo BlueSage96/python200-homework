@@ -21,10 +21,12 @@ print(f"\nShape: {students_df.shape}")
 print(f"\nFive rows:\n {students_df.head(5)}")
 print(f"\nData Types:\n {students_df.dtypes}")
 
-plt.hist(g3,bins=21,color="green")
-plt.xlabel("Final Grade")
-plt.ylabel("Grade Prediction")
+plt.hist(students_df["G3"], bins=21)
+
 plt.title("Distribution of Final Math Grades")
+plt.xlabel("Final Math Grade (G3)")
+plt.ylabel("Number of Students")
+
 plt.savefig("outputs/g3_distribution.png")
 plt.show()
 
@@ -68,7 +70,7 @@ g3 = students_df2["G3"]
 sorted_pearson = []
 numeric_cols = students_df2[["sex","age","Medu","Fedu","traveltime","studytime",
                             "failures","schoolsup","internet","higher","activities",
-                            "freetime","goout","Walc","G1","G2","G3"]]
+                            "freetime","goout","Walc"]]
 for cols in numeric_cols:
     if cols != "G3":
        pearson1 = pearsonr(students_df2[cols],g3)
@@ -197,24 +199,32 @@ plt.savefig("outputs/predicted_vs_actual.png")
 plt.show()
 
 '''
-The filtered dataset contains 357 students, and the test set contains
-72 students.
+Task 6 Summary:
 
-The model's RMSE is about 2.67. Since G3 is scored from 0 to 20, this
-means the model's typical prediction is about 2.67 grade points away
-from the student's actual final grade. The test R2 is about 0.26,
-meaning the model explains about 26% of the variation in final grades.
+Dataset size: The filtered dataset contains 357 students, and the test
+set contains 72 students.
 
-The largest positive coefficient is internet at about +1.09. Holding
-the other features constant, internet access is associated with a
-higher predicted G3. The largest negative coefficient is schoolsup at
-about -2.13. Holding the other features constant, school support is
-associated with a lower predicted G3. This does not mean school support
-causes lower grades; students who are already struggling may be more
-likely to receive school support.
+Model error: The RMSE is about 2.67. Since G3 is scored from 0 to 20,
+the model's predictions are typically about 2.67 grade points away from
+the actual final grade.
 
-I was surprised that school support had the largest negative coefficient,
-while internet access had the largest positive coefficient.
+Model R2: The test R2 is about 0.26, meaning the model explains about
+26% of the variation in students' final grades.
+
+Largest positive coefficient: Internet has the largest positive
+coefficient at about +1.09. Holding the other features constant,
+internet access is associated with a higher predicted G3.
+
+Largest negative coefficient: Schoolsup has the largest negative
+coefficient at about -2.13. Holding the other features constant,
+school support is associated with a lower predicted G3. This does not
+mean school support causes lower grades; students who are already
+struggling may be more likely to receive school support.
+
+Surprising result: I was surprised that school support had the largest
+negative coefficient, since school support is intended to help students.
+The result may reflect that students who need more support are already
+more likely to be struggling academically.
 '''
 
 # Extra: G1

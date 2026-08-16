@@ -19,8 +19,8 @@ predict2 = model.predict([[8]])
 print(f"Scikit Learn Q1:\n")
 print(f"Slope:\n {model.coef_[0]}")
 print(f"Intercept:\n {model.intercept_}")
-print(f"Prediction 1:\n {predict1}")
-print(f"Prediction 2:\n {predict2}")
+print("Prediction for 4 years:", model.predict([[4]])[0])
+print("Prediction for 8 years:", model.predict([[8]])[0])
 
 # Scikit Learn Q2
 '''
@@ -45,14 +45,19 @@ labels = kmeans.predict(X_clusters)
 print(f"KMeans clusters:\n {kmeans.cluster_centers_}")
 print(f"Points in cluster:\n {np.bincount(labels)}")
 
-fig, ax = plt.subplots()
-ax.scatter(X_clusters[:,0],X_clusters[:,1],c=labels)
-ax.scatter(kmeans.cluster_centers_[:,0],kmeans.cluster_centers_[:,1],color="black",marker="X",s=200)
-plt.xlabel("Cluster X")
-plt.ylabel("Cluster Y")
-plt.title("Clusters Demo")
-plt.savefig("outputs/kmeans_clusters.png")
+plt.scatter(x[:, 0], x[:, 1], c=labels)
+plt.scatter(
+    kmeans.cluster_centers_[:, 0],
+    kmeans.cluster_centers_[:, 1],
+    marker="X",
+    color="black",
+    s=100
+)
 
+plt.title("K-Means Clustering")
+plt.xlabel("Feature 1")
+plt.ylabel("Feature 2")
+plt.savefig("outputs/kmeans_clusters.png")
 plt.show()
 
 # Linear Regression
@@ -64,7 +69,7 @@ smoker = np.random.randint(0,2,num_patients).astype(float)
 cost = 200 * age + 15000 * smoker + np.random.normal(0,3000,num_patients)
 
 # Linear Regression Q1
-plt.scatter(age,cost,c=smoker,cmap="coolwarm")
+plt.scatter(age,cost,c=smoker)
 plt.title("Medical Cost vs Age")
 plt.xlabel("Age")
 plt.ylabel("Cost")
@@ -133,7 +138,7 @@ predicted. Points closer to the diagonal represent more accurate
 predictions.
 '''
 
-plt.scatter(y_pred2,y_test2,color="orange",cmap="coolwarm")
+plt.scatter(y_pred2,y_test2,color="orange")
 plt.plot( [0,30000],[0,30000], color="black")
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
