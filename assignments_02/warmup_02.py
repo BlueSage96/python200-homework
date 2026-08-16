@@ -124,11 +124,13 @@ The smoker coefficient represents the predicted cost of healthcare for all 100 p
 
 # Linear Regression 05
 plt.scatter(y_pred2,y_test2,color="orange",cmap="coolwarm")
-plt.plot( [0,25000],[0,25000], color="black")
+plt.plot( [0,30000],[0,30000], color="black")
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
 plt.title("Predicted vs Actual")
 plt.savefig("outputs/predicted_vs_actual.png")
 plt.show()
 
-#Above the line is positive correlation and below the line is negative correlation.
+# Points above the diagonal line have actual grades higher than predicted,
+# while points below the line have actual grades lower than predicted.
+# Points closer to the diagonal represent more accurate predictions.
