@@ -433,13 +433,15 @@ class CsvManager:
         Compute the Pearson correlation between two columns in the loaded DataFrame.
         Returns the correlation coefficient and p-value.
         """
-        pearson_r = pearsonr(col1,col2)
+        error = self._ensure_loaded()
+        pearson_r = pearsonr(self.df[col1],self.df[col2])
         p_value = pearson_r.pvalue
+        stat = pearson_r.statistic
         
-        if not col1 or not col2:
+        if error:
             return{"error": "No column is found nor is a CSV loaded."}
         else:
-            return f"{col1: col1:.4f}, {col2: col2:.4f},{pearson_r: pearson_r:.4f}, {p_value: p_value:.4f}"
+            return stat, p_value
 print("Class defined")
 
 # Q4
@@ -559,3 +561,104 @@ tools_schema = [
         }
     }
 ]
+
+# Q5
+print(f"\nQ5:\n")
+
+
+def run_agent_cycle(messages, user_text, max_tool_rounds=5):
+    """
+    Run through one react-agent loop using a simple tool-using agent.
+    `messages` parameter will usually just contain a system prompt, 
+    and then user text will be appended.  
+
+    The loop has three main steps:
+
+    REASON:
+      - Call the model with the conversation so far.
+      - The model either replies normally, or asks to call a tool from tool set.
+
+    ACT:
+      - If tools are requested, run the Python functions
+
+    OBSERVE:
+      - Append each requested tool result back into the LLMs conversation history.
+      - On the next iteration, the model reads those tool call results and determines
+        whether it has reached the goal.
+
+    Stop condition:
+      - If the model returns an assistant message with no tool calls, this is the 
+        final answer for this react cycle, this implies that reasoning alone without 
+        tool calls was enough.  
+      - max_tool_rounds is a safety cap to prevent infinite loops.
+    """
+    messages.append({"role": "user", "content": user_text})
+
+    def observe_tool_result(tool_call_id, result):
+        """
+        Return a tool's return value as a message that can be appended to the
+        LLMs conversation history. The model will read this tool output on the next
+        REASON step.
+        """
+        content = json.dumps(result, default=str) if not isinstance(result, str) else result
+        tool_message = {"role": "tool",
+                        "tool_call_id": tool_call_id,
+                        "content": content,}
+        return tool_message
+
+    for loop_idx in range(max_tool_rounds):
+        # REASON: call the model
+        # Here it will make use of any previous tool outputs it appended ("observed")
+        response = client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=messages,
+            tools=tools_schema,
+        )
+
+        msg = response.choices[0].message
+
+        # Append the assistant message to the conversation history.
+        # Use a plain dict so `messages` stays simple and inspectable.
+        assistant_entry = {"role": "assistant", "content": msg.content}
+        if msg.tool_calls:
+            assistant_entry["tool_calls"] = [tc.model_dump() for tc in msg.tool_calls]
+        messages.append(assistant_entry)
+
+        # No tool calls means the model is answering directly.
+        if not msg.tool_calls:
+            return msg.content 
+
+        # ACT + OBSERVE: run each tool call, then append its result.
+        # Note there may be multiple tool calls
+        for tool_call in msg.tool_calls:
+            name = tool_call.function.name
+            tool_args = json.loads(tool_call.function.arguments or "{}")
+
+            print(f"ACT: {name}({tool_args})")
+
+            fn = node_tools.get(name)
+            if fn is None:
+                result = {"error": f"Tool '{name}' not found."}
+            else:
+                try:
+                    result = fn(**tool_args) if tool_args else fn()
+                except Exception as e:
+                    print(f"Tool error in {name}: {type(e).__name__}: {e}")
+                    result = {"error": f"Tool '{name}' failed: {type(e).__name__}: {e}"}
+                    
+            # OBSERVE: append the tool result back into the conversation history.
+            messages.append(observe_tool_result(tool_call.id, result))
+            
+            # After we appending information about all tool outputs, we loop back and REASON again.
+    return "I hit the tool-round limit. Try a simpler request."
+
+
+SYSTEM_PROMPT = (
+    "You are a small data assistant for CSV files stored in resources/. "
+    "Use the available tools to do any data work (do not guess). "
+    "If no CSV is loaded yet, load one first (or list available CSV files). "
+    "Keep answers short and student-friendly."
+)
+messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+result = run_agent_cycle(messages, "Load bike_commute.csv and compute the correlation between avg_traffic_density and avg_speed_kmh.")
+print(f"\nResult: {result}\n")
