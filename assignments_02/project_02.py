@@ -127,10 +127,10 @@ plt.savefig("outputs/pearson_correlations.png")
 plt.show()
 
 '''
-The bar chart shows that G1 and G2 have the strongest positive
-relationships with G3, while failures has the strongest negative
-relationship. Most of the other features have relatively weak
-relationships with final grade.
+The bar chart shows the Pearson correlations between the selected numeric
+features and G3. Failures has the strongest negative relationship, while
+Medu has the strongest positive relationship among the selected features.
+Most of the selected features have relatively weak relationships with G3.
 '''
 
 # Task 4
