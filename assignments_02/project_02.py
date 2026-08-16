@@ -68,9 +68,18 @@ print(f"\nTask 3:\n")
 
 g3 = students_df2["G3"]
 sorted_pearson = []
-numeric_cols = students_df2[["sex","age","Medu","Fedu","traveltime","studytime",
-                            "failures","schoolsup","internet","higher","activities",
-                            "freetime","goout","Walc"]]
+numeric_cols = students_df2[[
+    "age",
+    "Medu",
+    "Fedu",
+    "traveltime",
+    "studytime",
+    "failures",
+    "freetime",
+    "goout",
+    "Walc",
+    "absences"
+]]
 for cols in numeric_cols:
     if cols != "G3":
        pearson1 = pearsonr(students_df2[cols],g3)
@@ -84,14 +93,12 @@ for feature,result in sorted_pearson:
     print(f"{feature:12s}{result.statistic:+3f}")
       
 '''
-G2 has the strongest positive relationship with G3, with a Pearson
-correlation of about 0.966. G1 also has a very strong positive
-relationship with G3 at about 0.892.
-
-Failures has the strongest negative relationship with G3 at about
--0.294. I was surprised that parental education (Medu and Fedu)
-had relatively weak positive relationships with G3 compared with
-G1 and G2.
+Failures has the strongest negative relationship with G3, with a Pearson
+correlation of about -0.294. Medu has the strongest positive relationship
+with G3 among the selected numeric features, with a correlation of about
+0.190. Most of the selected features have relatively weak relationships
+with G3. I was surprised that parental education had only a weak positive
+relationship with final grade.
 '''
 
 plt.figure(figsize=(10,8))
@@ -100,6 +107,11 @@ sns.heatmap(students_corr,cmap="coolwarm")
 plt.title("students Heatmap")
 plt.savefig("outputs/students_heatmap.png")
 plt.show()
+
+'''
+The heatmap shows that G1 and G2 have the strongest relationships with G3,
+while most of the other features have weaker relationships with final grade.
+'''
 
 # Pearson correlation bar chart
 features = [item[0] for item in sorted_pearson]
@@ -146,9 +158,23 @@ failures by itself does not explain much of the variation in final grades.
 '''
 
 # Task 5
-feature_cols = ["failures","Medu","Fedu","studytime","higher","schoolsup",
-                "internet","sex","freetime","activities","traveltime", 
-                "absences","goout","Walc"]
+feature_cols = [
+    "sex",
+    "age",
+    "Medu",
+    "Fedu",
+    "traveltime",
+    "studytime",
+    "failures",
+    "schoolsup",
+    "internet",
+    "higher",
+    "activities",
+    "freetime",
+    "goout",
+    "Walc",
+    "absences"
+]
 X = students_df2[feature_cols].values
 y = students_df2["G3"].values
 

@@ -45,7 +45,7 @@ labels = kmeans.predict(X_clusters)
 print(f"KMeans clusters:\n {kmeans.cluster_centers_}")
 print(f"Points in cluster:\n {np.bincount(labels)}")
 
-plt.scatter(x[:, 0], x[:, 1], c=labels)
+plt.scatter(X_clusters[:, 0], X_clusters[:, 1], c=labels)
 plt.scatter(
     kmeans.cluster_centers_[:, 0],
     kmeans.cluster_centers_[:, 1],
@@ -89,10 +89,10 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 print(f"\nLinear Regression Q2:\n")
-print(f"X Train:\n {X_train}")
-print(f"X Test:\n {X_test}")
-print(f"Y Train:\n {y_train}")
-print(f"Y test:\n {y_test}")
+print(f"X Train:\n {X_train.shape}")
+print(f"X Test:\n {X_test.shape}")
+print(f"Y Train:\n {y_train.shape}")
+print(f"Y test:\n {y_test.shape}")
 
 # Linear Regression Q3
 model.fit(X_train, y_train)
@@ -123,9 +123,9 @@ print("smoker coefficient: ", model_full.coef_[1])
 print(f"R2:{model_full.score(X_test2, y_test2)}\n")
 
 '''
-How does the smoker feature influence the predicted medical cost?
-Adding the smoker flag helps R2 significantly by going from 0.07 to 0.77
-The smoker coefficient represents the predicted cost of healthcare for all 100 patients
+Adding the smoker feature increases the R2 substantially, from about 0.07
+to about 0.77. The smoker coefficient represents the change in predicted
+medical cost when smoker changes from 0 to 1, while holding age constant.
 '''
 
 # Linear Regression Q5
