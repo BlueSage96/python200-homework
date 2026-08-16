@@ -147,7 +147,8 @@ failures by itself does not explain much of the variation in final grades.
 
 # Task 5
 feature_cols = ["failures","Medu","Fedu","studytime","higher","schoolsup",
-                "internet","sex","freetime","activities","traveltime"]
+                "internet","sex","freetime","activities","traveltime", 
+                "abscenses","goout","walc"]
 X = students_df2[feature_cols].values
 y = students_df2["G3"].values
 
@@ -162,32 +163,39 @@ print(f"\nRMSE:",np.sqrt(np.mean((y_pred - y_test) ** 2)))
 print(f"Train R2:",model.score(X_train, y_train))
 print(f"Test R2:\n",model.score(X_test, y_test))
 
-# The test R2 helps a little, meaning that adding features had a lukewarm effect on task 4's R2
-
 # Print each feature name & its cofficient
 for name, coef in zip(feature_cols, model.coef_):
     print(f"{name} coefficient: {coef}")
-
 '''
-The largest positive coefficient is internet, at about +0.83. This means
-that, while holding the other features constant, students with internet
-access have a predicted G3 about 0.83 points higher.
+The full model has a test R2 of about 0.26, meaning it explains about
+26% of the variation in students' final grades. The RMSE is about 2.67,
+so the model's predictions are typically about 2.67 grade points away
+from the actual G3 score on a 0-20 scale.
 
-The largest negative coefficient is schoolsup, at about -2.06. This means
-that, while holding the other features constant, students with school
-support have a predicted G3 about 2.06 points lower.
+The largest positive coefficient is internet at about +1.09. Holding
+the other features constant, internet access is associated with a
+higher predicted G3.
 
-This does not mean school support causes lower grades. Students who are
-already struggling may be more likely to receive school support.
+The largest negative coefficient is schoolsup at about -2.13. Holding
+the other features constant, receiving school support is associated
+with a lower predicted G3. This does not mean school support causes
+lower grades; students who are already struggling may be more likely
+to receive school support.
+
+I was surprised that school support had the largest negative coefficient,
+while internet access had the largest positive coefficient.
 '''
 
 # Task 6
 plt.plot( [0,20],[0,20], color="black")
 plt.scatter(y_pred,y_test,color="green",cmap="coolwarm")
+
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
 plt.title("Predicted vs Actual (Full Model)")
-plt.savefig("outputs/predicted_vs_actual_full.png")
+
+plt.savefig("outputs/predicted_vs_actual.png")
+# This overwrites the Warmup Q5 plot because both assignments require this filename.
 plt.show()
 
 '''
@@ -214,7 +222,8 @@ additional school support.
 
 # Extra: G1
 feature_cols = ["failures","Medu","Fedu","studytime","higher","schoolsup",
-                "internet","sex","freetime","activities","traveltime","G1"]
+                "internet","sex","freetime","activities","traveltime", 
+                "abscenses","goout","walc","G1"]
 X = students_df2[feature_cols].values
 y = students_df2["G3"].values
 
