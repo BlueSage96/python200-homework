@@ -6,18 +6,27 @@ from prefect.logging import get_run_logger
 from scipy.stats import ttest_ind,pearsonr
 import seaborn as sns
 
+from pathlib import Path
+
+# Folder containing project_01.py
+BASE_DIR = Path(__file__).resolve().parent
+
+# Input and output folders
+INPUT_DIR = BASE_DIR / "inputs"
+OUTPUT_DIR = BASE_DIR / "outputs"
+
 # Task 1
 paths = [ 
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2015.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2016.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2017.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2018.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2019.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2020.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2021.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2022.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2023.csv",
-         "https://raw.githubusercontent.com/Code-the-Dream-School/python-200-v1/refs/heads/main/assignments/resources/happiness_project/world_happiness_2024.csv",
+        INPUT_DIR/ "world_happiness_2015.csv",
+        INPUT_DIR/ "world_happiness_2016.csv",
+        INPUT_DIR/ "world_happiness_2017.csv",
+        INPUT_DIR/ "world_happiness_2018.csv",
+        INPUT_DIR/ "world_happiness_2019.csv",
+        INPUT_DIR/ "world_happiness_2020.csv",
+        INPUT_DIR/ "world_happiness_2021.csv",
+        INPUT_DIR/ "world_happiness_2022.csv",
+        INPUT_DIR/ "world_happiness_2023.csv",
+        INPUT_DIR/ "world_happiness_2024.csv",
         ]
 
 
@@ -26,74 +35,74 @@ def happiness_data():
     final_dataframe = []          
 
     for path in paths:
-        read_path = pd.read_csv(path, sep=";")
-        #Replace commas with periods
-        object_cols = read_path.select_dtypes(include="object").columns
-        read_path[object_cols] = read_path[object_cols].replace(",", ".", regex=True)
-        read_path = read_path.apply(pd.to_numeric,errors="ignore")
-        
-        read_path = read_path.rename(columns={"Ladder score":"Happiness score"})
-        
-        loop_path = pd.DataFrame(read_path)
-        path_year = path.replace(".csv", "").rsplit("_")
+        read_path = pd.read_csv(path, sep=";", decimal=",")
+        read_path = read_path.rename(
+            columns={"Ladder score": "Happiness score"}
+        )
 
-        final_path = loop_path.assign(Year=path_year[3])
+        year = int(path.stem.split("_")[-1])
+        final_path = read_path.assign(Year=year)
         final_dataframe.append(final_path)
         
     # merge all info into one csv --> go's to output folder
     happiness_merged = pd.concat(final_dataframe)
-    happiness_merged.to_csv("outputs/merged_happiness.csv",index=False)
+    happiness_merged["Year"] = happiness_merged["Year"].astype(int)
+    happiness_merged.to_csv(OUTPUT_DIR/"merged_happiness.csv", index=False)
+    return happiness_merged
 
-data = pd.read_csv("outputs/merged_happiness.csv")
-df = pd.DataFrame(data)
-df.rename(columns={"Happiness score":"happiness_score","Regional indicator":"regional_indicator"},inplace=True)
-
+    '''
+    Save to the outputs folder inside assignments_01.
+    Since this script runs from the assignments_01 directory,
+    the correct relative path is "OUTPUT_DIR/...".
+    '''
 # Task 2
 @task(retries=3,retry_delay_seconds=2)
-def happy_stats():
+def happy_stats(df):
     # A little cleanup
-    df["happiness_score"] = df["happiness_score"].astype(float).round(2)
+    df["Happiness score"] = df["Happiness score"].astype(float).round(2)
 
-    happy_score = df["happiness_score"]
+    happy_score = df["Happiness score"]
     happy_mean = happy_score.mean()
     happy_median = happy_score.median()
     happy_std = happy_score.std()
-    happy_mean_grouped = df.groupby(["Year","regional_indicator"])["happiness_score"].mean()
     
+    happy_mean_year = df.groupby("Year")["Happiness score"].mean()
+    happy_mean_region = df.groupby("Regional indicator")["Happiness score"].mean()
     logger = get_run_logger() 
 
     logger.info(f"Mean:\n {happy_mean}")
     logger.info(f"\nMedian:\n {happy_median}")
     logger.info(f"\nStandard deviation:\n {happy_std}")
-    logger.info(f"\nGrouped mean:\n {happy_mean_grouped}")
-
+    
+    logger.info(f"\nMean happiness by year:\n{happy_mean_year}")
+    logger.info(f"\nMean happiness by region:\n{happy_mean_region}")
+    
 # Task 3
 @task(retries=3,retry_delay_seconds=2)
-def visuals():
-    happy = df["happiness_score"]
-    years = df["Year"]
+def visuals(df):
+    logger = get_run_logger()
+    happy = df["Happiness score"]
     
     #Cleanup
     gdp = df["GDP per capita"]
     gdp = gdp.astype(float)
     
-    heat_cols = df[["happiness_score","GDP per capita","Social support",
-                       "Healthy life expectancy","Freedom to make life choices",
-                       "Generosity", "Perceptions of corruption","Year"]]
-    
     # Histogram
-    plt.hist(df["happiness_score"],bins=20,color="red",alpha=0.9)
+    plt.hist(df["Happiness score"],bins=20,color="red",alpha=0.9)
     plt.title("Happiness Over the Years")
     plt.xlabel("Score")
     plt.ylabel("Frequency")
-    plt.savefig("outputs/happiness_histogram.png",dpi=300)
+    
+    plt.savefig(OUTPUT_DIR/"happiness_histogram.png",dpi=300)
     plt.show()
+    logger.info("Saved histogram.")
     
     # Boxplot
-    sns.boxplot(x = years, y = happy,data=df)
+    sns.boxplot(data=df, x="Year", y ="Happiness score")
     plt.title("Happiness Distribution by Years")
-    plt.savefig("outputs/happiness_by_year.png",dpi=300)
+    plt.savefig(OUTPUT_DIR/"happiness_by_year.png",dpi=300)
     plt.show()
+    logger.info("Saved boxplot.")
     
     # Scatter Plot
     fig, ax = plt.subplots()
@@ -101,22 +110,27 @@ def visuals():
     ax.scatter(gdp,happy,color="turquoise")
     ax.set_xlabel("GDP")
     ax.set_ylabel("Happy")
-    plt.savefig("outputs/gdp_vs_happiness.png",dpi=300)
+    
+    plt.savefig(OUTPUT_DIR/"gdp_vs_happiness.png",dpi=300)
     plt.show()
-
+    logger.info("Saved scatter plot.")
+    
     # Heatmap
-    heat_corr = heat_cols.corr(numeric_only=True)
+    numeric = df.select_dtypes(include="number")
+    heat_corr = numeric.corr(numeric_only=True)
     plt.figure(figsize=(12,6))
     sns.heatmap(heat_corr,annot=True,cmap="coolwarm",fmt=".2f")
+    
     plt.title("Correlation Heatmap")
-    plt.savefig("outputs/correlation_heatmap.png",dpi=300)
+    plt.savefig(OUTPUT_DIR/"correlation_heatmap.png",dpi=300)
     plt.show()
+    logger.info("Saved heatmap.")
 
 # Task 4
 @task(retries=3,retry_delay_seconds=2)
-def hypothesis():
-    year1 = df[df['Year'] == 2019]["happiness_score"]
-    year2 = df[df['Year'] == 2020]["happiness_score"]
+def hypothesis(df):
+    year1 = df[df['Year'] == 2019]["Happiness score"]
+    year2 = df[df['Year'] == 2020]["Happiness score"]
     year_hypo = ttest_ind(year1,year2)
     logger = get_run_logger() 
 
@@ -125,137 +139,151 @@ def hypothesis():
     logger.info(f"Mean 2019: {year1.mean()}\n")
     logger.info(f"Mean 2020: {year2.mean()}")
     
-    #Results:
-    # The p-value is greater than or equal to 0.05, so the difference in
-    # average happiness scores between 2019 and 2020 is not statistically significant.
-    # This suggests there is not enough evidence to conclude that average
-    # global happiness scores changed between 2019 and 2020.
-    
-    #Test 2
-    country1 = df[df['Country'] == "Switzerland"]["happiness_score"]
-    country2 = df[df['Country'] == "United States"]["happiness_score"]
+    if year_hypo.pvalue < 0.05:
+        logger.info(
+            "The difference in average happiness scores between 2019 and 2020 "
+            "is statistically significant."
+    )
+    else:
+        logger.info(
+            "The difference in average happiness scores between 2019 and 2020 "
+            "is not statistically significant."
+        )
+    #Test of my choice
+    country1 = df[df['Country'] == "Switzerland"]["Happiness score"]
+    country2 = df[df['Country'] == "United States"]["Happiness score"]
     country_hypo = ttest_ind(country1,country2)
+    
     logger.info(f"Statistic: {country_hypo.statistic}\n")
     logger.info(f"Pvalue: {country_hypo.pvalue}\n")
     logger.info(f"Mean Switzerland: {country1.mean()}\n")
     logger.info(f"Mean United States: {country2.mean()}")
+    
+    if country_hypo.pvalue < 0.05:
+        logger.info(
+            "The average happiness scores for Switzerland and the United States are significantly different."
+        )
+    else:
+        logger.info(
+            "There is no statistically significant difference between Switzerland and the United States."
+        )
 
 # Task 5
 @task(retries=3,retry_delay_seconds=2)
-def pearson_happiness():
-    happy = df["happiness_score"]
-    year = df["Year"]
+def pearson_happiness(df):
+    
+    happy = df["Happiness score"]
     gdp = df["GDP per capita"]
-    social_support = df["Social support"]
-    life_expectancy = df["Healthy life expectancy"] 
+    social_support = df["Social support"] 
     freedom = df["Freedom to make life choices"]    
     corruption = df["Perceptions of corruption"]
     generosity = df["Generosity"]
     
     logger = get_run_logger() 
-
-    pearson1 = pearsonr(year,happy)
-    pearson2 = pearsonr(gdp,happy)
-    pearson3 = pearsonr(social_support,happy)
+    logger.info(df[["Year", "Happiness score"]].dtypes)
+    
+    pearson1 = pearsonr(gdp,happy)
+    pearson2 = pearsonr(social_support,happy)
     
     # Make sure bad values are dropped and both columns are the same length
-    temp = df[["Healthy life expectancy", "happiness_score"]].dropna()
-    pearson4 = pearsonr(temp["Healthy life expectancy"],temp["happiness_score"])
+    temp = df[["Healthy life expectancy", "Happiness score"]].dropna()
+    pearson3 = pearsonr(temp["Healthy life expectancy"],temp["Happiness score"])
     
-    pearson5 = pearsonr(freedom,happy)
-    pearson6 = pearsonr(corruption,happy)
-    pearson7 = pearsonr(generosity,happy)
+    pearson4 = pearsonr(freedom,happy)
+    pearson5 = pearsonr(corruption,happy)
+    pearson6 = pearsonr(generosity,happy)
     
-    logger.info("Pearson 1\n")
-    logger.info(f"Statistic:\n {pearson1.statistic}")
-    logger.info(f"P-value:\n {pearson1.pvalue}")
     
-    logger.info("Pearson 2\n")
-    logger.info(f"Statistic:\n {pearson2.statistic}")
-    logger.info(f"P-value:\n {pearson2.pvalue}")
+    #List of results
+    correlations = [
+        ("GDP per capita", pearson1),
+        ("Social support", pearson2),
+        ("Healthy life expectancy", pearson3),
+        ("Freedom to make life choices", pearson4),
+        ("Perceptions of corruption", pearson5),
+        ("Generosity", pearson6),
+    ]
     
-    logger.info("Pearson 3\n")
-    logger.info(f"Statistic:\n {pearson3.statistic}")
-    logger.info(f"P-value:\n {pearson3.pvalue}")
+    adjusted_alpha = 0.05/len(correlations)
     
-    logger.info("Pearson 4\n")
-    logger.info(f"Statistic:\n {pearson4.statistic}")
-    logger.info(f"P-value:\n {pearson4.pvalue}")
-    
-    logger.info("Pearson 5\n")
-    logger.info(f"Statistic:\n {pearson5.statistic}")
-    logger.info(f"P-value:\n {pearson5.pvalue}")
-    
-    logger.info("Pearson 6\n")
-    logger.info(f"Statistic:\n {pearson6.statistic}")
-    logger.info(f"P-value:\n {pearson6.pvalue}")
-    
-    logger.info("Pearson 7\n")
-    logger.info(f"Statistic:\n {pearson7.statistic}")
-    logger.info(f"P-value:\n {pearson7.pvalue}")
-    
-    adjusted_alpha = 0.05/7
-    
-    logger.info(f"Pearson1 P-value: {pearson1.pvalue}")
-    logger.info(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: No
-    
-    logger.info(f"Pearson2 P-value: {pearson2.pvalue}")
-    logger.info(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
-    
-    logger.info(f"Pearson3 P-value: {pearson3.pvalue}")
-    logger.info(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
-    
-    logger.info(f"Pearson4 P-value: {pearson4.pvalue}")
-    logger.info(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
+    # Loop over correlation name & result
+    for name, result in correlations:
+        logger.info(f"\n{name}")
+        logger.info(f"Correlation (r): {result.statistic:.3f}")
+        logger.info(f"P-value: {result.pvalue:.6f}")
+        logger.info(f"Adjusted alpha: {adjusted_alpha}")
+        
+        if result.pvalue < 0.05:
+            logger.info("Significant at alpha = 0.05: Yes")
+        else:
+            logger.info("Significant at alpha = 0.05: No")
 
-    logger.info(f"Pearson5 P-value: {pearson5.pvalue}")
-    logger.info(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
-
-    logger.info(f"Pearson6 P-value: {pearson6.pvalue}")
-    logger.info(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
-
-    logger.info(f"Pearson7 P-value: {pearson7.pvalue}")
-    logger.info(f"Adjusted alpha: {adjusted_alpha}")
-    # Significant at α = 0.05: Yes
-    # Significant after Bonferroni: Yes
-
-# Task 5
+        if result.pvalue < adjusted_alpha:
+            logger.info("Significant after Bonferroni correction: Yes")
+        else:
+            logger.info("Significant after Bonferroni correction: No")
+# Task 6
 @task(retries=3,retry_delay_seconds=2)
-def summary_report():
+def summary_report(df):
    logger = get_run_logger() 
-   logger.info("Merged dataset")
-   logger.info("Number of countries: 175")
-   logger.info("Number of years: 10")
+   logger.info("Merged dataset\n")
+   logger.info(f"Number of countries: {df['Country'].nunique()}")
+   logger.info(f"Number of years: {df['Year'].nunique()}")
    
-   logger.info("Top 3 regions by mean happiness score:")
-   logger.info("1. North America and ANZ 2. Western Europe 3. Latin America and Caribbean")
+   regional_means = (
+       df.groupby("Regional indicator")["Happiness score"].mean().sort_values(ascending=False)
+   )
+   logger.info(f"\nTop 3 regions by mean happiness:")
+   for region, score in regional_means.head(3).items():
+       logger.info(f"{region}: {score:.3f}")
+       
+   logger.info(f"\nBottom 3 regions by mean happiness:")
+   for region, score in regional_means.tail(3).items():
+       logger.info(f"{region}: {score:.3f}")
+       
+   mean_by_year = (
+       df.groupby("Year")["Happiness score"].mean().sort_values(ascending=False)
+   )
    
-   logger.info("Bottom 3 regions by mean happiness score:")
-   logger.info("1. Sub-Saharan Africa 2. South Asia 3. Middle East and North Africa")
-   
-   logger.info("Average happiness scores changed between 2019 and 2020, suggesting that people's reported happiness was different after the start of the pandemic.")
-   logger.info("Social support had the strongest relationship with happiness score, even after using a stricter significance test.")
+   year1 = df[df["Year"] == 2019]["Happiness score"]
+   year2 = df[df["Year"] == 2020]["Happiness score"]
+   year_hypo = ttest_ind(year1, year2)
+
+   if year_hypo.pvalue < 0.05:
+     logger.info(
+        f"Mean happiness was {mean_by_year[2019]:.2f} in 2019 and "
+        f"{mean_by_year[2020]:.2f} in 2020. "
+        "The difference is statistically significant at alpha = 0.05."
+     )
+
+   else:
+      logger.info(
+        f"Mean happiness was {mean_by_year[2019]:.2f} in 2019 and "
+        f"{mean_by_year[2020]:.2f} in 2020. "
+        "The difference is not statistically significant at alpha = 0.05."
+      )
+  
+   happy = df["Happiness score"]
+   social_support = df["Social support"]
+   pearson2 = pearsonr(social_support, happy)
+   adjusted_alpha = 0.05 / 6
+
+   if pearson2.pvalue < adjusted_alpha:
+      logger.info(
+         f"Social support showed the strongest positive correlation with "
+         f"happiness score (r = {pearson2.statistic:.3f}) and remained "
+         f"statistically significant after applying the Bonferroni correction."
+     )
 
 @flow(name="pipeline_flow")
 def happiness_pipeline():
-    happiness_data()
-    happy_stats()
-    visuals()
-    hypothesis()
-    pearson_happiness()
-    summary_report()
+    df = happiness_data()
+
+    happy_stats(df)
+    visuals(df)
+    hypothesis(df)
+    pearson_happiness(df)
+    summary_report(df)
 
 if __name__== "__main__":
     happiness_pipeline()

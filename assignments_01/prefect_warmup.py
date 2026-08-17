@@ -22,20 +22,19 @@ def summarize_data(series):
     })
     return series
 
-@flow(name="pipeline_flow")
-def data_pipeline(arr):
+@flow
+def pipeline_flow():
     created = create_series(arr)
     cleaned = clean_data(created)
     summary = summarize_data(cleaned)
     return summary
 
 if __name__ == "__main__":
-    data_pipeline(arr)
-    
-# 1. The compute time would become sluggish should the data becomes more complex.
+    pipeline_flow()
 
-# 2. Prefect can be used for automation tasks: 
-
-# add Slack and email notifications
-# use cloud providers such as AWS, GCP, Azure, or Snowflake
-# integrate with Docker or Kubernetes infrastructure
+# 1. Prefect would add unnecessary orchestration overhead for this small
+#    pipeline because the tasks are simple and execute quickly.
+#
+# 2. Prefect would be useful for larger real-world workflows that need
+#    scheduling, retries, notifications, and coordination with cloud
+#    services, databases, or other infrastructure.

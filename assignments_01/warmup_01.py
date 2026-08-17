@@ -165,20 +165,18 @@ plt.show()
 normal_data = np.random.normal(50,5,200)
 skewed_data = np.random.exponential(10, 200)
 
-# Creates subplots
-fig, axs = plt.subplots(1, 2, figsize=(15, 5))
-
 # Plots Boxplot for Data 1
-axs[0].set_title('Distribution Comparison')
-axs[0].boxplot(normal_data,labels=["Normal"],patch_artist=True,medianprops={'color':'red'})
-
-# Plots Boxplot for Data 2
-axs[1].set_title('Distribution Comparison')
-axs[1].boxplot(skewed_data,labels=["Exponential"],patch_artist=True,medianprops={'color':'blue'})
+plt.title('Distribution Comparison')
+plt.boxplot([normal_data, skewed_data],labels=["Normal","Exponential"],
+            patch_artist=True,medianprops={'color':'red'})
 plt.show()
 
-#The exponential distribution is more skewed. 
-#The median would provide a more appropriate measure of central tendency for each distribution.
+'''
+The exponential distribution is more skewed. 
+
+The median would provide a more appropriate measure 
+of central tendency for each distribution.
+'''
 
 # Descriptive Stats 05
 data1 = [10,12,12,16,18]
@@ -188,20 +186,21 @@ data2 = [10,12,12,16,150]
 data2_df = pd.DataFrame(data2)
 
 print("\nDescriptive Stats 05:\n")
-print(f"Data 1 mean: {data1_df.mean()}")
-print(f"Data 2 mean: {data2_df.mean()}")
+print(f"Data 1 mean: {data1_df[0].mean()}")
+print(f"Data 2 mean: {data2_df[0].mean()}")
 
-print(f"Data 1 median: {data1_df.median()}")
-print(f"Data 2 median: {data2_df.median()}")
+print(f"Data 1 median: {data1_df[0].median()}")
+print(f"Data 2 median: {data2_df[0].median()}")
 
-print(f"Data 1 mode: {data1_df.mode()}")
-print(f"Data 2 mode: {data2_df.mode()}")
+print(f"Data 1 mode: {data1_df[0].mode()[0]}")
+print(f"Data 2 mode: {data2_df[0].mode()[0]}")
 
-# Data2 contains an outlier (150), which increases the mean.
-# The median stays the same as data1 because it is not affected much by extreme values.
-
+'''
+Data2 contains an outlier (150), which increases the mean.
+The median stays the same as data1 because it is not 
+affected much by extreme values.
+'''
 #_____________________________________________________________________________
-
 
 # Hypothesis Question 01
 group_a = [72,68,75,70,69,73,71,74]
@@ -217,10 +216,10 @@ alpha = 0.05
 res_pvalue = res.pvalue
 print(f"\nHypothesis Question 02:\n")
 
-if (res_pvalue >= alpha):
-    print(f"Statistically significant based on p-value: {alpha}")
+if res_pvalue < alpha:
+    print(f"Statistically significant based on p-value: {res_pvalue}")
 else:
-    print(f"Not statistically significant based on p-value: {alpha}")
+    print(f"Not statistically significant based on p-value: {res_pvalue}")
     
 # Hypothesis Question 03
 before = [60,65,70,58,62,67,63,66]
@@ -239,16 +238,19 @@ print(f"Statistic: {new_scores.statistic}")
 print(f"Pvalue: {new_scores.pvalue}")
 
 # Hypothesis Question 05
-res2 = kstest(group_a, stats.norm.cdf, alternative='greater')
+res2 = ttest_ind(group_a, group_b, alternative='less')
 print(f"\nHypothesis Question 05:\n")
 print(f"Pvalue: {res2.pvalue}")
 
 # Hypothesis Question 06
 print(f"\nHypothesis Question 06:\n")
 print(
-    "Group B had a higher average score than Group A.\n"
-    "Because the p-value is much smaller than 0.05, the difference is unlikely to be due to chance."
+    f"Group A had a lower average score than Group B. "
+    f"The two-tailed p-value from Question 1 was {res.pvalue:.6f}, "
+    f"while the one-tailed p-value from Question 5 was {res2.pvalue:.6f}. "
+    f"Both results are statistically significant at alpha = 0.05."
 )
+
 
 #_____________________________________________________________________________
 
@@ -261,7 +263,8 @@ print(f"\nCorrelation Question 01:\n")
 print(f"Correlation matrix: {pearson}")
 print(f"Correlation coefficient: {pearson[0,1]}")
 
-# I expect the correlation to be 1 because x1, y1, x2, and y2 are all 1 
+# I expect the correlation to be 1 because y increases proportionally
+# with x, creating a perfect positive linear relationship.
 
 # Correlation Question 02
 x = [1,  2,  3,  4,  5,  6,  7,  8,  9, 10]
@@ -309,8 +312,7 @@ def create_series(arr):
     return pd.Series(arr,name="values")
 
 def clean_data(series):
-    cleaned = create_series(series).dropna()
-    return cleaned
+    return series.dropna()
     
 def summarize_data(series):
     series = ({
@@ -326,5 +328,8 @@ def data_pipeline(arr):
     return summarize_data(clean_data(created))
 
 result = data_pipeline(arr)
+
 print(f"\n Pipeline Question 01: \n")
-print(result)
+
+for key, value in result.items():
+    print(f"{key}: {value}")
