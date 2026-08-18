@@ -8,6 +8,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from dotenv import load_dotenv
 from openai import OpenAI
+
+# smolagents imports
+from smolagents import ToolCallingAgent, OpenAIServerModel, tool
+from smolagents import CodeAgent
 from scipy.stats import pearsonr
 
 if load_dotenv():
@@ -677,3 +681,84 @@ print(f"\nQ6:\n")
 #   Only calls tools if they are neccessary
 
 print(json.dumps(messages, indent=2, default=str))
+
+# Q7-Q9 setup
+
+
+
+model_to_use = "gpt-4o-mini"  # default model ID
+model = OpenAIServerModel(
+    api_key=load_dotenv,
+    model_id=model_to_use,
+)
+
+SYSTEM_PROMPT = (
+    "You are a small data assistant to help analyze files stored in resources/. "
+    "Use the available tools to do any work requested (do not guess). "
+    "Keep answers short and student-friendly."
+)
+
+
+# Q7
+print(f"\nQ7:\n")
+csv_manager = CsvManager(resources_dir=RESOURCES_DIR)
+
+@tool
+def compute_correlation(col1:str,col2:str) -> dict:
+    """
+    Compute the Pearson correlation between two columns in the loaded DataFrame.
+    Args:
+        col1: first column that is a string
+        col2: second column that is a string
+    Returns the correlation coefficient and p-value.
+    """
+    return csv_manager.compute_correlation(col1,col2)
+
+print(compute_correlation.description)
+
+# The developer needs to provide: name, description, 
+# properties (col1 --> type & description, col2 --> type & description) 
+# in order to produce a good description.
+
+TOOLS = [
+    csv_backend.list_csv_files,
+    csv_backend.load_csv,
+    csv_backend.get_columns,
+    csv_backend.summarize_columns,
+    csv_backend.describe_column,
+    csv_backend.plot_data,
+    csv_backend.compute_correlation
+]
+
+tool_agent = ToolCallingAgent(tools=TOOLS,
+                         model=model,
+                         instructions=SYSTEM_PROMPT,)
+
+CODE_INSTRUCTIONS = """
+You are a helpful CSV analysis assistant.
+
+You can do two kinds of actions:
+1) Call the provided tools.
+2) Write and execute Python code when tools are not enough.
+
+Rules:
+- Prefer tools for simple tasks.
+- IMPORTANT: If the user requests plot styling (color, marker, title text, labels, grid, etc.)
+  that the plot_data tool cannot control, DO NOT call plot_data.
+  Instead, write matplotlib code directly so the plot matches the request.
+  If code execution fails, do not fall back to plot_data when the user requested styling (like color). 
+  Explain what failed and what you would need to proceed.
+- Be honest: only claim you did something if the code or tool actually did it.
+- Assume the active dataset lives in csv_manager.df after a CSV is loaded.
+"""
+
+
+# Initialiize agent
+
+code_agent = CodeAgent(
+    tools=TOOLS,
+    model=model,
+    instructions=CODE_INSTRUCTIONS,
+    additional_authorized_imports=["pandas", "matplotlib.pyplot", "numpy"],
+    max_steps=8,
+)
