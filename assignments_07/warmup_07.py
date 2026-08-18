@@ -22,6 +22,8 @@ else:
 client = OpenAI()
 print('OpenAI client created.')
 
+api_key = os.getenv("OPEN_AI_KEY")
+
 # Q1
 
 def celsius_to_fahrenheit(celsius: float) -> str:
@@ -688,7 +690,7 @@ print(json.dumps(messages, indent=2, default=str))
 
 model_to_use = "gpt-4o-mini"  # default model ID
 model = OpenAIServerModel(
-    api_key=load_dotenv,
+    api_key=api_key,
     model_id=model_to_use,
 )
 
@@ -721,13 +723,7 @@ print(compute_correlation.description)
 # in order to produce a good description.
 
 TOOLS = [
-    csv_backend.list_csv_files,
-    csv_backend.load_csv,
-    csv_backend.get_columns,
-    csv_backend.summarize_columns,
-    csv_backend.describe_column,
-    csv_backend.plot_data,
-    csv_backend.compute_correlation
+    compute_correlation
 ]
 
 tool_agent = ToolCallingAgent(tools=TOOLS,
@@ -754,7 +750,7 @@ Rules:
 
 
 # Initialiize agent
-
+# Q7 agent
 code_agent = CodeAgent(
     tools=TOOLS,
     model=model,
@@ -762,3 +758,37 @@ code_agent = CodeAgent(
     additional_authorized_imports=["pandas", "matplotlib.pyplot", "numpy"],
     max_steps=8,
 )
+
+
+# Q8
+
+
+tool_agent = ToolCallingAgent(tools=TOOLS,
+                         model=model,
+                         instructions=SYSTEM_PROMPT,)
+
+# Initialiize agent
+# Q8 agent
+code_agent = CodeAgent(
+    tools=TOOLS,
+    model=model,
+    instructions=CODE_INSTRUCTIONS,
+    additional_authorized_imports=["pandas", "matplotlib.pyplot", "numpy"],
+    max_steps=8,
+)
+
+prompt = "Load bike_commute.csv. Plot avg_heart_rate vs duration_min as a scatter plot with green dots. Put the file in the resources folder."
+
+response_tool = tool_agent.run(prompt)
+response_code = code_agent.run(prompt, additional_args={"csv_manager": csv_manager})
+
+print(f"\nQ8:\n")
+print(f"Response Tool: {response_tool}")
+print(f"\nResponse Code: {response_code}")
+
+# 1. The tool agent produced the requested chart and saved it.
+# 2. The CodeAgent produced the green color for the dots.
+# 3. The CodeAgent is better at creating visuals including charts 
+# while the tools agent access whether tools are needed and if it 
+# needs to create them itself.
+
