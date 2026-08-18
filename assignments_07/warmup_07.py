@@ -446,8 +446,8 @@ class CsvManager:
         
         if error:
             return{"error": "No column is found nor is a CSV loaded."}
-        else:
-            return stat, p_value
+        
+        return {"col1": col1, "col2": col2, "pearson_r": round(stat,4),"p_value": round(p_value,4)}
 print("Class defined")
 
 # Q4
