@@ -786,9 +786,14 @@ print(f"\nQ8:\n")
 print(f"Response Tool: {response_tool}")
 print(f"\nResponse Code: {response_code}")
 
-# 1. The tool agent produced the requested chart and saved it.
-# 2. The CodeAgent produced the green color for the dots.
-# 3. The CodeAgent is better at creating visuals including charts 
-# while the tools agent access whether tools are needed and if it 
-# needs to create them itself.
+# 1. The CodeAgent produced the requested chart and the green color for the dots.
+# 2. The CodeAgent has more agency than the ToolCallingAgent because it can produce 
+#    its own code while the ToolCallingAgent can only act on the tools given to it. 
 
+# Q9
+# 1a. A situation where the ToolCallingAgent is better used than the CodeAgent 
+#     would when repetitive tasks need to be done.
+# 1b. The ToolCallingAgent best act as a "dispatcher/controller".
+
+# 2.  One meaningful risk are security issues coming from the CodeAgent 
+#     that goes unchecked.
