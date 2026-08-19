@@ -36,8 +36,8 @@ tools = [
     {
         'type': 'function',
         'function': {
-            'name': 'celsius_to_fahrenheit',
-            'description': 'Converts a Celsius temperature to Fahrenheit and return it as a formatted string.',
+            'name': 'get_current_time',
+            'description': 'Returns the current local time as a string.',
             'parameters': {
                 'type': 'object',
                 'properties': {'celsius' : {
@@ -60,9 +60,8 @@ print(f"{cf2}\n")
 print(f"{cf3}\n")
 
 # Q2
-# Yes because the model needs to call the tool that uses celsius_to_fahrenheit()
-# Two API calls will be made to answer the query: one where the model asks for a 
-# tool, andone where the model uses the tool result to answer.
+# No. The agent should not call get_current_time because the 
+# query is about temperature conversion, not the current time.
 
 print(f"\nQ2:\n")
 
@@ -151,26 +150,31 @@ print(f"\nQ3:\n")
 
 tools = [
     {
-        'type': 'function',
-        'function': {
-            'name': 'get_current_time',
-            'description': 'Returns the current local time as a string.',
-            'parameters': {
-                'type': 'object',
-                'properties': {},
-                'required': [],
-            },
-        },
-        'type': 'function',
-        'function' : {
-            'name': 'celsius_to_fahrenheit',
-            'description': 'Converts a Celsius temperature to Fahrenheit and return it as a formatted string.',
-            'parameters': {
-                'type': 'object',
-                'properties': {'celsius': {
-                        'type': 'number'
-                    }},
-                'required': []
+        "type": "function",
+        "function": {
+            "name": "get_current_time",
+            "description": "Get the current time.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": []
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "celsius_to_fahrenheit",
+            "description": "Convert Celsius to Fahrenheit.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "celsius": {
+                        "type": "number",
+                        "description": "Temperature in Celsius."
+                    }
+                },
+                "required": ["celsius"]
             }
         }
     }
@@ -216,8 +220,11 @@ def run_agent(user_prompt: str) -> str:
         for tool_call in first_message.tool_calls:
             function_name = tool_call.function.name
             # In this example we only have one tool: celsius_to_fahrenheit
-            if function_name == 'celsius_to_fahrenheit':
-                tool_result =  celsius_to_fahrenheit(100)
+            if function_name == 'get_current_time':
+                tool_result =  get_current_time()
+            elif function_name == 'celsius_to_fahrenheit':
+                arguments = json.loads(tool_call.function.arguments)
+                tool_result = celsius_to_fahrenheit(arguments["celsius"])
             else:
                 tool_result = f'Error: unknown tool {function_name}.'
 
@@ -440,12 +447,12 @@ class CsvManager:
         Returns the correlation coefficient and p-value.
         """
         error = self._ensure_loaded()
+        if error:
+            return{"error": "No column is found nor is a CSV loaded."}
+        
         pearson_r = pearsonr(self.df[col1],self.df[col2])
         p_value = pearson_r.pvalue
         stat = pearson_r.statistic
-        
-        if error:
-            return{"error": "No column is found nor is a CSV loaded."}
         
         return {"col1": col1, "col2": col2, "pearson_r": round(stat,4),"p_value": round(p_value,4)}
 print("Class defined")
@@ -551,21 +558,26 @@ tools_schema = [
         },
     }, 
     {
-        "type": "function",
-        "function": {
-            "name": "compute_correlation",
-            "description": "Compute the Pearson correlation between two columns in the loaded DataFrame.",
-            "parameters": {
-                "type":"object",
-                "properties":{
-                    "col1": {"type":"string","description":"First column."},
-                    "col2": {"type":"string","description":"Second column."},
-                    "pearson_r": {"type":"string","description":"pearsonr value"},
-                    "p_value": {"type":"string","description":"p_value"}
+    "type": "function",
+    "function": {
+        "name": "compute_correlation",
+        "description": "Compute the Pearson correlation between two columns in the loaded DataFrame.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "col1": {
+                    "type": "string",
+                    "description": "First column to correlate."
+                },
+                "col2": {
+                    "type": "string",
+                    "description": "Second column to correlate."
                 }
-            }
+            },
+            "required": ["col1", "col2"]
         }
     }
+  }
 ]
 
 # Q5
@@ -665,6 +677,7 @@ SYSTEM_PROMPT = (
     "If no CSV is loaded yet, load one first (or list available CSV files). "
     "Keep answers short and student-friendly."
 )
+
 messages = [{"role": "system", "content": SYSTEM_PROMPT}]
 result = run_agent_cycle(messages, "Load bike_commute.csv and compute the correlation between avg_traffic_density and avg_speed_kmh.")
 print(f"\nResult: {result}\n")
@@ -672,21 +685,15 @@ print(f"\nResult: {result}\n")
 # Q6
 print(f"\nQ6:\n")
 
-# Roles:
-#   system -- defines the purpose/personality of the model
-
-#   user -- give the bot the user prompt
-
-#   assistant -- sometimes used for more complex queries
-
-#   tool -- what tools the model should craft its answers from.
-#   Only calls tools if they are neccessary
+# Roles in the ReAct loop:
+#   system -- defines the agent's behavior and instructions.
+#   user -- provides the task or question to the agent.
+#   assistant -- represents the model's reasoning/tool requests or final response.
+#   tool -- contains the result returned by a tool the assistant requested.
 
 print(json.dumps(messages, indent=2, default=str))
 
 # Q7-Q9 setup
-
-
 
 model_to_use = "gpt-4o-mini"  # default model ID
 model = OpenAIServerModel(
@@ -718,9 +725,12 @@ def compute_correlation(col1:str,col2:str) -> dict:
 
 print(compute_correlation.description)
 
-# The developer needs to provide: name, description, 
-# properties (col1 --> type & description, col2 --> type & description) 
-# in order to produce a good description.
+# The manual schema requires the developer to explicitly define the tool
+# name, description, parameter types, parameter descriptions, and required
+# parameters. The @tool decorator generates this information from the
+# function name, type hints, and Google-style docstring. This makes the
+# smolagents version shorter because the developer does not have to build
+# the JSON schema manually.
 
 TOOLS = [
     compute_correlation
@@ -786,14 +796,16 @@ print(f"\nQ8:\n")
 print(f"Response Tool: {response_tool}")
 print(f"\nResponse Code: {response_code}")
 
-# 1. The CodeAgent produced the requested chart and the green color for the dots.
-# 2. The CodeAgent has more agency than the ToolCallingAgent because it can produce 
-#    its own code while the ToolCallingAgent can only act on the tools given to it. 
-
 # Q9
-# 1a. A situation where the ToolCallingAgent is better used than the CodeAgent 
-#     would when repetitive tasks need to be done.
-# 1b. The ToolCallingAgent best act as a "dispatcher/controller".
 
-# 2.  One meaningful risk are security issues coming from the CodeAgent 
-#     that goes unchecked.
+# 1. A ToolCallingAgent is better when the available tools already provide
+#    the specific actions needed for the task. It acts mainly as a dispatcher,
+#    choosing which predefined tool to call. A CodeAgent is more flexible
+#    because it can write and execute Python code when the available tools
+#    are not sufficient.
+#
+# 2. One meaningful risk of a CodeAgent is that it can execute generated code.
+#    This gives it more flexibility, but it also creates additional risks if
+#    the generated code performs unintended operations or produces incorrect
+#    results. Therefore, CodeAgents need appropriate execution restrictions
+#    and safeguards.
