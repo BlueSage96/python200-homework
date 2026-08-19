@@ -31,19 +31,21 @@ def celsius_to_fahrenheit(celsius: float) -> str:
     fahrenheit = (celsius * 9 / 5) + 32
     return f"{celsius}°C is {fahrenheit}°F"
 
-
 tools = [
     {
         'type': 'function',
         'function': {
-            'name': 'get_current_time',
-            'description': 'Returns the current local time as a string.',
+            'name': 'celsius_to_fahrenheit',
+            'description': 'Convert a temperature from Celsius to Fahrenheit.',
             'parameters': {
                 'type': 'object',
-                'properties': {'celsius' : {
-                    'type':'number'
-                    } },
-                'required': [],
+                'properties': {
+                    'celsius': {
+                        'type': 'number',
+                        'description': 'Temperature in degrees Celsius.'
+                    }
+                },
+                'required': ['celsius'],
             },
         },
     }
@@ -60,8 +62,14 @@ print(f"{cf2}\n")
 print(f"{cf3}\n")
 
 # Q2
-# No. The agent should not call get_current_time because the 
-# query is about temperature conversion, not the current time.
+
+# Q2 prediction:
+# Yes, the query "Convert 100 degrees Celsius to Fahrenheit" should trigger
+# the celsius_to_fahrenheit tool because the user is asking for a temperature
+# conversion and that tool is available to the agent.
+# Two API calls should be made: the first call asks the model whether to use
+# a tool, and the second call gives the model the tool result so it can provide
+# the final answer.
 
 print(f"\nQ2:\n")
 
@@ -142,10 +150,6 @@ def run_agent(user_prompt: str) -> str:
 convert = run_agent("Covert 100 degrees Celsius to Fahrenheit")
 print("Conversion",convert)
 
-# There were two API calls, but the second one had an error as it didn't recognize 
-# 'celsius_to_fahrenheit'. As a result, the LLM told the user how to do the conversion 
-# instead of outright doing the calculation itself.
-
 print(f"\nQ3:\n")
 
 tools = [
@@ -184,8 +188,9 @@ print('Tools list defined with one tool: get_current_time')
 def run_agent(user_prompt: str) -> str:
     '''Run a minimal ReAct-style agent for a single user prompt.'''
 
-    SYSTEM_PROMPT = '''You are a simple assistant that can tell the current time.
-                     Use the tool get_current_time whenever a user asks about the time.'''
+    SYSTEM_PROMPT = '''You are a simple assistant that can tell the current time
+    or convert Celsius temperatures to Fahrenheit. Use get_current_time for time
+    questions and celsius_to_fahrenheit for Celsius conversion questions.'''
     
     # Step 1: start the conversation with system and user messages
     messages = [
@@ -260,11 +265,13 @@ def run_agent(user_prompt: str) -> str:
 
 response_a = run_agent("What is 37 degrees Celsius in Fahrenheit?")
 print(f"\nResponse A: {response_a}\n")
-# The celsius_to_fahrenheit tool was called because it was doing a celsius to fahrenheit conversion.
+# The celsius_to_fahrenheit tool was called because the query asks for a Celsius
+# to Fahrenheit conversion.
 
 response_b = run_agent("What is the boiling point of water in plain English?")
 print(f"\nResponse B: {response_b}\n")
-# No tools were needed to respond. There was no calculations needed.
+# No tool was needed because the question asks for general information rather
+# than the current time or a Celsius-to-Fahrenheit conversion.
 
 RESOURCES_DIR = Path("resources")
 RESOURCES_DIR
@@ -448,7 +455,13 @@ class CsvManager:
         """
         error = self._ensure_loaded()
         if error:
-            return{"error": "No column is found nor is a CSV loaded."}
+            return {"error": "No column is found nor is a CSV loaded."}
+        
+        if col1 not in self.df.columns:
+            return {"error": f"Column '{col1}' was not found."}
+
+        if col2 not in self.df.columns:
+            return {"error": f"Column '{col2}' was not found."}
         
         pearson_r = pearsonr(self.df[col1],self.df[col2])
         p_value = pearson_r.pvalue
@@ -771,41 +784,32 @@ code_agent = CodeAgent(
 
 
 # Q8
-
-
-tool_agent = ToolCallingAgent(tools=TOOLS,
-                         model=model,
-                         instructions=SYSTEM_PROMPT,)
-
-# Initialiize agent
-# Q8 agent
-code_agent = CodeAgent(
-    tools=TOOLS,
-    model=model,
-    instructions=CODE_INSTRUCTIONS,
-    additional_authorized_imports=["pandas", "matplotlib.pyplot", "numpy"],
-    max_steps=8,
-)
-
-prompt = "Load bike_commute.csv. Plot avg_heart_rate vs duration_min as a scatter plot with green dots. Put the file in the resources folder."
+prompt = "Load bike_commute.csv. Plot avg_heart_rate vs duration_min as a scatter plot with green dots."
 
 response_tool = tool_agent.run(prompt)
-response_code = code_agent.run(prompt, additional_args={"csv_manager": csv_manager})
+response_code = code_agent.run(prompt)
 
 print(f"\nQ8:\n")
 print(f"Response Tool: {response_tool}")
 print(f"\nResponse Code: {response_code}")
 
+# Comparison:
+# The ToolCallingAgent uses the available predefined tools, while the CodeAgent
+# can write Python code to create the requested plot. The CodeAgent can directly
+# control the scatter plot styling, including the green dot color. The
+# ToolCallingAgent can only control the color if its available tool supports
+# that option.
+
 # Q9
 
-# 1. A ToolCallingAgent is better when the available tools already provide
-#    the specific actions needed for the task. It acts mainly as a dispatcher,
-#    choosing which predefined tool to call. A CodeAgent is more flexible
-#    because it can write and execute Python code when the available tools
-#    are not sufficient.
-#
-# 2. One meaningful risk of a CodeAgent is that it can execute generated code.
-#    This gives it more flexibility, but it also creates additional risks if
-#    the generated code performs unintended operations or produces incorrect
-#    results. Therefore, CodeAgents need appropriate execution restrictions
-#    and safeguards.
+# 1. A ToolCallingAgent is preferable when the task can be completed using
+#    predefined tools because it is more controlled and predictable. A
+#    CodeAgent is preferable when the available tools are not sufficient and
+#    the agent needs to write custom Python code, such as creating a plot with
+#    specific styling.
+
+# 2. A unique risk of a CodeAgent is that it can generate and execute Python
+#    code. This provides more flexibility, but incorrect or unsafe generated
+#    code could perform unintended actions or produce incorrect results.
+#    ToolCallingAgents are more restricted because they primarily select from
+#    predefined tools.
