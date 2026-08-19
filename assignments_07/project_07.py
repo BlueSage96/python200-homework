@@ -169,7 +169,7 @@ queries = [
     "Summarize the Happiness score column.",
     "What is the correlation between GDP per capita and Happiness score? Is it statistically significant?",
     "Show me the top 5 happiest countries in 2020.",
-    "Plot Happiness score over the years as a line chart, with one line per Regional indicator. Save the plot to resources/happiness_by_region.png.",
+    "Plot Happiness score over the years as a line chart, with one line per Regional indicator. Save the plot to outputs/happiness_by_region.png.",
 ]
 
 for query in queries:
