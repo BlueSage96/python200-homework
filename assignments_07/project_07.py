@@ -143,10 +143,14 @@ You are a data analyst assistant for the World Happiness dataset.
 Use the available tools for loading data, summarizing columns, computing correlations,
 and ranking countries. Write Python code directly only when the tools are not sufficient
 (for example, when creating custom plots or computing something the tools don't cover).
-For custom plots, use the actual dataset rows from the project's merged happiness CSV.
-Do not use the metadata returned by load_happiness_data() as the dataset or invent data.
-For regional happiness plots, use Year, Regional indicator, and Happiness score from
-the CSV and calculate the mean Happiness score for each Year and Regional indicator.
+
+For custom plots, use the actual rows from the project's merged happiness CSV, not the
+metadata returned by load_happiness_data(). Never invent, simulate, randomize, or
+substitute data. Use the actual column names and values from the CSV.
+
+For regional happiness plots, group the actual rows by Year and Regional indicator and
+calculate the mean Happiness score for each group.
+
 Be concise and student-friendly in your responses.
 """
 
@@ -171,3 +175,17 @@ for query in queries:
     print(f"\n--- Query: {query} ---")
     response = agent.run(query, reset=False)
     print(response)
+    
+
+# Task 4
+# My query 1
+my_query_1 = "Show me the top 5 least happiest countries in 2018."   # replace with your question
+response_1 = agent.run(my_query_1, reset=False)
+print(response_1)
+# Comment: Both code use and the get_top_n_countries tool.
+
+# My query 2
+my_query_2 = "Create a bar chart for Healthy life expectancy vs Happiness score for the top two (highest happiness scores) and bottom two (lowest happiness scores) countries. Make sure to list each country and not 'Country 1', etc. Save the chart to resources/happiness_life_expectancy.png."   # replace with your question
+response_2 = agent.run(my_query_2, reset=False)
+print(response_2)
+# Comment: Code generation only.
