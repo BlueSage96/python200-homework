@@ -14,9 +14,8 @@ if load_dotenv():
 else:
     print('Warning: could not load environment variables from .env')
 
-DATA_PATH = Path("resources/happiness_project/")
-MERGED_PATH = DATA_PATH / "merged_happiness.csv"
-
+MERGED_PATH = Path("assignments_01/outputs/merged_happiness.csv")
+DATA_PATH = Path("assignments/resources/happiness_project/")
 
 # Task 1
 df = None
@@ -24,39 +23,47 @@ df = None
 @tool
 def load_happiness_data() -> dict:
     """Load the World Happiness dataset into memory.
-    
-    If a merged CSV exists, load that file. Otherwise, load
-    each yearly CSV file from the happiness_project directory and combine
-    them into one DataFrame.
+
+    If the merged happiness CSV exists in assignments_01/outputs,
+    load that file. Otherwise, load and combine the yearly CSV files
+    from the resources/happiness_project directory.
 
     Returns:
         A dictionary containing the shape and column names of the
         loaded DataFrame, or an error message if no CSV files are found.
     """
-    global df #important since df is created outside of function
-    
-    # Load merged CSV from DATA_PATH
-    if MERGED_PATH.exists():
-        df = pd.read_csv(MERGED_PATH)
+    global df
+
+    # Preferred path: merged dataset from Assignment 01
+    merged_path = Path("../assignments_01/outputs/merged_happiness.csv")
+
+    # Fallback path: yearly happiness CSV files in Assignment 07
+    data_path = Path("resources/happiness_project/")
+
+    if merged_path.exists():
+        df = pd.read_csv(merged_path)
+
     else:
-        # if file does not exist, fall back to loading & merging
-        # all yearly CSVs from DATA_PATH
-        happiness_files = []
-        for file in DATA_PATH.glob("*.csv"):
-            if file.name != "merged_happiness.csv":
-                happiness_files.append(file)
-            
+        happiness_files = [
+            file for file in data_path.glob("*.csv")
+            if file.name != "merged_happiness.csv"
+        ]
+
         if not happiness_files:
             return {"error": "No happiness files were found."}
-        
-        dataframes = []
-        for file in happiness_files:
-            happy_df = pd.read_csv(file)
-            dataframes.append(happy_df)
-            
-        df = pd.concat(dataframes,ignore_index=True)
-    return {"shape":df.shape, "columns": df.columns.tolist()}
 
+        dataframes = []
+
+        for file in happiness_files:
+            dataframes.append(pd.read_csv(file))
+
+        df = pd.concat(dataframes, ignore_index=True)
+
+    return {
+        "shape": df.shape,
+        "columns": df.columns.tolist()
+    }
+    
 @tool
 def summarize_column(column: str) -> dict:
     """Return descriptive statistics for a single column in the loaded dataset.
@@ -166,10 +173,10 @@ agent = CodeAgent(
 # Task 3
 queries = [
     "Load the happiness data and tell me its shape and column names.",
-    "Summarize the Happiness score column.",
-    "What is the correlation between GDP per capita and Happiness score? Is it statistically significant?",
+    "Summarize the happiness_score column.",
+    "What is the correlation between gdp_per_capita and happiness_score? Is it statistically significant?",
     "Show me the top 5 happiest countries in 2020.",
-    "Plot Happiness score over the years as a line chart, with one line per Regional indicator. Save the plot to outputs/happiness_by_region.png.",
+    "Plot happiness_score over the years as a line chart, with one line per region. Save the plot to outputs/happiness_by_region.png.",
 ]
 
 for query in queries:
@@ -177,7 +184,6 @@ for query in queries:
     response = agent.run(query, reset=False)
     print(response)
     
-
 # Task 4
 # My query 1
 my_query_1 = "Show me the top 5 least happiest countries in 2018."   # replace with your question

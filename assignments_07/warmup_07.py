@@ -63,13 +63,9 @@ print(f"{cf3}\n")
 
 # Q2
 
-# Q2 prediction:
-# Yes, the query "Convert 100 degrees Celsius to Fahrenheit" should trigger
-# the celsius_to_fahrenheit tool because the user is asking for a temperature
-# conversion and that tool is available to the agent.
-# Two API calls should be made: the first call asks the model whether to use
-# a tool, and the second call gives the model the tool result so it can provide
-# the final answer.
+# Prediction: The model should call celsius_to_fahrenheit because the query
+# asks for a Celsius-to-Fahrenheit conversion. Two API calls should occur:
+# one to decide to call the tool and one after receiving the tool result.
 
 print(f"\nQ2:\n")
 
@@ -147,7 +143,7 @@ def run_agent(user_prompt: str) -> str:
     # If there were no tool calls, the first response was already the final answer
     return first_message.content or ''
 
-convert = run_agent("Covert 100 degrees Celsius to Fahrenheit")
+convert = run_agent("Convert 100 degrees Celsius to Fahrenheit")
 print("Conversion",convert)
 
 print(f"\nQ3:\n")
@@ -265,13 +261,13 @@ def run_agent(user_prompt: str) -> str:
 
 response_a = run_agent("What is 37 degrees Celsius in Fahrenheit?")
 print(f"\nResponse A: {response_a}\n")
-# The celsius_to_fahrenheit tool was called because the query asks for a Celsius
-# to Fahrenheit conversion.
+# The celsius_to_fahrenheit tool was called because this query requires
+# converting a Celsius temperature to Fahrenheit.
 
-response_b = run_agent("What is the boiling point of water in plain English?")
+response_b = run_agent("What is the current time?")
 print(f"\nResponse B: {response_b}\n")
-# No tool was needed because the question asks for general information rather
-# than the current time or a Celsius-to-Fahrenheit conversion.
+# The get_current_time tool was called because the user asked for the
+# current time.
 
 RESOURCES_DIR = Path("resources")
 RESOURCES_DIR
@@ -450,24 +446,29 @@ class CsvManager:
 
     def compute_correlation(self, col1: str, col2: str):
         """
-        Compute the Pearson correlation between two columns in the loaded DataFrame.
-        Returns the correlation coefficient and p-value.
+        Compute the Pearson correlation between two columns.
         """
-        error = self._ensure_loaded()
-        if error:
-            return {"error": "No column is found nor is a CSV loaded."}
-        
+        # Check whether a CSV has been loaded
+        if self.df is None:
+            return {"error": "No CSV is loaded."}
+
+        # Check whether the first column exists
         if col1 not in self.df.columns:
             return {"error": f"Column '{col1}' was not found."}
 
+        # Check whether the second column exists
         if col2 not in self.df.columns:
             return {"error": f"Column '{col2}' was not found."}
-        
-        pearson_r = pearsonr(self.df[col1],self.df[col2])
-        p_value = pearson_r.pvalue
-        stat = pearson_r.statistic
-        
-        return {"col1": col1, "col2": col2, "pearson_r": round(stat,4),"p_value": round(p_value,4)}
+
+        # Only call pearsonr after all input checks pass
+        pearson_r = pearsonr(self.df[col1], self.df[col2])
+
+        return {
+            "col1": col1,
+            "col2": col2,
+            "pearson_r": round(pearson_r.statistic, 4),
+            "p_value": round(pearson_r.pvalue, 4)
+        }
 print("Class defined")
 
 # Q4
