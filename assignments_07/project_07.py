@@ -5,8 +5,19 @@ from scipy.stats import pearsonr
 from pathlib import Path
 
 import pandas as pd
-DATA_PATH = Path("assignments/resources/happiness_project/")
+import os
+from dotenv import load_dotenv
+
+api_key = os.getenv("OPEN_AI_KEY")
+if load_dotenv():
+    print('Successfully loaded environment variables from .env')
+else:
+    print('Warning: could not load environment variables from .env')
+
+DATA_PATH = Path("resources/happiness_project/")
 MERGED_PATH = DATA_PATH / "merged_happiness.csv"
+
+
 # Task 1
 df = None
 
@@ -132,6 +143,10 @@ You are a data analyst assistant for the World Happiness dataset.
 Use the available tools for loading data, summarizing columns, computing correlations,
 and ranking countries. Write Python code directly only when the tools are not sufficient
 (for example, when creating custom plots or computing something the tools don't cover).
+For custom plots, use the actual dataset rows from the project's merged happiness CSV.
+Do not use the metadata returned by load_happiness_data() as the dataset or invent data.
+For regional happiness plots, use Year, Regional indicator, and Happiness score from
+the CSV and calculate the mean Happiness score for each Year and Regional indicator.
 Be concise and student-friendly in your responses.
 """
 
@@ -142,3 +157,17 @@ agent = CodeAgent(
     additional_authorized_imports=["pandas", "matplotlib.pyplot", "scipy.stats"],
     max_steps=8,
 )
+
+# Task 3
+queries = [
+    "Load the happiness data and tell me its shape and column names.",
+    "Summarize the Happiness score column.",
+    "What is the correlation between GDP per capita and Happiness score? Is it statistically significant?",
+    "Show me the top 5 happiest countries in 2020.",
+    "Plot Happiness score over the years as a line chart, with one line per Regional indicator. Save the plot to resources/happiness_by_region.png.",
+]
+
+for query in queries:
+    print(f"\n--- Query: {query} ---")
+    response = agent.run(query, reset=False)
+    print(response)
