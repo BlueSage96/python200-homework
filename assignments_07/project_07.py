@@ -149,7 +149,8 @@ metadata returned by load_happiness_data(). Never invent, simulate, randomize, o
 substitute data. Use the actual column names and values from the CSV.
 
 For regional happiness plots, group the actual rows by Year and Regional indicator and
-calculate the mean Happiness score for each group.
+calculate the mean Happiness score for each group. Only create files explicitly requested by the user. 
+Do not create additional plots or output files.
 
 Be concise and student-friendly in your responses.
 """
@@ -189,3 +190,35 @@ my_query_2 = "Create a bar chart for Healthy life expectancy vs Happiness score 
 response_2 = agent.run(my_query_2, reset=False)
 print(response_2)
 # Comment: Code generation only.
+
+
+# Task 5
+
+# --- Reflection ---
+#
+# 1. In Query 3, how did the agent communicate whether the correlation was statistically
+#    significant? Did it use the p-value correctly? What threshold did it apply?
+
+#    It used the compute_corrleation tool and was very accurate p-value. 
+#    The threshold used was the "significance" dictionary key to determine whether 
+#    or not there was a correlation between GDP per capita and the Happiness score.
+
+# 2. Did any of the agent's responses surprise you — either by being more capable than
+#    you expected, or less? Describe one specific example.
+
+#    For the first question for query 3, the agent failed to get the happiness_data's shape, 
+#    so it improvised and got the length of the shape and got a list of keys for the data_columns. 
+#    This shows me how creative smolagents are.
+
+# 3. What one additional tool would make this agent meaningfully more useful?
+#    Describe what it would do and what kind of question it would help the agent answer.
+#    (You do not need to implement it.)
+
+#    A tool that can automatically have the agent: can tell the agent to automatically do simple things 
+#    like making sure it gives proper axis and legend labels. The tool could also have the agent 
+#    question its decisions before it goes back and check its own output.
+
+if __name__ == "__main__":
+    queries,
+    my_query_1,
+    my_query_2
