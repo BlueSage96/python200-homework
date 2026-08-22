@@ -15,7 +15,7 @@ else:
     print('Warning: could not load environment variables from .env')
 
 MERGED_PATH = Path("assignments_01/outputs/merged_happiness.csv")
-DATA_PATH = Path("assignments/resources/happiness_project/")
+DATA_PATH = Path("resources/happiness_project/")
 
 # Task 1
 df = None
@@ -192,11 +192,10 @@ print(response_1)
 # Comment: Both code use and the get_top_n_countries tool.
 
 # My query 2
-my_query_2 = "Create a bar chart for Healthy life expectancy vs Happiness score for the top two (highest happiness scores) and bottom two (lowest happiness scores) countries. Make sure to list each country and not 'Country 1', etc. Save the chart to resources/happiness_life_expectancy.png."   # replace with your question
+my_query_2 = "Create a bar chart for Healthy life expectancy vs Happiness score for the top two (highest happiness scores) and bottom two (lowest happiness scores) countries. Make sure to list each country and not 'Country 1', etc. Save the chart to outputs/happiness_life_expectancy.png."   # replace with your question
 response_2 = agent.run(my_query_2, reset=False)
 print(response_2)
 # Comment: Code generation only.
-
 
 # Task 5
 
@@ -204,25 +203,33 @@ print(response_2)
 #
 # 1. In Query 3, how did the agent communicate whether the correlation was statistically
 #    significant? Did it use the p-value correctly? What threshold did it apply?
+#
+#    The agent used the compute_correlation tool, which returned both the Pearson
+#    correlation coefficient and p-value. It used a p-value threshold of 0.05 to
+#    determine statistical significance. Since the p-value was below 0.05, the agent
+#    correctly identified the correlation between GDP per capita and Happiness score
+#    as statistically significant.
 
-#    It used the compute_corrleation tool and was very accurate p-value. 
-#    The threshold used was the "significance" dictionary key to determine whether 
-#    or not there was a correlation between GDP per capita and the Happiness score.
 
 # 2. Did any of the agent's responses surprise you — either by being more capable than
 #    you expected, or less? Describe one specific example.
+#
+#    I was surprised by how the agent could use multiple tools in sequence to answer
+#    one question. For example, when I asked it to load bike_commute.csv and calculate
+#    a correlation in the warmup, it first found the CSV, loaded it, and then used the
+#    correlation tool to calculate the result. This showed me that an agent can decide
+#    which tools it needs and use their results to complete a larger task.
 
-#    For the first question for query 3, the agent failed to get the happiness_data's shape, 
-#    so it improvised and got the length of the shape and got a list of keys for the data_columns. 
-#    This shows me how creative smolagents are.
 
 # 3. What one additional tool would make this agent meaningfully more useful?
 #    Describe what it would do and what kind of question it would help the agent answer.
 #    (You do not need to implement it.)
-
-#    A tool that can automatically have the agent: can tell the agent to automatically do simple things 
-#    like making sure it gives proper axis and legend labels. The tool could also have the agent 
-#    question its decisions before it goes back and check its own output.
+#
+#    An additional data-visualization tool would make this agent more useful. It could
+#    create and save common charts while automatically using appropriate axis labels,
+#    titles, legends, and other formatting. This would help with questions that ask
+#    the agent to visualize relationships or trends in the World Happiness dataset,
+#    such as comparing happiness scores across countries or regions.
 
 if __name__ == "__main__":
     queries,
