@@ -2,6 +2,7 @@
 # What is the core economic model of cloud computing, and how does it differ from owning your own servers?
 
 The core economic model is that developers "rent" the cloud servers to run their AI models from cloud services including AWS and Azure. The idea is to train the machine learning model using the cloud provider's GPU cluster and then shut down the cloud service when the developer is done.
+# ___________________________________________________________________________________________________________________________
 
 # Cloud Concepts 02
 # What is the difference between vertical scaling and horizontal scaling? Give a concent example of when you might choose each.
@@ -23,3 +24,39 @@ Since a single machine needs to be upgraded, vertical scaling makes the most sen
 # A data pipeline that processes 10 files per run now needs to process 10,000 files per run, and the work can be split across machines.
 
 Horizontal scaling is the best solution due to the increased demand and it can be scaled again in the future when 100,000+ files per run are needed.
+
+# ___________________________________________________________________________________________________________________________
+
+# Cloud Concepts 03
+
+# Before writing your definitions, classify each item in the list below as IaaS, PaaS, SaaS, or BaaS. One sentence of reasoning is enough for each.
+
+# Gmail 
+
+SaaS because Google has built and runs the apps while users do not have to do any setup.
+
+# Azure Virtual Machines
+
+Iaas because Azure allows user to install the software, configure the enviornment, and handle security updates.
+
+# AWS S3 (Simple Storage Service)
+
+IaaS because the service is an object storage service offering scalability, data availability, security, and performance.
+
+# GitHub Codespaces
+
+PaaS because GitHub is a service that provides tools to the users to build with their own code.
+
+# Snowflake
+
+SaaS because Snowflake builds, runs, and maintains its services.
+
+# Supabase
+
+PaaS because Supabase manages the infrastructure and allows users to use their own code.
+
+# Now describe IaaS, PaaS, and SaaS in your own words. For each, give one example (from the lesson or the list above) and describe what you, as the developer, are responsible for managing.
+
+IaaS is a flexible system that allows developers to use an app to install, build, and maintain their own projects.
+SaaS allows users to use an app or service that is prebuilt for them.
+PaaS the provider manages the service while the developer adds their own tools to the service.
