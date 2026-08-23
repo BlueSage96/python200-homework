@@ -1,10 +1,12 @@
 # Cloud concepts 01
+
 # What is the core economic model of cloud computing, and how does it differ from owning your own servers?
 
 The core economic model is that developers "rent" the cloud servers to run their AI models from cloud services including AWS and Azure. The idea is to train the machine learning model using the cloud provider's GPU cluster and then shut down the cloud service when the developer is done.
 # ___________________________________________________________________________________________________________________________
 
 # Cloud Concepts 02
+
 # What is the difference between vertical scaling and horizontal scaling? Give a concent example of when you might choose each.
 
 Vertical scaling means upgrading the machine by adding more CPU and RAM, and using a bigger GPU. Horizontal scaling means that more machines are used and the modeling work is split across these machines.
@@ -64,6 +66,7 @@ PaaS the provider manages the service while the developer adds their own tools t
 # ___________________________________________________________________________________________________________________________
 
 # Cloud Concepts 04
+
 # What is a mananged platform like Databricks or Snowflake, and how does it differ from using a cloud provider like AWS or GCP directly? What do you gain, and what do you give up?
 
 Managed platforms like Databricks and Snowflake build their platforms directly off of cloud providers like AWS and GCP. What is gained is that the managed platforms manages the cloud resources on our behalf. The downside is less flexibility and potential higher costs than using cloud providers directly.
@@ -71,6 +74,7 @@ Managed platforms like Databricks and Snowflake build their platforms directly o
 # ___________________________________________________________________________________________________________________________
 
 # Cloud Concepts 05
+
 # The lesson names two situations where the cloud is probably not the right choice. What are they?
 
 -There is a steep learning curve for cloud computing even for basic use.
@@ -79,6 +83,7 @@ Managed platforms like Databricks and Snowflake build their platforms directly o
 # ___________________________________________________________________________________________________________________________
 
 # Cloud Landscape Question 01
+
 # Name the three hyperscalers. For each, write one sentence describing its primary strengteh and the type of organization most likely to use it.
 
 Hyperscalers:
@@ -148,3 +153,12 @@ What it does: Access to large language models
 Provider: Azure ML
 
 # ___________________________________________________________________________________________________________________________
+
+# Cloud Landscape 04
+
+# The lesson says most projects don't use one provider for everything. Describe a simple data project of your own design (one or two sentences is fine) and sketch a plausible stack using services from at least two different providers or products from the taxonomy table. Then answer: is there a benefit to consolidating to one provider, and what would you give up if you did?
+
+
+If I made a AI model for game development, I would use AWS SageMaker for ML, Azure OpenAI for LLM, and GCP for cloud storage.
+My stack would be: Game model --> GCP storage --> LLM (Azure) --> SageMaker (ML)
+Consolidating with one provider could hurt a project if that provider lacked features another provider. For example, if I only use GCP, I could miss out on Microsoft 365 features that would make it easier to use my model and sync it between my MacBook Pro and my Windows PC.
