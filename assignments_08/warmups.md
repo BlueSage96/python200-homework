@@ -116,3 +116,35 @@ Organization using it: OpenAI, Walmart, Samsung, Fedex, UPS, etc.
 # Then add your own reflection: what does this suggest about how you should evaluate a cloud tool when starting a new project?
 
 I need to do deep research before choosing a cloud service and determine how steep of a learning curve these cloud services have before building anything. Also, I need to look at how each service saves data and how tables and other properties work with one another for each service.
+
+# ___________________________________________________________________________________________________________________________
+
+# Cloud Landscape 03
+
+# For each of the four scenarios below, identify which service category from the taxonomy table applies (e.g., "object storage", "managed relational DB", "LLM API", "serverless compute") and name one specific provider or product that offers it.
+
+# You need to store 10 TB of image files and retrieve them by filename from any machine.
+
+Category: Object storage 
+What it does: Store files by key
+Provider: GCP provides cloud storage
+
+# You need to run an ML training job on a GPU for four hours, then shut it down.
+
+Category: ML platform
+What it does: Train and deploy models
+Provider: AWS SageMaker
+
+# You need to host a web API that automatically scales up when traffic spikes and scales down when it quiets.
+
+Category: Serverless compute
+What it does: Run functions without managing servers
+Provider: Supabase Edge Functions
+
+# You need to send structured data to a large language model and get a text response back.
+
+Category: LLM API
+What it does: Access to large language models
+Provider: Azure ML
+
+# ___________________________________________________________________________________________________________________________
