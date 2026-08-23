@@ -77,3 +77,26 @@ Managed platforms like Databricks and Snowflake build their platforms directly o
 -Customer support can be slow, resulting in delays for assistance. AI platforms may not always be helpful since cloud platforms quickly makes changes the AI has not caught up with.
 
 # ___________________________________________________________________________________________________________________________
+
+# Cloud Landscape Question 01
+# Name the three hyperscalers. For each, write one sentence describing its primary strengteh and the type of organization most likely to use it.
+
+Hyperscalers:
+
+Amazon Web Services (AWS):
+
+The primary strength of AWS is its broad range of services including EC2 (compute), S3 (object storage), RDS (managed databases), SageMaker (ML platform), Lambda (serverless functions).
+
+Organzations using it: Anthropic, Netflix, Airbnb, etc.
+
+Google Cloud Platform (GCP):
+
+GCP is strongest in data and machine learning with Google building many of the foundational ideas in modern distributed systems (MapReduce, Bigtable, Dremel — the precursor to BigQuery).
+
+Organizations using it: Snapchat, Etsy, Shopify, Mars, etc.
+
+Microsoft Azure:
+
+Microsoft is strongest provider for enterprise and government settings mainly because of its deep integration with Windows, Active Directory and Microsoft 365.
+
+Organization using it: OpenAI, Walmart, Samsung, Fedex, UPS, etc.
