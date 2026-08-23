@@ -60,3 +60,8 @@ PaaS because Supabase manages the infrastructure and allows users to use their o
 IaaS is a flexible system that allows developers to use an app to install, build, and maintain their own projects.
 SaaS allows users to use an app or service that is prebuilt for them.
 PaaS the provider manages the service while the developer adds their own tools to the service.
+
+# Cloud Concepts 04
+# What is a mananged platform like Databricks or Snowflake, and how does it differ from using a cloud provider like AWS or GCP directly? What do you gain, and what do you give up?
+
+Managed platforms like Databricks and Snowflake build their platforms directly off of cloud providers like AWS and GCP. What is gained is that the managed platforms manages the cloud resources on our behalf. The downside is less flexibility and potential higher costs than using cloud providers directly.
