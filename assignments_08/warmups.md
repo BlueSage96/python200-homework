@@ -100,3 +100,19 @@ Microsoft Azure:
 Microsoft is strongest provider for enterprise and government settings mainly because of its deep integration with Windows, Active Directory and Microsoft 365.
 
 Organization using it: OpenAI, Walmart, Samsung, Fedex, UPS, etc.
+
+# ___________________________________________________________________________________________________________________________
+
+# Cloud Landscape 02
+
+# The lesson explains why this course switched from Microsoft Azure to Supabase. It gives three concrete reasons. Summarize each reason in your own words — one sentence each.
+
+-Access: Weird Azure setup made it harder for students to join the CTD organization, resulting in tenant-level configuration problems and students being blocked for days.
+
+-Pedagogical fit: Azure Blob Storage stored data in a weird format that was organized by path and not easy to work with.
+
+-Pipeling coherence: The ETL pipeline was not easy to work with in Azure, and Supabase gives the two tables (raw zone and enriched zone) a clear relationship making it easier to inspect and debug the table contents.
+
+# Then add your own reflection: what does this suggest about how you should evaluate a cloud tool when starting a new project?
+
+I need to do deep research before choosing a cloud service and determine how steep of a learning curve these cloud services have before building anything. Also, I need to look at how each service saves data and how tables and other properties work with one another for each service.
