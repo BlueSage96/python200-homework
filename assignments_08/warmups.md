@@ -61,7 +61,19 @@ IaaS is a flexible system that allows developers to use an app to install, build
 SaaS allows users to use an app or service that is prebuilt for them.
 PaaS the provider manages the service while the developer adds their own tools to the service.
 
+# ___________________________________________________________________________________________________________________________
+
 # Cloud Concepts 04
 # What is a mananged platform like Databricks or Snowflake, and how does it differ from using a cloud provider like AWS or GCP directly? What do you gain, and what do you give up?
 
 Managed platforms like Databricks and Snowflake build their platforms directly off of cloud providers like AWS and GCP. What is gained is that the managed platforms manages the cloud resources on our behalf. The downside is less flexibility and potential higher costs than using cloud providers directly.
+
+# ___________________________________________________________________________________________________________________________
+
+# Cloud Concepts 05
+# The lesson names two situations where the cloud is probably not the right choice. What are they?
+
+-There is a steep learning curve for cloud computing even for basic use.
+-Customer support can be slow, resulting in delays for assistance. AI platforms may not always be helpful since cloud platforms quickly makes changes the AI has not caught up with.
+
+# ___________________________________________________________________________________________________________________________
