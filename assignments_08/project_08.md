@@ -16,3 +16,5 @@ While making a SageMaker calculation, I noticed that some of the instances had a
 # A sentence on how the two scenarios compare — what does the cost difference tell you about when a GPU instance is or isn't worth it?
 
 A .micro and .large instance have a HUGE price gap, and a GPU instance is only worth it if it is used often.
+
+YouTube video link: https://youtu.be/3dOYw0HiGaI
