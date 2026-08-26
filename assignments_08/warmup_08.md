@@ -44,7 +44,7 @@ IaaS because users manage the operating system, software, and environment runnin
 
 # AWS S3
 
-IaaS because it provides cloud infrastructure for storing and managing files without requiring users to own the physical storage hardware.
+BaaS because it provides a backend storage service without requiring users to manage the underlying infrastructure.
 
 # GitHub Codespaces
 
@@ -56,15 +56,17 @@ SaaS because Snowflake manages the software and infrastructure while users acces
 
 # Supabase
 
-PaaS because Supabase manages the infrastructure and provides tools for developers to build applications.
+BaaS because it provides backend services like a database and storage without requiring developers to manage the underlying infrastructure.
 
-# IaaS, PaaS, and SaaS
+IaaS, PaaS, SaaS, and BaaS
 
 IaaS gives developers more control over the infrastructure, but they have more things to manage. Azure Virtual Machines is an example.
 
-PaaS manages more of the infrastructure for the developer so they can focus on building their application. Supabase is an example.
+PaaS manages more of the infrastructure so developers can focus on their applications. GitHub Codespaces is an example.
 
 SaaS is a finished application that users can access without managing the underlying infrastructure. Gmail is an example.
+
+BaaS provides backend services that developers can use without building and managing the backend themselves. Supabase is an example.
 
 # ___________________________________________________________________________________________________________________________
 
@@ -89,25 +91,17 @@ Managed platforms like Databricks and Snowflake handle more of the cloud infrast
 
 # Name the three hyperscalers. For each, write one sentence describing its primary strengteh and the type of organization most likely to use it.
 
-Hyperscalers:
-
 Amazon Web Services (AWS)
 
-AWS’s primary strength is its huge range of cloud services, so it is useful for organizations that need a lot of different cloud tools.
-
-Organzations using it: Anthropic, Netflix, Airbnb, etc.
+AWS’s primary strength is its huge range of cloud services, so it is useful for organizations that need many different cloud tools and services.
 
 Google Cloud Platform (GCP)
 
-GCP is strongest in data and machine learning, making it a good choice for organizations working heavily with data and AI.
-
-Organizations using it: Snapchat, Etsy, Shopify, Mars, etc.
+GCP is strongest in data and machine learning, making it a good choice for organizations that work heavily with data and AI.
 
 Microsoft Azure
 
-Azure is strongest for enterprise and government organizations because of its integration with Microsoft products and services.
-
-Organizations using it: OpenAI, Walmart, Samsung, Fedex, UPS, etc.
+Azure is strong for enterprise and government organizations because of its integration with Microsoft products and services.
 
 
 # ___________________________________________________________________________________________________________________________
@@ -162,6 +156,6 @@ It provides access to large language models so structured data can be sent in an
 
 # The lesson says most projects don't use one provider for everything. Describe a simple data project of your own design (one or two sentences is fine) and sketch a plausible stack using services from at least two different providers or products from the taxonomy table. Then answer: is there a benefit to consolidating to one provider, and what would you give up if you did?
 
-If I made an AI model for game development, I could use AWS SageMaker for ML, Azure OpenAI for the LLM, and GCP for cloud storage. Consolidating everything with one provider could make the project easier to manage, but I could give up features or tools that another provider does better.
+If I made an AI model for game development, I could use GCP Cloud Storage for game data, Azure OpenAI for the LLM, and AWS SageMaker for training the ML model. Consolidating everything with one provider could make the project easier to manage, but I could give up features that another provider does better.
 
-My stack would be: Game model --> GCP storage --> LLM (Azure) --> SageMaker (ML)
+My stack would be: GCP Cloud Storage + Azure OpenAI + AWS SageMaker.

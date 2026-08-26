@@ -2,13 +2,7 @@ My project and tables are all loaded and ready to go on Supabase!
 
 # What each scenario costs, and whether the numbers surprised you.
 
-The monthly costs are:
-
-* Scenario A: $7.23
-* Scenario B EC2: $2,233.80
-* Scenario B RDS: $673.52
-
-Scenario A surprised me because I expected the monthly cost to be closer to $100. Scenario B was much more expensive, especially the EC2 cost.
+Scenario A costs $7.23/month. Scenario B costs $2,233.80/month for EC2 and $673.52/month for RDS. Scenario A surprised me because I expected the monthly cost to be closer to $100, while Scenario B was much more expensive, especially the EC2 cost.
 
 # Anything interesting you found while exploring the calculator beyond the two required scenarios.
 
