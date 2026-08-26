@@ -34,14 +34,11 @@ def load_happiness_data() -> dict:
     """
     global df
 
-    # Preferred path: merged dataset from Assignment 01
-    merged_path = Path("../assignments_01/outputs/merged_happiness.csv")
-
     # Fallback path: yearly happiness CSV files in Assignment 07
     data_path = Path("resources/happiness_project/")
 
-    if merged_path.exists():
-        df = pd.read_csv(merged_path)
+    if MERGED_PATH.exists():
+        df = pd.read_csv(MERGED_PATH)
 
     else:
         happiness_files = [
@@ -179,22 +176,13 @@ queries = [
     "Plot happiness_score over the years as a line chart, with one line per region. Save the plot to outputs/happiness_by_region.png.",
 ]
 
-for query in queries:
-    print(f"\n--- Query: {query} ---")
-    response = agent.run(query, reset=False)
-    print(response)
-    
 # Task 4
 # My query 1
 my_query_1 = "Show me the top 5 least happiest countries in 2018."   # replace with your question
-response_1 = agent.run(my_query_1, reset=False)
-print(response_1)
 # Comment: Both code use and the get_top_n_countries tool.
 
 # My query 2
 my_query_2 = "Create a bar chart for Healthy life expectancy vs Happiness score for the top two (highest happiness scores) and bottom two (lowest happiness scores) countries. Make sure to list each country and not 'Country 1', etc. Save the chart to outputs/happiness_life_expectancy.png."   # replace with your question
-response_2 = agent.run(my_query_2, reset=False)
-print(response_2)
 # Comment: Code generation only.
 
 # Task 5
@@ -232,6 +220,14 @@ print(response_2)
 #    such as comparing happiness scores across countries or regions.
 
 if __name__ == "__main__":
-    queries,
-    my_query_1,
-    my_query_2
+    
+    for query in queries:
+        print(f"\n--- Query: {query} ---")
+        response = agent.run(query, reset=False)
+        print(f"Task 3: {response}")
+    
+    response_1 = agent.run(my_query_1, reset=False)
+    print(f"Task 4 response 01: {response_1}")
+    
+    response_2 = agent.run(my_query_2, reset=False)
+    print(f"Task 4 response 02: {response_2}")
