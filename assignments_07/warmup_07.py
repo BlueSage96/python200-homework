@@ -13,6 +13,7 @@ from openai import OpenAI
 from smolagents import ToolCallingAgent, OpenAIServerModel, tool
 from smolagents import CodeAgent
 from scipy.stats import pearsonr
+from datetime import datetime
 
 if load_dotenv():
     print('Successfully loaded environment variables from .env')
@@ -23,6 +24,12 @@ client = OpenAI()
 print('OpenAI client created.')
 
 api_key = os.getenv("OPEN_AI_KEY")
+
+
+
+def get_current_time() -> str:
+    '''Return the current local time as a formatted string.'''
+    return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 # Q1
 
