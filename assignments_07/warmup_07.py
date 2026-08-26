@@ -63,9 +63,13 @@ print(f"{cf3}\n")
 
 # Q2
 
-# Prediction: The model should call celsius_to_fahrenheit because the query
-# asks for a Celsius-to-Fahrenheit conversion. Two API calls should occur:
-# one to decide to call the tool and one after receiving the tool result.
+# Prediction:
+
+# Calling run_agent("Convert 100 degrees Celsius to Fahrenheit") should NOT
+# trigger a tool call because the only available tool is get_current_time,
+# and the user is asking for a temperature conversion, not the current time.
+# The model should answer without using a tool, so only ONE API call should
+# be made.
 
 print(f"\nQ2:\n")
 
@@ -146,8 +150,8 @@ def run_agent(user_prompt: str) -> str:
 convert = run_agent("Convert 100 degrees Celsius to Fahrenheit")
 print("Conversion",convert)
 
-print(f"\nQ3:\n")
-
+# The prediction was correct if the model did not request get_current_time
+# and answered the Celsius-to-Fahrenheit question directly.
 tools = [
     {
         "type": "function",
@@ -160,27 +164,11 @@ tools = [
                 "required": []
             }
         }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "celsius_to_fahrenheit",
-            "description": "Convert Celsius to Fahrenheit.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "celsius": {
-                        "type": "number",
-                        "description": "Temperature in Celsius."
-                    }
-                },
-                "required": ["celsius"]
-            }
-        }
     }
 ]
 print('Tools list defined with one tool: get_current_time')
 
+print(f"\nQ3:\n")
 def run_agent(user_prompt: str) -> str:
     '''Run a minimal ReAct-style agent for a single user prompt.'''
 
@@ -261,13 +249,14 @@ def run_agent(user_prompt: str) -> str:
 
 response_a = run_agent("What is 37 degrees Celsius in Fahrenheit?")
 print(f"\nResponse A: {response_a}\n")
-# The celsius_to_fahrenheit tool was called because this query requires
-# converting a Celsius temperature to Fahrenheit.
+# The celsius_to_fahrenheit tool should be called because the question asks
+# for a Celsius-to-Fahrenheit conversion.
 
-response_b = run_agent("What is the current time?")
+response_b = run_agent("What is the boiling point of water in plain English?")
 print(f"\nResponse B: {response_b}\n")
-# The get_current_time tool was called because the user asked for the
-# current time.
+# No tool should be called because the question asks for general information
+# about the boiling point of water, not the current time or a Celsius-to-
+# Fahrenheit conversion.
 
 RESOURCES_DIR = Path("resources")
 RESOURCES_DIR
@@ -472,7 +461,6 @@ class CsvManager:
 print("Class defined")
 
 # Q4
-
 csv_backend = CsvManager(RESOURCES_DIR)
 
 node_tools = {
@@ -597,7 +585,6 @@ tools_schema = [
 # Q5
 print(f"\nQ5:\n")
 
-
 def run_agent_cycle(messages, user_text, max_tool_rounds=5):
     """
     Run through one react-agent loop using a simple tool-using agent.
@@ -694,7 +681,8 @@ SYSTEM_PROMPT = (
 
 messages = [{"role": "system", "content": SYSTEM_PROMPT}]
 result = run_agent_cycle(messages, "Load bike_commute.csv and compute the correlation between avg_traffic_density and avg_speed_kmh.")
-print(f"\nResult: {result}\n")
+print("\nQ5 Final Agent Response:")
+print(result)
 
 # Q6
 print(f"\nQ6:\n")
@@ -705,6 +693,7 @@ print(f"\nQ6:\n")
 #   assistant -- represents the model's reasoning/tool requests or final response.
 #   tool -- contains the result returned by a tool the assistant requested.
 
+print("\nQ6 Full Messages List:")
 print(json.dumps(messages, indent=2, default=str))
 
 # Q7-Q9 setup
