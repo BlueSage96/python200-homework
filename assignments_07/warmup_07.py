@@ -26,11 +26,6 @@ print('OpenAI client created.')
 api_key = os.getenv("OPEN_AI_KEY")
 
 
-
-def get_current_time() -> str:
-    '''Return the current local time as a formatted string.'''
-    return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
 # Q1
 
 def celsius_to_fahrenheit(celsius: float) -> str:
@@ -70,6 +65,10 @@ print(f"{cf3}\n")
 
 # Q2
 
+def get_current_time() -> str:
+    '''Return the current local time as a formatted string.'''
+    return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
 # Prediction:
 
 # Calling run_agent("Convert 100 degrees Celsius to Fahrenheit") should NOT
@@ -79,6 +78,24 @@ print(f"{cf3}\n")
 # be made.
 
 print(f"\nQ2:\n")
+
+# The prediction was correct if the model did not request get_current_time
+# and answered the Celsius-to-Fahrenheit question directly.
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_current_time",
+            "description": "Get the current time.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": []
+            }
+        }
+    }
+]
+print('Tools list defined with one tool: get_current_time')
 
 def run_agent(user_prompt: str) -> str:
     '''Run a minimal ReAct-style agent for a single user prompt.'''
@@ -155,10 +172,10 @@ def run_agent(user_prompt: str) -> str:
     return first_message.content or ''
 
 convert = run_agent("Convert 100 degrees Celsius to Fahrenheit")
-print("Conversion",convert)
+print("Conversion", convert)
 
-# The prediction was correct if the model did not request get_current_time
-# and answered the Celsius-to-Fahrenheit question directly.
+# Q3
+
 tools = [
     {
         "type": "function",
@@ -171,9 +188,25 @@ tools = [
                 "required": []
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "celsius_to_fahrenheit",
+            "description": "Convert a temperature from Celsius to Fahrenheit.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "celsius": {
+                        "type": "number",
+                        "description": "Temperature in degrees Celsius."
+                    }
+                },
+                "required": ["celsius"]
+            }
+        }
     }
 ]
-print('Tools list defined with one tool: get_current_time')
 
 print(f"\nQ3:\n")
 def run_agent(user_prompt: str) -> str:

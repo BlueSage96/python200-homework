@@ -8,13 +8,15 @@ import pandas as pd
 import os
 from dotenv import load_dotenv
 
-api_key = os.getenv("OPEN_AI_KEY")
 if load_dotenv():
     print('Successfully loaded environment variables from .env')
 else:
     print('Warning: could not load environment variables from .env')
+    
+api_key = os.getenv("OPEN_AI_KEY")
+model = OpenAIServerModel(api_key=api_key, model_id="gpt-4o-mini")
 
-MERGED_PATH = Path("assignments_01/outputs/merged_happiness.csv")
+MERGED_PATH = Path("../assignments_01/outputs/merged_happiness.csv")
 DATA_PATH = Path("resources/happiness_project/")
 
 # Task 1
@@ -35,8 +37,8 @@ def load_happiness_data() -> dict:
     global df
 
     # Fallback path: yearly happiness CSV files in Assignment 07
-    data_path = Path("resources/happiness_project/")
-
+    data_path = DATA_PATH
+    
     if MERGED_PATH.exists():
         df = pd.read_csv(MERGED_PATH)
 
@@ -81,34 +83,34 @@ def summarize_column(column: str) -> dict:
 @tool
 def compute_correlation(col1: str, col2: str) -> dict:
     """Compute the Pearson correlation coefficient and p-value between two numeric columns.
+
     Args:
-        col1: First column whose value will be correlated.
-        col2: Second column whose value will be correlated.
-        
+        col1: First column to correlate.
+        col2: Second column to correlate.
+
     Returns:
-        A dictionary containing the two column names, Pearson correlation
-        coefficient, and p-value, or an error dictionary if the data or
-        columns are invalid.
+        A dictionary containing the column names, Pearson correlation
+        coefficient, and p-value, or an error dictionary if the data
+        is not loaded or either column is missing.
     """
-    
     if df is None:
-        return{"error": "No column is found in the CSV loaded."}
+        return {"error": "No data is loaded."}
 
     if col1 not in df.columns:
-        return{"error": f"{col1} was not found."}
+        return {"error": f"Column '{col1}' was not found."}
 
     if col2 not in df.columns:
-        return{"error": f"{col2} was not found."}
+        return {"error": f"Column '{col2}' was not found."}
+
+    result = pearsonr(df[col1], df[col2])
+
+    return {
+        "col1": col1,
+        "col2": col2,
+        "pearson_r": round(result.statistic, 4),
+        "p_value": round(result.pvalue, 4),
+}
     
-    pearson_r = pearsonr(df[col1],df[col2])
-    p_value = pearson_r.pvalue
-    stat = pearson_r.statistic
-    
-    return { "col1": col1, 
-                "col2": col2,
-                "pearson_r": round(stat,4),
-                "p_value" : round(p_value,4)}
-        
 @tool
 def get_top_n_countries(column: str, year: int, n: int = 5) -> list[dict] | dict:
     """Return the top N countries ranked by a given column for a specific year.
@@ -140,7 +142,6 @@ def get_top_n_countries(column: str, year: int, n: int = 5) -> list[dict] | dict
 
 
 # Task 2
-model = OpenAIServerModel(api_key=api_key, model_id="gpt-4o-mini")
 
 SYSTEM_PROMPT = """
 You are a data analyst assistant for the World Happiness dataset.
@@ -170,10 +171,10 @@ agent = CodeAgent(
 # Task 3
 queries = [
     "Load the happiness data and tell me its shape and column names.",
-    "Summarize the happiness_score column.",
-    "What is the correlation between gdp_per_capita and happiness_score? Is it statistically significant?",
+    "Summarize the Happiness score column.",
+    "What is the correlation between GDP per capita and Happiness score? Is it statistically significant?",
     "Show me the top 5 happiest countries in 2020.",
-    "Plot happiness_score over the years as a line chart, with one line per region. Save the plot to outputs/happiness_by_region.png.",
+    "Plot Happiness score over the years as a line chart, with one line per Regional indicator. Save the plot to outputs/happiness_by_region.png.",
 ]
 
 # Task 4
