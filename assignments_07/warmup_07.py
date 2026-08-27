@@ -756,15 +756,19 @@ print(f"\nQ7:\n")
 csv_manager = CsvManager(resources_dir=RESOURCES_DIR)
 
 @tool
-def compute_correlation(col1:str,col2:str) -> dict:
-    """
-    Compute the Pearson correlation between two columns in the loaded DataFrame.
+def compute_correlation(col1: str, col2: str) -> dict:
+    """Compute the Pearson correlation between two columns in the loaded DataFrame.
+
     Args:
-        col1: first column that is a string
-        col2: second column that is a string
-    Returns the correlation coefficient and p-value.
+        col1: The name of the first column to correlate.
+        col2: The name of the second column to correlate.
+
+    Returns:
+        A dictionary containing the column names, Pearson correlation
+        coefficient, and p-value, or an error dictionary if the data
+        is not loaded or either column is missing.
     """
-    return csv_manager.compute_correlation(col1,col2)
+    return csv_manager.compute_correlation(col1, col2)
 
 print(compute_correlation.description)
 
@@ -817,7 +821,7 @@ code_agent = CodeAgent(
 prompt = "Load bike_commute.csv. Plot avg_heart_rate vs duration_min as a scatter plot with green dots."
 
 response_tool = tool_agent.run(prompt)
-response_code = code_agent.run(prompt)
+response_code = code_agent.run(prompt, additional_args={"csv_manager":csv_manager})
 
 print(f"\nQ8:\n")
 print(f"Response Tool: {response_tool}")
