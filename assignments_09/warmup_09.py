@@ -70,3 +70,23 @@ records = get_records_by_date_range(supabase, "2020-01-01", "2026-08-30")
 
 print(f"\n CRUD 02:\n")
 print(records)
+
+# CRUD 03
+
+# Using a plain "insert" can result in an error if the record already exists. 
+# Upsert inserts a new row if the key is new or updates the existing row if 
+# it doesn't already exist.
+
+# Example: A user creates a sudoku game picking the difficulty. When they are finished, 
+# the record updates to include the number of hints used and the number of errors for that 
+# game. Insert would work well to insert this data into the database; however, if this is a 
+# game the user lost (too many mistakes) and they retry again, upsert needs to be used to 
+# update the existing record. 
+
+def safe_upsert(supabase, records):
+    response = (
+        supabase.table("weather_raw").upsert(records, on_conflict="date").execute()
+    )
+    print(f"\nRows effected: {response}\n")
+    
+safe_upsert(supabase, records)
