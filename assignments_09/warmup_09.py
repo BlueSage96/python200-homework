@@ -1,4 +1,6 @@
-
+import os
+from dotenv import load_dotenv
+from supabase import create_client
 
 # Connection 01
 
@@ -12,3 +14,19 @@
 
 #   We should never commit a key to a public GitHub repository because it can be scraped 
 #   within minutes by automated bots. 
+
+# Connection 02
+
+def get_client():
+    if load_dotenv():  # reads .env and sets environment variables
+        print('Successfully loaded environment varables from .env')
+    else:
+        print('Warning: could not load environment variables from .env')
+        
+    SUPABASE_URL = os.getenv("SUPABASE_URL")
+    SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    
+    return supabase
+
+get_client()
