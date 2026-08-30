@@ -30,3 +30,12 @@ def get_client():
     return supabase
 
 get_client()
+
+# Connection 03
+
+# Row Level Security (RLS) dictates what table rows a use can access. 
+# RLS is an important production feature, but it adds complexity during development. 
+
+# A real-world use case would be making an important distinction between the admin and 
+# regular users in an app. The admin can access all of the data in the app while 
+# regular users can only see the data they created.
