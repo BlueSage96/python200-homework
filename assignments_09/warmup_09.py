@@ -53,8 +53,20 @@ def insert_test_record(supabase):
     print(response.data)
 
 supabase = get_client()
-insert_test_record(supabase)
+# insert_test_record(supabase)
 
 # Running the function twice creates a 'duplicate key' error.
 # Would use "upsert" in the function instead of "insert" to 
 # make repeated calls safe.
+
+# CRUD 02
+
+def get_records_by_date_range(supabase, start, end):
+    response = supabase.table("weather_raw").select("*").gte("date", start).lte("date", end).execute()
+    rows = response.data  # list of dicts
+    return rows
+
+records = get_records_by_date_range(supabase, "2020-01-01", "2026-08-30")
+
+print(f"\n CRUD 02:\n")
+print(records)
