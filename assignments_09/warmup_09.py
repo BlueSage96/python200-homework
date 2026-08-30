@@ -53,7 +53,7 @@ def insert_test_record(supabase):
     print(response.data)
 
 supabase = get_client()
-# insert_test_record(supabase)
+insert_test_record(supabase)
 
 # Running the function twice creates a 'duplicate key' error.
 # Would use "upsert" in the function instead of "insert" to 
@@ -90,3 +90,10 @@ def safe_upsert(supabase, records):
     print(f"\nRows effected: {response}\n")
     
 safe_upsert(supabase, records)
+
+# Idempotency 01
+
+# Idempotency preserves pipeline data by not duplicating it. If data fails to load while 
+# running the pipeline, idempotency will prevent the original data from being lost.
+# Example: Retrying a failed sudoku game (hits max mistakes) with idempotency updating 
+# the existing record instead of duplicating it.
