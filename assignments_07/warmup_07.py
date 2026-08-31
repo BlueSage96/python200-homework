@@ -69,14 +69,6 @@ def get_current_time() -> str:
     '''Return the current local time as a formatted string.'''
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-# Prediction:
-
-# Calling run_agent("Convert 100 degrees Celsius to Fahrenheit") should NOT
-# trigger a tool call because the only available tool is get_current_time,
-# and the user is asking for a temperature conversion, not the current time.
-# The model should answer without using a tool, so only ONE API call should
-# be made.
-
 print(f"\nQ2:\n")
 
 # The prediction was correct if the model did not request get_current_time
@@ -170,6 +162,15 @@ def run_agent(user_prompt: str) -> str:
 
     # If there were no tool calls, the first response was already the final answer
     return first_message.content or ''
+
+
+# Prediction:
+
+# Calling run_agent("Convert 100 degrees Celsius to Fahrenheit") should NOT
+# trigger a tool call because the only available tool is get_current_time,
+# and the user is asking for a temperature conversion, not the current time.
+# The model should answer without using a tool, so only ONE API call should
+# be made.
 
 convert = run_agent("Convert 100 degrees Celsius to Fahrenheit")
 print("Conversion", convert)
@@ -721,7 +722,6 @@ SYSTEM_PROMPT = (
 
 messages = [{"role": "system", "content": SYSTEM_PROMPT}]
 result = run_agent_cycle(messages, "Load bike_commute.csv and compute the correlation between avg_traffic_density and avg_speed_kmh.")
-print("\nQ5 Final Agent Response:")
 print(result)
 
 # Q6
@@ -750,10 +750,87 @@ SYSTEM_PROMPT = (
     "Keep answers short and student-friendly."
 )
 
-
 # Q7
 print(f"\nQ7:\n")
 csv_manager = CsvManager(resources_dir=RESOURCES_DIR)
+
+@tool
+def list_csv_files() -> dict:
+    """List available CSV files in resources/.
+
+    Returns:
+        A dict with a "files" list, or a message if none are found.
+    """
+    return csv_manager.list_csv_files()
+
+
+@tool
+def load_csv(filename: str) -> dict:
+    """Load a CSV file from resources/ and make it the active dataset.
+
+    Args:
+        filename: CSV filename in resources/. You can pass "bike_commute" or "bike_commute.csv".
+
+    Returns:
+        A dict with a status message and column names, or an error dict.
+    """
+    return csv_manager.load_csv(filename)
+
+
+@tool
+def get_columns() -> list[str] | dict:
+    """Return column names for the currently loaded CSV.
+
+    Returns:
+        A list of column names, or an error dict if no CSV is loaded.
+    """
+    return csv_manager.get_columns()
+
+
+@tool
+def summarize_columns(columns: list[str] | None = None) -> dict:
+    """Return summary stats for selected columns (or all columns). 
+    This includes count, mean, std, min, max, and percentiles for numeric columns,
+    or count, unique, top, freq for categorical columns.
+
+    Args:
+        columns: Column names to summarize. If None, summarizes all columns.
+
+    Returns:
+        A dict of summary statistics (from pandas.describe), or an error dict.
+    """
+    return csv_manager.summarize_columns(columns)
+
+
+@tool
+def describe_column(column: str) -> dict:
+    """Describe a single column (basic stats) for the requested column.
+    This includes count, mean, std, min, max, and percentiles for numeric column,
+    or count, unique, top, freq for categorical column.
+
+    Args:
+        column: The name of the column to describe.
+
+    Returns:
+        A dict of basic stats for the column, or an error dict.
+    """
+    return csv_manager.describe_column(column)
+
+
+@tool
+def plot_data(y: str, x: str | None = None, plot_type: str = "line") -> str | dict:
+    """Plot from the active CSV.
+
+    Args:
+        y: Column name to plot on the y-axis. 
+        x: Column name to plot on the x-axis. If None, use row index.
+        plot_type: "line" or "scatter". Scatter requires x and y.
+
+    Returns:
+        Generates and shows the plot. 
+        Retirms a short success message string, or an error dict/string.
+    """
+    return csv_manager.plot_data(y=y, x=x, plot_type=plot_type)
 
 @tool
 def compute_correlation(col1: str, col2: str) -> dict:
@@ -780,6 +857,12 @@ print(compute_correlation.description)
 # the JSON schema manually.
 
 TOOLS = [
+    list_csv_files,
+    load_csv,
+    get_columns,
+    summarize_columns,
+    describe_column,
+    plot_data,
     compute_correlation
 ]
 

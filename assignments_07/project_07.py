@@ -24,23 +24,27 @@ df = None
 
 @tool
 def load_happiness_data() -> dict:
-    """Load the World Happiness dataset into memory.
+    """Load the World Happiness dataset.
 
-    If the merged happiness CSV exists in assignments_01/outputs,
-    load that file. Otherwise, load and combine the yearly CSV files
-    from the resources/happiness_project directory.
+    First attempts to load the merged happiness CSV from
+    assignments_01/outputs/merged_happiness.csv. If that file does not
+    exist, loads and combines the yearly CSV files from
+    assignments/resources/happiness_project/.
 
     Returns:
         A dictionary containing the shape and column names of the
-        loaded DataFrame, or an error message if no CSV files are found.
+        loaded dataset, or an error dictionary if no files are found.
     """
     global df
 
-    # Fallback path: yearly happiness CSV files in Assignment 07
-    data_path = DATA_PATH
-    
-    if MERGED_PATH.exists():
-        df = pd.read_csv(MERGED_PATH)
+    # Preferred path: Assignment 01 merged dataset
+    merged_path = Path("../assignments_01/outputs/merged_happiness.csv")
+
+    # Fallback path: Assignment resources
+    data_path = Path("resources/happiness_project/")
+
+    if merged_path.exists():
+        df = pd.read_csv(merged_path)
 
     else:
         happiness_files = [
@@ -51,11 +55,7 @@ def load_happiness_data() -> dict:
         if not happiness_files:
             return {"error": "No happiness files were found."}
 
-        dataframes = []
-
-        for file in happiness_files:
-            dataframes.append(pd.read_csv(file))
-
+        dataframes = [pd.read_csv(file) for file in happiness_files]
         df = pd.concat(dataframes, ignore_index=True)
 
     return {
@@ -138,7 +138,7 @@ def get_top_n_countries(column: str, year: int, n: int = 5) -> list[dict] | dict
     
     filtered_year = df[df["Year"] == year]  
     filtered_year = filtered_year.sort_values(by=column,ascending=False)
-    return filtered_year[["Year","Country",column]].head(n).to_dict("records") #get the first 5 countries
+    return filtered_year[["Country", column]].head(n).to_dict("records") #get the first 5 countries
 
 
 # Task 2
@@ -149,9 +149,12 @@ Use the available tools for loading data, summarizing columns, computing correla
 and ranking countries. Write Python code directly only when the tools are not sufficient
 (for example, when creating custom plots or computing something the tools don't cover).
 
-For custom plots, use the actual rows from the project's merged happiness CSV, not the
-metadata returned by load_happiness_data(). Never invent, simulate, randomize, or
-substitute data. Use the actual column names and values from the CSV.
+For custom plots, DO NOT call load_happiness_data() to get the DataFrame.
+load_happiness_data() returns metadata only (shape and columns).
+Read the actual merged CSV directly with pandas:
+../assignments_01/outputs/merged_happiness.csv
+Use the actual rows and values from that CSV.
+Never invent, simulate, randomize, or substitute data.
 
 For regional happiness plots, group the actual rows by Year and Regional indicator and
 calculate the mean Happiness score for each group. Only create files explicitly requested by the user. 
@@ -174,61 +177,83 @@ queries = [
     "Summarize the Happiness score column.",
     "What is the correlation between GDP per capita and Happiness score? Is it statistically significant?",
     "Show me the top 5 happiest countries in 2020.",
-    "Plot Happiness score over the years as a line chart, with one line per Regional indicator. Save the plot to outputs/happiness_by_region.png.",
+    "Plot Happiness score over the years as a line chart, with one line per Regional indicator. Save the plot to outputs/happiness_by_region.png."
 ]
 
 # Task 4
+
 # My query 1
-my_query_1 = "Show me the top 5 least happiest countries in 2018."   # replace with your question
-# Comment: Both code use and the get_top_n_countries tool.
+my_query_1 = """
+            Show me the top 5 least happiest countries in 2018.
+            Use the actual data from ../assignments_01/outputs/merged_happiness.csv.
+            Sort Happiness score in ascending order and return the five countries with the lowest scores.
+            """
+# Comment: The agent should use Python/pandas to sort Happiness score
+# in ascending order because get_top_n_countries() returns the highest values.
 
 # My query 2
-my_query_2 = "Create a bar chart for Healthy life expectancy vs Happiness score for the top two (highest happiness scores) and bottom two (lowest happiness scores) countries. Make sure to list each country and not 'Country 1', etc. Save the chart to outputs/happiness_life_expectancy.png."   # replace with your question
+
+my_query_2 = """
+Create a bar chart for Healthy life expectancy vs Happiness score for the top two
+(highest happiness scores) and bottom two (lowest happiness scores) countries.
+
+Use the actual data from ../assignments_01/outputs/merged_happiness.csv.
+Do not use load_happiness_data() as the DataFrame because it only returns metadata.
+
+Use pandas to:
+1. Load the actual CSV.
+2. Find the two countries with the highest Happiness score.
+3. Find the two countries with the lowest Happiness score.
+4. Get the actual Healthy life expectancy and Happiness score values for those four countries.
+5. Label the chart with the actual country names.
+6. Create the bar chart comparing Healthy life expectancy and Happiness score.
+7. Save it to outputs/happiness_life_expectancy.png.
+
+Do not invent, simulate, or substitute any values.
+"""
+
 # Comment: Code generation only.
 
-# Task 5
-
-# --- Reflection ---
-#
-# 1. In Query 3, how did the agent communicate whether the correlation was statistically
-#    significant? Did it use the p-value correctly? What threshold did it apply?
-#
-#    The agent used the compute_correlation tool, which returned both the Pearson
-#    correlation coefficient and p-value. It used a p-value threshold of 0.05 to
-#    determine statistical significance. Since the p-value was below 0.05, the agent
-#    correctly identified the correlation between GDP per capita and Happiness score
-#    as statistically significant.
-
-
-# 2. Did any of the agent's responses surprise you — either by being more capable than
-#    you expected, or less? Describe one specific example.
-#
-#    I was surprised by how the agent could use multiple tools in sequence to answer
-#    one question. For example, when I asked it to load bike_commute.csv and calculate
-#    a correlation in the warmup, it first found the CSV, loaded it, and then used the
-#    correlation tool to calculate the result. This showed me that an agent can decide
-#    which tools it needs and use their results to complete a larger task.
-
-
-# 3. What one additional tool would make this agent meaningfully more useful?
-#    Describe what it would do and what kind of question it would help the agent answer.
-#    (You do not need to implement it.)
-#
-#    An additional data-visualization tool would make this agent more useful. It could
-#    create and save common charts while automatically using appropriate axis labels,
-#    titles, legends, and other formatting. This would help with questions that ask
-#    the agent to visualize relationships or trends in the World Happiness dataset,
-#    such as comparing happiness scores across countries or regions.
 
 if __name__ == "__main__":
-    
+    # Task 3 queries
     for query in queries:
         print(f"\n--- Query: {query} ---")
         response = agent.run(query, reset=False)
         print(f"Task 3: {response}")
     
+    # Task 4 queries
     response_1 = agent.run(my_query_1, reset=False)
     print(f"Task 4 response 01: {response_1}")
     
     response_2 = agent.run(my_query_2, reset=False)
     print(f"Task 4 response 02: {response_2}")
+    
+# Task 5
+
+# --- Reflection ---
+
+# 1. In Query 3, how did the agent communicate whether the correlation
+#    was statistically significant? Did it use the p-value correctly?
+#    What threshold did it apply?
+#
+# The agent used the p-value returned by compute_correlation to determine
+# statistical significance. It compared the p-value to 0.05. A p-value
+# below 0.05 was treated as statistically significant.
+
+
+# 2. Did any of the agent's responses surprise you?
+#    Describe one specific example.
+#
+# I was surprised that the agent could use multiple tools in sequence.
+# For example, it could load the dataset and then use the loaded data
+# to calculate the requested correlation without me manually writing
+# the pandas code.
+
+
+# 3. What one additional tool would make this agent meaningfully more useful?
+#
+# A plot-saving tool would make the agent more useful. It could accept
+# the data, chart type, labels, and output path and reliably save the
+# requested chart. This would help with questions that require creating
+# and saving visualizations.
