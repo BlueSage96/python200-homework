@@ -73,10 +73,10 @@ print(f"Rows in weather_raw: {count_response.count}\n")
 
 # First & last record
 earliest = supabase.table("weather_raw").select("*").order("date", desc=False).limit(1).execute()
-latest = supabase.table("weather_raw").select("*").order("date",desc=True).execute()
+latest = supabase.table("weather_raw").select("*").order("date",desc=True).limit(1).execute()
 specific_date = supabase.table("weather_raw").select("*").eq("date", "2023-07-04").execute()
 
-# Handle if 07/04/2026 is missing
+# Handle if 07/04/2023 is missing
 if specific_date.data:
     print(f"Record for July 4, 2023: {specific_date.data}\n")
 
@@ -87,5 +87,5 @@ else:
     )
     print(f"July 4, 2023 was missing. Nearby records: {nearest.data}\n")
 
-print(f"Earliest record: {earliest.data}\n")
-print(f"Last record: {latest.data}\n")
+print(f"Earliest date: {earliest.data}\n")
+print(f"Last date: {latest.data}\n")

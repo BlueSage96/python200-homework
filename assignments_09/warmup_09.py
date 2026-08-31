@@ -3,7 +3,8 @@ from dotenv import load_dotenv
 from supabase import create_client
 from datetime import date
 
-# Connection 01
+# --- Supabase Connection ---
+# Q1
 
 # 1. supabase-py needs the Supabase project URL and API key to connect to the project.
 
@@ -14,7 +15,7 @@ from datetime import date
 #    GitHub repository because exposing credentials can allow unauthorized access to
 #    the Supabase project.
 
-# Connection 02
+# Q2
 
 def get_client():
     load_dotenv()  # reads .env and sets environment variables
@@ -27,7 +28,7 @@ def get_client():
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     return supabase
 
-# Connection 03
+# Q3
 
 # Row Level Security (RLS) is a Supabase/PostgreSQL security feature that controls
 # which rows users can access or modify based on policies.
@@ -37,28 +38,28 @@ def get_client():
 # course to simplify development and allow the Python program to insert and
 # access the weather data without creating additional RLS policies.
 
-# CRUD 01
+# --- CRUD ---
+# Q1
 
 def insert_test_record(supabase):
     record = {
-        "date":date.today().isoformat(),
+        "date": date.today().isoformat(),
         "temperature_2m_max": 16.3,
         "temperature_2m_min": 2.1,
-        "precipitation_sum":  0.7,
+        "precipitation_sum": 0.7,
         "wind_speed_10m_max": 15.5,
     }
     
     response = supabase.table("weather_raw").insert(record).execute()
     print(response.data)
 
-supabase = get_client()
-insert_test_record(supabase)
-
 # Running this function twice with insert() would cause a duplicate key error
 # because date is the primary key. Using upsert() instead would make the operation
 # safe to repeat by updating the existing row when the date already exists.
 
-# CRUD 02
+supabase = get_client()
+insert_test_record(supabase)
+# Q2
 
 def get_records_by_date_range(supabase, start, end):
     response = supabase.table("weather_raw").select("*").gte("date", start).lte("date", end).execute()
@@ -70,7 +71,7 @@ records = get_records_by_date_range(supabase, "2020-01-01", "2026-08-30")
 print(f"\n CRUD 02:\n")
 print(records)
 
-# CRUD 03
+# Q3
 
 # Using a plain "insert" can result in an error if the record already exists. 
 # Upsert inserts a new row if the key is new or updates the existing row if 
@@ -86,11 +87,12 @@ def safe_upsert(supabase, records):
     response = (
         supabase.table("weather_raw").upsert(records, on_conflict="date").execute()
     )
-    print(f"\nRows affected: {len(response).data}\n")
+    print(f"\nRows affected: {len(response.data)}\n")
     
 safe_upsert(supabase, records)
 
-# Idempotency 01
+# --- Idempotency ---
+# Q1
 
 # Idempotency is important in data pipelines because it allows a failed pipeline
 # to be safely restarted without creating duplicate records or corrupting data.
