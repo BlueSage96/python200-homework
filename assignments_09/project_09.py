@@ -1,4 +1,10 @@
 import requests
+import os
+from dotenv import load_dotenv
+from supabase import create_client
+
+load_dotenv()
+supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 
 # Step 01
 print(f"\nStep 01:\n")
@@ -41,3 +47,10 @@ print(f"Last record: {records[-1]}\n")
 print(f"All records: {len(records)} records")
 
 # I expected 365 records for each day and that's what printed out.
+
+# Step 03
+response = (
+    supabase.table("weather_raw").upsert(records, on_conflict="date").execute()
+)
+print(f"Upserted {len(response.data)} rows into weather_raw")
+# Idemptency is very important for ensuring data reliability, safe retries, and efficiency.
