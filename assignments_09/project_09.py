@@ -1,3 +1,5 @@
+# Video: https://youtu.be/9OdlDQxDSMI
+
 import requests
 import os
 from dotenv import load_dotenv
