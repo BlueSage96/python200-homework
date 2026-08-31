@@ -1,48 +1,47 @@
 import os
 from dotenv import load_dotenv
 from supabase import create_client
+from datetime import date
 
 # Connection 01
 
-# 1. supabase-py needs the supabase url and key to connect to the project.
+# 1. supabase-py needs the Supabase project URL and API key to connect to the project.
 
-# 2. Both the supabase url can be accessed by hovering over the settings (gear icon) 
-#    and selecting "Project Settings". The url is the "Project ID".
+# 2. The Supabase project URL can be found in Project Settings under the API section.
+#    The API key can also be found in the API section of the Supabase dashboard.
 
-#    The supabase key can be found by clicking on "API keys" on the project's 
-#    main dashboard under the "Get Connected".
-
-#   We should never commit a key to a public GitHub repository because it can be scraped 
-#   within minutes by automated bots. 
+#    These values should not be hardcoded in the source code or committed to a public
+#    GitHub repository because exposing credentials can allow unauthorized access to
+#    the Supabase project.
 
 # Connection 02
 
 def get_client():
-    if load_dotenv():  # reads .env and sets environment variables
-        print('Successfully loaded environment varables from .env')
-    else:
-        print('Warning: could not load environment variables from .env')
-        
+    load_dotenv()  # reads .env and sets environment variables
     SUPABASE_URL = os.getenv("SUPABASE_URL")
-    SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    SUPABASE_KEY = os.getenv("SUPABASE_KEY")   
     
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        raise ValueError("Missing SUPABASE_URL or SUPABASE_KEY environment variable")
+        
+    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     return supabase
 
 # Connection 03
 
-# Row Level Security (RLS) dictates what table rows a use can access. 
-# RLS is an important production feature, but it adds complexity during development. 
+# Row Level Security (RLS) is a Supabase/PostgreSQL security feature that controls
+# which rows users can access or modify based on policies.
 
-# A real-world use case would be making an important distinction between the admin and 
-# regular users in an app. The admin can access all of the data in the app while 
-# regular users can only see the data they created.
+# RLS is normally important in production applications because it can restrict
+# users to only the data they are authorized to access. It is disabled for this
+# course to simplify development and allow the Python program to insert and
+# access the weather data without creating additional RLS policies.
 
 # CRUD 01
 
 def insert_test_record(supabase):
     record = {
-        "date":"2026-08-30",
+        "date":date.today().isoformat(),
         "temperature_2m_max": 16.3,
         "temperature_2m_min": 2.1,
         "precipitation_sum":  0.7,
@@ -55,9 +54,9 @@ def insert_test_record(supabase):
 supabase = get_client()
 insert_test_record(supabase)
 
-# Running the function twice creates a 'duplicate key' error.
-# Would use "upsert" in the function instead of "insert" to 
-# make repeated calls safe.
+# Running this function twice with insert() would cause a duplicate key error
+# because date is the primary key. Using upsert() instead would make the operation
+# safe to repeat by updating the existing row when the date already exists.
 
 # CRUD 02
 
@@ -87,13 +86,17 @@ def safe_upsert(supabase, records):
     response = (
         supabase.table("weather_raw").upsert(records, on_conflict="date").execute()
     )
-    print(f"\nRows effected: {response}\n")
+    print(f"\nRows affected: {len(response).data}\n")
     
 safe_upsert(supabase, records)
 
 # Idempotency 01
 
-# Idempotency preserves pipeline data by not duplicating it. If data fails to load while 
-# running the pipeline, idempotency will prevent the original data from being lost.
-# Example: Retrying a failed sudoku game (hits max mistakes) with idempotency updating 
-# the existing record instead of duplicating it.
+# Idempotency is important in data pipelines because it allows a failed pipeline
+# to be safely restarted without creating duplicate records or corrupting data.
+# If a pipeline crashes halfway through loading data and is restarted, an idempotent
+# operation can update existing records instead of inserting duplicates.
+
+# Example: A Sudoku game update fails after the game reaches the maximum number
+# of mistakes. When the update is retried, idempotency ensures the existing game
+# record is updated instead of creating a duplicate game record.
