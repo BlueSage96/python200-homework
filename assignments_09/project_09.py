@@ -1,4 +1,4 @@
-# Video: https://youtu.be/9OdlDQxDSMI
+# Video: https://youtu.be/eeVxkfCbV1U
 
 import requests
 import os
@@ -88,4 +88,4 @@ else:
     print(f"July 4, 2023 was missing. Nearby records: {nearest.data}\n")
 
 print(f"Earliest date: {earliest.data}\n")
-print(f"Last date: {latest.data}\n")
+print(f"Lastest date: {latest.data}\n")
