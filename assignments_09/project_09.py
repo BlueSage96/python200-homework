@@ -6,7 +6,7 @@ from supabase import create_client
 load_dotenv()
 supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 
-# Step 01
+# Step 01: Extract
 print(f"\nStep 01:\n")
 
 url = "https://archive-api.open-meteo.com/v1/archive"
@@ -28,7 +28,7 @@ response.raise_for_status()
 data = response.json()
 print(f"{data}\n")
 
-# Step 02
+# Step 02: Transform
 print(f"\nStep 02:\n")
 
 daily = data["daily"]
@@ -48,9 +48,27 @@ print(f"All records: {len(records)} records")
 
 # I expected 365 records for each day and that's what printed out.
 
-# Step 03
+# Step 03: Load
+print(f"\nStep 03:\n")
+
 response = (
     supabase.table("weather_raw").upsert(records, on_conflict="date").execute()
 )
-print(f"Upserted {len(response.data)} rows into weather_raw")
+print(f"Upserted {len(response.data)} rows into weather_raw\n")
 # Idemptency is very important for ensuring data reliability, safe retries, and efficiency.
+
+# Step 04: Verify
+print(f"\nStep 04:\n")
+
+# row count
+count_response = supabase.table("weather_raw").select("date", count="exact").execute()
+print(f"Rows in weather_raw: {count_response.count}\n")
+
+# First & last record
+first = supabase.table("weather_raw").select("*").eq("date","2023-01-01").execute()
+last = supabase.table("weather_raw").select("*").eq("date", "2023-12-31").execute()
+specific_date = supabase.table("weather_raw").select("*").eq("date", "2023-07-04").execute()
+
+print(f"First record: {first.data}\n")
+print(f"Last record: {last.data}\n")
+print(f"Record for July 4, 2023: {specific_date.data}\n")
