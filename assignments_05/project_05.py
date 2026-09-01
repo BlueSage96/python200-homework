@@ -87,8 +87,16 @@ def rewrite_bullets(bullets: list[str]) -> list[dict]:
     """
     messages = [{"role": "user", "content": prompt}]
     response = get_completion(messages,temperature=0)
+    
+    try:
+        result = json.loads(response)
 
-    result = json.loads(response)
+    except json.JSONDecodeError:
+        print("Error: Unable to parse the model's response as JSON.")
+        print("Raw response:")
+
+        print(response)
+        return []
     
     for bullet in result:
         print(f"Original: {bullet['original']:<55} | Improved: {bullet['improved']}")
@@ -269,11 +277,9 @@ If you do not know industry-specific expectations, tell the user to use their ow
 
             assistant_reply = "Here are your improved resume bullet points:\n\n"
 
-            assistant_reply = "Here are your revised resume bullet points:\n\n"
-
             for bullet in new_raw_bullets:
                 assistant_reply += (
-                    f"Original : {bullet['original']}\n"
+                    f"Original: {bullet['original']}\n"
                     f"Improved: {bullet['improved']}\n\n"
                 )
 
@@ -289,10 +295,6 @@ If you do not know industry-specific expectations, tell the user to use their ow
             job_title = input("Job Application Helper: What is the job title? ").strip()
             background = input("Job Application Helper: Briefly describe your background: ").strip()
 
-            messages.append({
-                "role": "user",
-                "content": f"Job title: {job_title}\nBackground: {background}"
-            })
             letter = generate_cover_letter(job_title, background)
             print(f"\nJob Application Helper:\n{letter}")
 

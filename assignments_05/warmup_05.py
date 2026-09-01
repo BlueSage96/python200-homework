@@ -166,7 +166,7 @@ print("Zero Shot")
 z = 0
 for r in reviews:
     z += 1
-    prompt = f"""Classify the sentiment of this review as Positive, Negative, or Mixed.
+    prompt = f"""Classify the sentiment of this review as positive, negative, or mixed.
                 Review: "{r}"
                 Sentiment:
             """
@@ -212,15 +212,15 @@ for r in reviews:
 
         Example 1:
         Review: "The staff was friendly and solved my issue quickly."
-        Sentiment: Positive
+        Sentiment: positive
 
         Example 2:
         Review: "The software crashes every time I try to save my work."
-        Sentiment: Negative
+        Sentiment: negative
 
         Example 3:
         Review: "The price was excellent, but the instructions were difficult to follow."
-        Sentiment: Mixed
+        Sentiment: mixed
 
         Now classify this review:
 
@@ -250,17 +250,34 @@ for r in reviews:
 
 # Prompt 04 - Chain of Thought
 prompt = f"""
-    Show your step-by-step reasoning, then give the final answer on its own line labelled: Final answer: <value>
+    Provide a brief explanation, then give the final answer on its own line labelled: Final answer: 
     
     Problem: A data engineer earns $85,000 per year. She gets a 12% raise, then 6 months later
     takes a new job that pays $7,500 more per year than her post-raise salary.
     What is her final annual salary?
 """
 response = get_completion(prompt, temperature=0)
-print(f"Chain of thought:\n{response}")
 
-# The bot is automatically built to give output but not to list it's reasoning.
-# The output allows the developers to correct any mistakes.
+print("Raw response:")
+print(response)
+
+try:
+    result = json.loads(response)
+
+    print("Sentiment:", result["sentiment"])
+    print("Confidence:", result["confidence"])
+    print("Reason:", result["reason"])
+
+except json.JSONDecodeError:
+    print("Error: Unable to parse the model's response as JSON.")
+    print("Raw response:")
+    print(response)
+
+'''
+The brief explanation helps show how the model reached the answer and makes the calculation
+easier to verify. Asking for the final answer on its own labeled line also makes the result
+easy to identify.
+'''
 
 # Prompt 05 - Structured Output
 
