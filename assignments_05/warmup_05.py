@@ -258,20 +258,9 @@ prompt = f"""
 """
 response = get_completion(prompt, temperature=0)
 
+print(f"\nPrompt 04:\n")
 print("Raw response:")
 print(response)
-
-try:
-    result = json.loads(response)
-
-    print("Sentiment:", result["sentiment"])
-    print("Confidence:", result["confidence"])
-    print("Reason:", result["reason"])
-
-except json.JSONDecodeError:
-    print("Error: Unable to parse the model's response as JSON.")
-    print("Raw response:")
-    print(response)
 
 '''
 The brief explanation helps show how the model reached the answer and makes the calculation
@@ -365,6 +354,7 @@ model responded with exactly "No steps provided." as instructed.
 prompt = f"""
 Review: Explain what a large language model is in two sentences.
 """
+# OpenAI response
 response = get_completion(prompt, temperature=0)
 print(f"\nOpenAI response:\n {response}")
 
