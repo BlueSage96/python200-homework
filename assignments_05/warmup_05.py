@@ -2,7 +2,10 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import json
 
+# --- Completions API ---
+
 #API 01
+
 load_dotenv()
 client = OpenAI()
 
@@ -17,7 +20,8 @@ print(f"Response: \n{response.choices[0].message.content}")
 print(f"\nModel: {response.model}")
 print(f"\nTotal tokens:{response.usage.total_tokens}")
 
-#API 02
+# API 02
+
 print(f"\nAPI 02:\n")
 
 prompt = "Suggest a creative name for a data engineering consultancy"
@@ -57,6 +61,7 @@ print(f"\nTemperature 3:\n{response_temp3.choices[0].message.content}")
 '''
 
 # API 03
+
 response = client.chat.completions.create(
     model="gpt-4o-mini",
     messages=[{"role":"user","content":"Give me a one-sentence fun fact about pandas (the animal, not the library)"}],
@@ -69,6 +74,7 @@ for r in response.choices:
     print(f"\nResponse:\n{r.message.content}")
     
 # API 04
+
 response = client.chat.completions.create(
     model="gpt-4o-mini",
     messages=[{"role":"user","content":"Explain how neural networks work"}],
@@ -86,7 +92,10 @@ print(f"Neural networks response:\n{response.choices[0].message.content}")
     and prevents the model from generating more text than an application needs.
 '''
 
+# --- Systems ---
+
 # System Question 01
+
 messages = [
     {"role": "system", "content": 
         """
@@ -122,6 +131,7 @@ print(f"Personality 02:\n{response2.choices[0].message.content}")
 
 
 # System Question 02
+
 print(f"\nSystem 02:\n")
 messages3 = [
     {"role": "system", "content": "You are a helpful assistant."},
@@ -153,7 +163,10 @@ def get_completion(prompt: str, model="gpt-4o-mini", temperature=0):
     )
     return response.choices[0].message.content
 
+# --- Prompt Engineering ---
+
 # Prompt 01 - Zero Shot
+
 reviews = [
     "The onboarding process was smooth and the team was welcoming.",
     "The software crashes constantly and support never responds.",
@@ -174,6 +187,7 @@ for r in reviews:
     print(f"Review {z}:\n{response}")
     
 # Prompt 02 - One Shot
+
 print(f"\nPrompt 02:\n")
 print("One-Shot")
 o = 0
@@ -250,7 +264,7 @@ for r in reviews:
 
 # Prompt 04 - Chain of Thought
 prompt = f"""
-    Provide a brief explanation, then give the final answer on its own line labelled: Final answer: 
+    Provide a brief step-by-step explanation, then give the final answer on its own line labelled: Final answer:
     
     Problem: A data engineer earns $85,000 per year. She gets a 12% raise, then 6 months later
     takes a new job that pays $7,500 more per year than her post-raise salary.
@@ -349,6 +363,8 @@ The first prompt was correctly converted into a numbered list because it contain
 step-by-step instructions. The second prompt was recognized as prose, and the
 model responded with exactly "No steps provided." as instructed.
 '''
+
+# --- Ollama ---
 
 # Ollama 01
 prompt = f"""
