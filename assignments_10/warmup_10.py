@@ -42,3 +42,15 @@ Data manipulation is involved so using deterministic code is the best move.
 
 Data manipulation is best used for this scenario since there is no training nor predictions involved.
 """
+
+# ML/LLM Q3
+
+"""
+Incremental processing only classifies records that have not been enriched. If the
+data is rewritten, if something went wrong with the LLM during the last run, the data could be corrupted.
+If the orignal records are not backed up, that information may be lost forever. 
+
+For this project, there only needs to be 365 records per year. If there is no incremental processing,
+those records are repeatedly ran with inaccurate data possibly replacing the original data. As a result,
+the weather model would be trained on bad data and will not work as expected.
+"""
