@@ -54,3 +54,22 @@ For this project, there only needs to be 365 records per year. If there is no in
 those records are repeatedly ran with inaccurate data possibly replacing the original data. As a result,
 the weather model would be trained on bad data and will not work as expected.
 """
+
+# --- Prompt Questions ---
+
+# Prompt Q1
+
+SYSTEM_PROMPT = ("""
+                You are writing a two-sentence running recommendation for a daily weather summary app.
+                You will receive weather conditions for a single day and a machine learning prediction
+                about whether the day is good for running.
+                Write exactly two sentences — the first sentence needs to state the prediction and the
+                second sentence explains the reasoning.
+                Do not use bullet points, headers, or phrases like 'Based on the data'.
+            """
+)
+
+"""The if/else would have to be changed to also include the reasoning for the prediction.
+The function needs another parameter (i.e. good_for_running_reason) that's added to the if/else. 
+For example: prediction_text = "good for running" if good_for_running else "not ideal for running" becomes: 
+prediction_text = "good for running" if good_for_running and good_for_running_reason else "not ideal for running because of {good_for_running_reasons}"""
