@@ -1,4 +1,10 @@
+import os
+import time
+from dotenv import load_dotenv
+from openai import OpenAI
 
+load_dotenv()
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 # --- ML/LLM Questions ---
 
@@ -73,3 +79,33 @@ SYSTEM_PROMPT = ("""
 The function needs another parameter (i.e. good_for_running_reason) that's added to the if/else. 
 For example: prediction_text = "good for running" if good_for_running else "not ideal for running" becomes: 
 prediction_text = "good for running" if good_for_running and good_for_running_reason else "not ideal for running because of {good_for_running_reasons}"""
+
+# Prompt Q2
+
+print(f"Prompt 02\n")
+def call_with_retry(client, messages, max_retries=3):
+    for retries in range(max_retries):
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages = [
+                    {"role": "system", "content": SYSTEM_PROMPT}, 
+                    { "role":"user", "content": messages}
+                ],
+                max_tokens = max_retries
+            )
+            return response
+        except Exception:
+            if retries < max_retries - 1:
+                time.sleep(2)
+
+    return None
+
+messages = """Give me a prediction weather for January 01, 2027 in Raleigh, North Carolina. 
+Tell me the reasoning for your prediction."""
+
+retry = call_with_retry(client,messages,3)
+print(retry)
+
+# In production, retry logic can be useful when an API request fails temporarily
+# because of a network issue, timeout, or short-lived service error.
