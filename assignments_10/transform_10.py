@@ -141,3 +141,14 @@ def validate_summary(text):
     if len(sentences) > 2:
         return None
     return text
+
+# Step Q4
+print(f"\nStep Q4:\n")
+
+# upsert to weather_enriched once records have an llm_summary
+response = (
+    supabase.table("weather_enriched")
+    .upsert(enrichment_records, on_conflict="date")
+    .execute()
+)
+print(f"Upserted {len(response.data)} rows into weather_enriched")
