@@ -4,10 +4,12 @@ import pandas as pd
 
 import joblib
 from dotenv import load_dotenv
+from openai import OpenAI
 from supabase import create_client
 
 load_dotenv()
 supabase = create_client(os.getenv("SUPABASE_URL"),os.getenv("SUPABASE_KEY"))
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 # --- Steps ---
 
@@ -68,11 +70,74 @@ print(f"Skip days: {len(skip_days)}")
 
 # Show a few high-confidence and borderline predictions
 enrichment_records.sort(key=lambda r: r["confidence"], reverse=True)
-print("\nHighest confidence (good for running):")
+print("\nHighest confidence (good for running):\n")
 for r in enrichment_records[:3]:
     print(f"  {r['date']}: {r['confidence']:.3f}")
 
 enrichment_records.sort(key=lambda r: abs(r["confidence"] - 0.5))
-print("\nMost borderline (closest to 0.5 confidence):")
+print("\nMost borderline (closest to 0.5 confidence):\n")
 for r in enrichment_records[:3]:
     print(f"  {r['date']}: {r['confidence']:.3f}")
+    
+# Step Q3
+
+print(f"\nStep Q3:\n")
+
+# Prompt
+SYSTEM_PROMPT = (
+    "You are writing a one-sentence running recommendation for a daily weather summary app. "
+    "You will receive weather conditions for a single day and a machine learning prediction "
+    "about whether the day is good for running. "
+    "Write exactly one sentence — direct, practical, and specific to the conditions. "
+    "Do not use bullet points, headers, or phrases like 'Based on the data'."
+)
+
+def make_user_message(row, good_for_running, confidence):
+    prediction_text = "good for running" if good_for_running else "not ideal for running"
+    return (
+        f"Date: {row['date']}\n"
+        f"High: {row['temperature_2m_max']}°C, Low: {row['temperature_2m_min']}°C\n"
+        f"Precipitation: {row['precipitation_sum']} mm\n"
+        f"Max wind speed: {row['wind_speed_10m_max']} km/h\n"
+        f"Model prediction: {prediction_text} (confidence: {confidence:.0%})"
+    )
+
+# raw_rows is the original list of dicts from weather_raw
+# enrichment_records is the list from the ML step, indexed in the same order
+
+for i, record in enumerate(enrichment_records):
+    raw_row = next(r for r in to_classify if r["date"] == record["date"])
+    
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {
+                "role": "user",
+                "content": make_user_message(
+                    raw_row,
+                    record["good_for_running"],
+                    record["confidence"]
+                )
+            }
+        ],
+        max_tokens=100
+    )
+    summary = response.choices[0].message.content.strip()
+    record["llm_summary"] = summary
+    
+    # Fallback string & progress print every 50 records
+    if (i + 1) % 50 == 0:
+        print(f"\nEnriched {i + 1} / {len(enrichment_records)} records...")
+        
+# Handle unexpected responses
+def validate_summary(text):
+    text = text.strip()
+    if not text:
+        return None
+    # Reject if more than two sentences
+    sentences = [s for s in text.split(".") if s.strip()]
+    
+    if len(sentences) > 2:
+        return None
+    return text
