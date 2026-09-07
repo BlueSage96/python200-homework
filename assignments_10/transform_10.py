@@ -175,3 +175,20 @@ good_count = (
 )
 
 print(f"Good-for-running days in weather_enriched {good_count.count}")
+
+# Step Q6
+"""
+1. The classifier was trained on my selected city not Charlotte. 
+   If another city was loaded, I expect the classifier's information
+   would be less accurate and the numbers for the predictions and 
+   "good_for_running" days would be significantly different.
+   
+2. The current one-sentence recommendation does not allow the LLM
+   to "override" the classifier as an override will need to have 
+   a longer description that may not fit into a single sentence.
+   
+3.  The cost would be the main concern especially if more tokens
+    have to be used. I would space out the processing by a few hours
+    and only handle 1000 records at a time. Another idea would be to
+    choose a cheaper service to handle the records with.
+"""
