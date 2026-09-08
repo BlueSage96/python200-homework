@@ -7,6 +7,10 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from supabase import create_client
 
+# Robust wherever Python launches
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.path.join(BASE_DIR, "models")
+
 load_dotenv()
 supabase = create_client(os.getenv("SUPABASE_URL"),os.getenv("SUPABASE_KEY"))
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
@@ -39,7 +43,7 @@ if to_classify:
     print(f"\nStep Q2:\n")
 
     # Build the feature DataFrame
-    with open("models/weather_classifier_metadata.json") as f:
+    with open(os.path.join(MODEL_DIR, "weather_classifier_metadata.json")) as f:
         metadata = json.load(f)
         
     FEATURES = metadata["features"]
@@ -47,7 +51,7 @@ if to_classify:
     X = df[FEATURES]
 
     # Predict & predict probabilities
-    clf = joblib.load("models/weather_classifier.pkl")
+    clf = joblib.load(os.path.join(MODEL_DIR, "weather_classifier.pkl"))
     predictions = clf.predict(X) #array of 0s & 1s
     probabilities = clf.predict_proba(X)[:,1] # Probability of class 1 (good for running])
 
@@ -135,7 +139,7 @@ if to_classify:
             record["llm_summary"] = "Recommendation unavailable."
             
         # Fallback string & progress print every 50 records
-        if (i + 1) % 50 == 0:
+        if (i + 1) % 50 == 0 or (i + 1) == len(enrichment_records):
             print(f"\nEnriched {i + 1} / {len(enrichment_records)} records...")
 
     # Step Q4
@@ -160,9 +164,9 @@ for row in check.data:
     print(
         f"{row['date']} | "
         f"good={row['good_for_running']} | "
-        f"conf={row['confidence']:.2f}"
-        )
-    print(row["llm_summary"])
+        f"conf={row['confidence']:.2f} | "
+        f"summary={row['llm_summary']}"
+    )
     
 #count how many records were classified as good
 good_count = (
@@ -172,7 +176,14 @@ good_count = (
     .execute()
 )
 
+total_count = (
+    supabase.table("weather_enriched")
+    .select("date", count="exact")
+    .execute()
+)
+
 print(f"Total good-for-running days: {good_count.count}")
+print(f"Total rows in weather_enriched: {total_count.count}")
 
 # Step Q6
 
@@ -182,6 +193,8 @@ print(f"Total good-for-running days: {good_count.count}")
 # when weather patterns differ significantly from the training data. In this
 # pipeline, the LLM does not override the classifier because good_for_running is
 # set by the machine learning model, while the LLM only adds a natural-language
-# summary. This makes the LLM transform additive rather than authoritative. At a
-# larger scale, I would also use incremental processing so previously enriched
-# records are not sent through the classifier and LLM again unnecessarily.
+# summary. This makes the LLM transform additive rather than authoritative. If
+# the pipeline processed 50,000 records, my main concern would be the cost and
+# time required to make that many LLM API calls. Incremental processing would
+# help by preventing previously enriched records from being unnecessarily sent
+# through the classifier and LLM again.

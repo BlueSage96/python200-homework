@@ -47,17 +47,16 @@ client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 # ML/LLM Q3
 
-"""
-Incremental processing prevents the pipeline from processing records that
-have already been enriched. Without it, rerunning the pipeline could send
-all 365 weather records to the LLM again, creating unnecessary API calls
-and additional cost.
+# Incremental processing prevents the pipeline from processing records that
+# have already been enriched. Without it, rerunning the pipeline could send
+# all 365 weather records to the LLM again, creating unnecessary API calls
+# and additional cost.
 
-It could also overwrite existing enrichment results even though the raw
-weather data has not changed. Processing only new records makes the pipeline
-more efficient and helps preserve the correctness of data that has already
-been processed successfully.
-"""
+# It could also overwrite existing enrichment results even though the raw
+# weather data has not changed. Processing only new records makes the pipeline
+# more efficient and helps preserve the correctness of data that has already
+# been processed successfully.
+
 
 # --- Prompt Questions ---
 
@@ -79,6 +78,11 @@ SYSTEM_PROMPT = ("""
 # supplied weather conditions. The existing weather values and classifier
 # prediction already provide the LLM with the information it needs to explain
 # its reasoning, so an additional reasoning parameter is not required.
+
+# The validation logic would also need to change because it should verify that
+# the LLM returned exactly two sentences instead of one. The sentence-count
+# check would need to accept two sentences as valid and reject responses that
+# contain fewer or more than two sentences.
 
 # Prompt Q2
 
