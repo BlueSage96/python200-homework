@@ -186,6 +186,16 @@ total_count = (
 print(f"Total good-for-running days: {good_count.count}")
 print(f"Total rows in weather_enriched: {total_count.count}")
 
+# The LLM summaries generally reflect the weather features and the model's
+# prediction accurately. The November 6 summary is particularly good because
+# it clearly connects the mild temperatures, lack of rain, and light winds to
+# the model's good-for-running prediction. The March 6 summary seems weaker
+# because it describes a confidence of 0.50 as "low confidence" and tells the
+# user to exercise caution even though the model classified the day as good
+# for running. This may have happened because the LLM interpreted the confidence
+# value too strongly instead of treating 0.50 as an uncertain or borderline
+# prediction.
+
 # Step Q6
 
 # The classifier was trained using weather data from my hometown, so I would be
