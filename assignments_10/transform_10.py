@@ -21,6 +21,10 @@ client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 response = supabase.table("weather_raw").select("*").execute()
 raw_rows = response.data
 
+with open(os.path.join(MODEL_DIR, "weather_classifier_metadata.json")) as f:
+    metadata = json.load(f)
+        
+
 # Step Q1
 print(f"\nStep Q1:\n")
 
@@ -43,9 +47,6 @@ if to_classify:
     print(f"\nStep Q2:\n")
 
     # Build the feature DataFrame
-    with open(os.path.join(MODEL_DIR, "weather_classifier_metadata.json")) as f:
-        metadata = json.load(f)
-        
     FEATURES = metadata["features"]
     df = pd.DataFrame(to_classify)
     X = df[FEATURES]

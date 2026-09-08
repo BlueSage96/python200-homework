@@ -105,8 +105,16 @@ def call_with_retry(client, messages, max_retries=3):
 
     return None
 
-messages = """Give me a prediction weather for January 01, 2027 in Raleigh, North Carolina. 
+messages = [
+    {"role": "system", "content": SYSTEM_PROMPT},
+    {
+        "role": "user",
+        "content": """Give me a weather prediction for January 01, 2027 in Raleigh, North Carolina.
 Tell me the reasoning for your prediction."""
+    }
+]
+
+response = call_with_retry(client, messages)
 
 retry = call_with_retry(client,messages,3)
 print(retry)
