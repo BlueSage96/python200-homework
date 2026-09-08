@@ -158,6 +158,13 @@ else:
     
 # Step 05
 print(f"\nStep Q5:\n")
+total_count = (
+    supabase.table("weather_enriched")
+    .select("date", count="exact")
+    .execute()
+)
+print(f"Total rows in weather_enriched: {total_count.count}")
+
 
 # Confirm weather_enriched results
 check = supabase.table("weather_enriched").select("*").limit(5).execute()
@@ -177,14 +184,7 @@ good_count = (
     .execute()
 )
 
-total_count = (
-    supabase.table("weather_enriched")
-    .select("date", count="exact")
-    .execute()
-)
-
 print(f"Total good-for-running days: {good_count.count}")
-print(f"Total rows in weather_enriched: {total_count.count}")
 
 # The LLM summaries generally reflect the weather features and the model's
 # prediction accurately. The November 6 summary is particularly good because
