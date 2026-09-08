@@ -10,55 +10,53 @@ client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 # ML/LLM Q1
 
-"""
-The ML classifier is best at fast, predictable predictions from the 
-structured data. For example, the ML classier can make predictions
-for good_for_running and confidence.
+# The ML classifier is best at fast, predictable predictions from the 
+# structured data. For example, the ML classier can make predictions
+# for good_for_running and confidence.
 
-The LLM is best at language, explanations, and judgment. It can
-be used to make human readable predictions such as, "Classify the sentiment. 
-Reply with exactly one word: positive, negative, or neutral."
+# The LLM is best at language, explanations, and judgment. It can
+# be used to make human readable predictions such as, "Classify the sentiment. 
+# Reply with exactly one word: positive, negative, or neutral."
 
-If the LLM was used to make predictions, it is possible that the data
-would unreadable to the model or even corrupted. If the ML was used 
-to make prompts, the data would be unreadable to a human or it gives
-inaccurate statements making it harder to properly train the model.
-"""
+# If the LLM was used to make predictions, it is possible that the data
+# would unreadable to the model or even corrupted. If the ML was used 
+# to make prompts, the data would be unreadable to a human or it gives
+# inaccurate statements making it harder to properly train the model.
+
 
 # ML/LLM Q2
 
-"""
-1. Converting a date string like "2023-07-04" to day-of-week
+# 1. Converting "2023-07-04" to a day of the week:
+# Deterministic code, because the answer follows a fixed calendar rule.
 
-I would use deterministic code since this is not a prediction or prompt command.
+# 2. Classifying a freeform job posting as entry-level, mid-level, or senior:
+# An LLM, because the task requires interpreting unstructured language and context.
 
-2. Classifying a job posting as "entry-level", "mid-level", or "senior" based on freeform text
+# 3. Predicting customer churn from 15 numeric features and labeled training data:
+# Machine learning, because this is a supervised prediction problem with
+# structured features and known labels.
 
-I would use a LLM because reading comprehension is required and judgment that rule-based code handles poorly.
+# 4. Normalizing city names such as "NYC" and "New York City":
+# Deterministic code, because known variants can be mapped to a canonical value
+# consistently without needing prediction.
 
-3. Predicting customer churn given 15 numeric features and a labeled training dataset
+# 5. Summing a revenue column:
+# Deterministic code, because addition has an exact result and requires neither
+# machine learning nor language interpretation.
 
-This situation would be best handled by a ML since there is prediction and labeled training dataset involved.
-
-4. Normalizing inconsistent city names ("NYC", "New York City", "New York, NY") to a canonical form
-
-Data manipulation is involved so using deterministic code is the best move.
-
-5. Summing a column of revenue figures
-
-Data manipulation is best used for this scenario since there is no training nor predictions involved.
-"""
 
 # ML/LLM Q3
 
 """
-Incremental processing only classifies records that have not been enriched. If the
-data is rewritten, if something went wrong with the LLM during the last run, the data could be corrupted.
-If the orignal records are not backed up, that information may be lost forever. 
+Incremental processing prevents the pipeline from processing records that
+have already been enriched. Without it, rerunning the pipeline could send
+all 365 weather records to the LLM again, creating unnecessary API calls
+and additional cost.
 
-For this project, there only needs to be 365 records per year. If there is no incremental processing,
-those records are repeatedly ran with inaccurate data possibly replacing the original data. As a result,
-the weather model would be trained on bad data and will not work as expected.
+It could also overwrite existing enrichment results even though the raw
+weather data has not changed. Processing only new records makes the pipeline
+more efficient and helps preserve the correctness of data that has already
+been processed successfully.
 """
 
 # --- Prompt Questions ---
@@ -75,10 +73,12 @@ SYSTEM_PROMPT = ("""
             """
 )
 
-"""The if/else would have to be changed to also include the reasoning for the prediction.
-The function needs another parameter (i.e. good_for_running_reason) that's added to the if/else. 
-For example: prediction_text = "good for running" if good_for_running else "not ideal for running" becomes: 
-prediction_text = "good for running" if good_for_running and good_for_running_reason else "not ideal for running because of {good_for_running_reasons}"""
+# The prompt should explicitly require two sentences and give each sentence
+# a specific purpose. The first sentence should state whether the day is good
+# for running, and the second should explain the recommendation using the
+# supplied weather conditions. The existing weather values and classifier
+# prediction already provide the LLM with the information it needs to explain
+# its reasoning, so an additional reasoning parameter is not required.
 
 # Prompt Q2
 
@@ -92,9 +92,9 @@ def call_with_retry(client, messages, max_retries=3):
                     {"role": "system", "content": SYSTEM_PROMPT}, 
                     { "role":"user", "content": messages}
                 ],
-                max_tokens = max_retries
             )
             return response
+        
         except Exception:
             if retries < max_retries - 1:
                 time.sleep(2)
@@ -107,5 +107,6 @@ Tell me the reasoning for your prediction."""
 retry = call_with_retry(client,messages,3)
 print(retry)
 
-# In production, retry logic can be useful when an API request fails temporarily
-# because of a network issue, timeout, or short-lived service error.
+# In a production pipeline, I would use retry logic for temporary API failures,
+# such as network errors, timeouts, or short-lived service errors, so one
+# temporary failure does not immediately stop the pipeline.
