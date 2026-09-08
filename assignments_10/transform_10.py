@@ -16,7 +16,6 @@ client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 # Read records from weather_raw
 response = supabase.table("weather_raw").select("*").execute()
 raw_rows = response.data
-print(f"Fetched {len(raw_rows)} rows from weather_raw.")
 
 # Step Q1
 print(f"\nStep Q1:\n")
@@ -26,10 +25,14 @@ enriched_response = supabase.table("weather_enriched").select("date").execute()
 
 # Check for processed records
 already_done = {row["date"] for row in enriched_response.data}
-print(f"{len(already_done)} records processed.\n")
 
 to_classify = [row for row in raw_rows if row["date"] not in already_done]
-print(f"Records to classify: {len(to_classify)} (skipping {len(already_done)} already enriched)")
+
+print(
+    f"Raw records: {len(raw_rows)} | "
+    f"Already enriched: {len(already_done)} | "
+    f"Processing this run: {len(to_classify)}"
+)
 
 if to_classify:
     # Step Q2
@@ -108,40 +111,32 @@ if to_classify:
 
     for i, record in enumerate(enrichment_records):
         raw_row = next(r for r in to_classify if r["date"] == record["date"])
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {
+                        "role": "user",
+                        "content": make_user_message(
+                            raw_row,
+                            record["good_for_running"],
+                            record["confidence"]
+                        )
+                    }
+                ],
+                max_tokens=100
+            )
+            summary = response.choices[0].message.content.strip()
+            record["llm_summary"] = summary
         
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {
-                    "role": "user",
-                    "content": make_user_message(
-                        raw_row,
-                        record["good_for_running"],
-                        record["confidence"]
-                    )
-                }
-            ],
-            max_tokens=100
-        )
-        summary = response.choices[0].message.content.strip()
-        record["llm_summary"] = summary
-        
+        except Exception as e:
+            print(f"API error on {record['date']}: {e}")
+            record["llm_summary"] = "Recommendation unavailable."
+            
         # Fallback string & progress print every 50 records
         if (i + 1) % 50 == 0:
             print(f"\nEnriched {i + 1} / {len(enrichment_records)} records...")
-            
-    # Handle unexpected responses
-    def validate_summary(text):
-        text = text.strip()
-        if not text:
-            return None
-        # Reject if more than two sentences
-        sentences = [s for s in text.split(".") if s.strip()]
-        
-        if len(sentences) > 2:
-            return None
-        return text
 
     # Step Q4
     print(f"\nStep Q4:\n")
@@ -162,9 +157,12 @@ print(f"\nStep Q5:\n")
 # Confirm weather_enriched results
 check = supabase.table("weather_enriched").select("*").limit(5).execute()
 for row in check.data:
-    print(f"{row["date"]} | good={row["good_for_running"]} | conf={row["confidence"]:.2f} \n")
-    print(f"{row["llm_summary"]}\n")
-    print()
+    print(
+        f"{row['date']} | "
+        f"good={row['good_for_running']} | "
+        f"conf={row['confidence']:.2f}"
+        )
+    print(row["llm_summary"])
     
 #count how many records were classified as good
 good_count = (
@@ -174,21 +172,16 @@ good_count = (
     .execute()
 )
 
-print(f"Good-for-running days in weather_enriched {good_count.count}")
+print(f"Total good-for-running days: {good_count.count}")
 
 # Step Q6
-"""
-1. The classifier was trained on my selected city not Charlotte. 
-   If another city was loaded, I expect the classifier's information
-   would be less accurate and the numbers for the predictions and 
-   "good_for_running" days would be significantly different.
-   
-2. The current one-sentence recommendation does not allow the LLM
-   to "override" the classifier as an override will need to have 
-   a longer description that may not fit into a single sentence.
-   
-3.  The cost would be the main concern especially if more tokens
-    have to be used. I would space out the processing by a few hours
-    and only handle 1000 records at a time. Another idea would be to
-    choose a cheaper service to handle the records with.
-"""
+
+# The classifier was trained using weather data from my hometown, so I would be
+# careful about assuming that it will generalize equally well to cities with very
+# different climates. A model trained on one location may perform less reliably
+# when weather patterns differ significantly from the training data. In this
+# pipeline, the LLM does not override the classifier because good_for_running is
+# set by the machine learning model, while the LLM only adds a natural-language
+# summary. This makes the LLM transform additive rather than authoritative. At a
+# larger scale, I would also use incremental processing so previously enriched
+# records are not sent through the classifier and LLM again unnecessarily.
