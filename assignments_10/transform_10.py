@@ -1,3 +1,5 @@
+# Video: https://youtu.be/sSyjQNCykXQ
+
 import os
 import json
 import pandas as pd
@@ -170,10 +172,10 @@ print(f"Total rows in weather_enriched: {total_count.count}")
 check = supabase.table("weather_enriched").select("*").limit(5).execute()
 for row in check.data:
     print(
-        f"{row['date']} | "
-        f"good={row['good_for_running']} | "
-        f"conf={row['confidence']:.2f} | "
-        f"summary={row['llm_summary']}"
+        f"{row['date']}\n | "
+        f"good={row['good_for_running']}\n | "
+        f"conf={row['confidence']:.2f}\n | "
+        f"summary={row['llm_summary']}\n"
     )
     
 #count how many records were classified as good
