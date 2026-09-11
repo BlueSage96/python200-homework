@@ -8,6 +8,7 @@ from io import BytesIO
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+from sklearn.pipeline import Pipeline
 
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
@@ -179,6 +180,32 @@ print(f"Components needed for 90% explained variance: {n}")
 X_train_pca = pca.transform(X_train_scaled)[:, :n]
 X_test_pca  = pca.transform(X_test_scaled)[:, :n]
 
+# Task 05
+
+dt_pca_pipeline = Pipeline([
+    ("scaler",     StandardScaler()),
+    ("pca",        PCA(n_components=n)),  # use your n_components from Task 2
+    ("classifier", DecisionTreeClassifier(max_depth=3, random_state=42))
+])
+dt_pca_pipeline.fit(X_train, y_train)
+dt_pca_pred = dt_pca_pipeline.predict(X_test)
+dt_report = classification_report(y_test, dt_pca_pred)
+
+lr_pca_pipeline = Pipeline([
+    ("scaler",     StandardScaler()),
+    ("pca",        PCA(n_components=n)),  # use your n_components from Task 2
+    ("classifier", LogisticRegression(C=1.0, max_iter=1000, solver='liblinear'))
+])
+lr_pca_pipeline.fit(X_train, y_train)
+lr_pca_pred = lr_pca_pipeline.predict(X_test)
+lr_report = classification_report(y_test, lr_pca_pred)
+
+print(f"\nTask 05:\n")
+print(f"DecisionTreeClassifier Report:\n {dt_report}\n")
+print(f"LogisticRegression Report:\n {lr_report}\n")
+
+# Both pipelines have similar structure to the reports in task 3.
+
 #Task 03
 print(f"\nTask 03:\n")
 
@@ -191,7 +218,7 @@ class_report = classification_report(y_test,preds)
 
 print(f"\nKNN 01:\n")
 print(f"Accuracy: {score}")
-print(f"Report: {class_report}")
+print(f"Report:\n {class_report}")
 
 #KNN on scaled data
 knn2 = KNeighborsClassifier(n_neighbors=5)
@@ -202,7 +229,7 @@ class_report2 = classification_report(y_test,preds2)
 
 print(f"\nKNN 02:\n")
 print(f"Accuracy: {score2}")
-print(f"Report: {class_report2}")
+print(f"Report:\n {class_report2}")
 
 #Decision Tree 01
 dtc1 = DecisionTreeClassifier(max_depth=3,random_state=42)
@@ -262,7 +289,7 @@ print(f"Test Accuracy: {test_accuracy_dtc4}")
 
 print(f"\nDecision Tree 04 accuracy and report:\n")
 print(f"Test Accuracy: {test_accuracy_dtc4}")
-print(f"Report: {class_report_dtc4}")
+print(f"Report:\n {class_report_dtc4}")
 
 #Random Foreset Classifier
 rf = RandomForestClassifier(n_estimators=100,random_state=42)
@@ -274,7 +301,7 @@ rf_class_report = classification_report(y_test, rf_pred)
 
 print(f"\nRandom Forest 01:\n")
 print(f"Accuracy: {rf_score}")
-print(f"Report: {rf_class_report}")
+print(f"Report:\n {rf_class_report}")
 
 #Logical Regression
 logistic_scaled = LogisticRegression(C=1.0,max_iter=1000,solver="liblinear")
