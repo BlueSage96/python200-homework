@@ -116,7 +116,7 @@ ax[2].set_title("Capital Length Total")
 plt.savefig("outputs/spam_ham_comparisons")
 plt.show()
 
-'''
+
 #1. The differences between Word frequency free and Character Frequency are subtle, 
 # but the differences for each against Capital Run Length Total are dramatic 
 # given that capital has a long numeric range than the other two classes.
@@ -129,15 +129,13 @@ plt.show()
 
 #4. The training and test data will contain drastic skews so there may be 
 # a need to normalize some of the data before training and testing.
-'''
+
 
 #Task 02
 
-'''
-Data prep - Standardize the features because they have different scales
-like capital_run_length_total that has much larger values
-than the other features), which helps Logistic Regression perform better.
-'''
+# Data prep - Standardize the features because they have different scales
+# like capital_run_length_total that has much larger values
+# than the other features), which helps Logistic Regression perform better.
 
 #Remove spam_label for X data 
 X = df.drop("spam_label",axis=1)
@@ -181,7 +179,8 @@ X_train_pca = pca.transform(X_train_scaled)[:, :n]
 X_test_pca  = pca.transform(X_test_scaled)[:, :n]
 
 #Task 03
-print(f"\nTa 03:\n")
+print(f"\nTask 03:\n")
+
 #KNN on unscaled data
 knn = KNeighborsClassifier(n_neighbors=5)
 knn.fit(X_train,y_train)
@@ -257,10 +256,8 @@ print(f"\nDecision Tree 04:\n")
 print(f"Train Accuracy: {train_accuracy_dtc4}")
 print(f"Test Accuracy: {test_accuracy_dtc4}")
 
-'''
-1. The test accuracy doesn't increase as fast as the train accuracy does.
-2. I would use no depth as it has the best train accuracy
-'''
+# 1. The test accuracy doesn't increase as fast as the train accuracy does.
+# 2. I would use no depth as it has the best train accuracy.
 
 print(f"\nDecision Tree 04 accuracy and report:\n")
 print(f"Test Accuracy: {test_accuracy_dtc4}")
@@ -292,67 +289,12 @@ print(f"\nLogical Regression 01:\n")
 print(f"Scaled data: {logistic_scaled}")
 print(f"PCA data: {logistic_pca}")
 
-#Going by the accuracies, decision tree 04 is the best model.
+# I see that the Decision Tree Classifer and Random Forest Classifier has 
+# much higher accuracy than KNN. Going by the accuracy ratine, the best performing 
+# model was the fourth decision tree (max_depth=None,random_state=42). 
 
 cm = confusion_matrix(y_train,train_preds_dtc4)
 display = ConfusionMatrixDisplay(confusion_matrix=cm)
 display.plot()
 plt.title("Decision Tree 04 Confusion Matrix")
 plt.savefig("outputs/decision_tree_04_confusion_matrix.png")
-
-
-#Task 04
-print(f"\nTask 04:\n")
-cv_scores = cross_val_score(knn,X_train,y_train,cv=5)
-
-print(f"\nKNN 01:\n")
-print(f"Mean fold scores: {cv_scores.mean():.3f}")
-print(f"Standard deviation of fold scores: {cv_scores.std():.3f}")
-
-cv_scores2 = cross_val_score(knn2,X_train,y_train,cv=5)
-
-print(f"\nKNN 02:\n")
-print(f"Mean fold scores: {cv_scores2.mean():.3f}")
-print(f"Standard deviation of fold scores: {cv_scores2.std():.3f}")
-
-cv_scores_dtc1 = cross_val_score(dtc1,X_train,y_train,cv=5)
-
-print(f"\nDecision Tree 01:\n")
-print(f"Mean fold scores: {cv_scores_dtc1.mean():.3f}")
-print(f"Standard deviation of fold scores: {cv_scores_dtc1.std():.3f}")
-
-cv_scores_dtc2 = cross_val_score(dtc2,X_train,y_train,cv=5)
-
-print(f"\nDecision Tree 02:\n")
-print(f"Mean fold scores: {cv_scores_dtc2.mean():.3f}")
-print(f"Standard deviation of fold scores: {cv_scores_dtc2.std():.3f}")
-
-cv_scores_dtc3 = cross_val_score(dtc3,X_train,y_train,cv=5)
-
-print(f"\nDecision Tree 03:\n")
-print(f"Mean fold scores: {cv_scores_dtc3.mean():.3f}")
-print(f"Standard deviation of fold scores: {cv_scores_dtc3.std():.3f}")
-
-cv_scores_dtc4 = cross_val_score(dtc4,X_train,y_train,cv=5)
-
-print(f"\nDecision Tree 04:\n")
-print(f"Mean fold scores: {cv_scores_dtc4.mean():.3f}")
-print(f"Standard deviation of fold scores: {cv_scores_dtc4.std():.3f}")
-
-cv_scores_rf = cross_val_score(rf,X_train,y_train,cv=5)
-
-print(f"\nRandom Forest 01:\n")
-print(f"Mean fold scores: {cv_scores_rf.mean():.3f}")
-print(f"Standard deviation of fold scores: {cv_scores_rf.std():.3f}")
-
-cv_scores_logistic_scaled = cross_val_score(logistic_scaled,X_train,y_train,cv=5)
-
-print(f"\nLogistic Regression 01:\n")
-print(f"Mean fold scores: {cv_scores_logistic_scaled.mean():.3f}")
-print(f"Standard deviation of fold scores: {cv_scores_logistic_scaled.std():.3f}")
-
-cv_scores_logistic_pca = cross_val_score(logistic_pca,X_train,y_train,cv=5)
-
-print(f"\nLogistic Regression 02:\n")
-print(f"Mean fold scores: {cv_scores_logistic_pca.mean():.3f}")
-print(f"Standard deviation of fold scores: {cv_scores_logistic_pca.std():.3f}")
