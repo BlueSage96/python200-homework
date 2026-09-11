@@ -171,8 +171,9 @@ plt.ylabel("Total Explained")
 plt.savefig("outputs/pca_variance_project_03.png")
 plt.show()
 
+print(f"\nTask 02:\n")
 print("Explained variance (%):", ", ".join(f"{v:.2f}" for v in perc_exp_vals))
-print(f"Total (%): {n}")
+print(f"Components needed for 90% explained variance: {n}")
 
 #Transform both train and test data and slice the first n components
 X_train_pca = pca.transform(X_train_scaled)[:, :n]
@@ -273,17 +274,17 @@ rf_class_report = classification_report(y_test, rf_pred)
 
 print(f"\nRandom Forest 01:\n")
 print(f"Accuracy: {rf_score}")
-print(f"Report: {class_report}")
+print(f"Report: {rf_class_report}")
 
 #Logical Regression
 logistic_scaled = LogisticRegression(C=1.0,max_iter=1000,solver="liblinear")
 logistic_pca = LogisticRegression(C=1.0,max_iter=1000,solver="liblinear")
 
-logistic_scaled = logistic_scaled.fit(X_train_scaled,y_train)
-logistic_pca = logistic_pca.fit(X_train_pca,y_train)
+logistic_scaled.fit(X_train_scaled,y_train)
+logistic_pca.fit(X_train_pca,y_train)
 
-logistic_scaled = np.abs(logistic_scaled.coef_).sum()
-logistic_pca = np.abs(logistic_pca.coef_).sum()
+logistic_scaled_coeff = np.abs(logistic_scaled.coef_).sum()
+logistic_pca_coeff = np.abs(logistic_pca.coef_).sum()
 
 print(f"\nLogical Regression 01:\n")
 print(f"Scaled data: {logistic_scaled}")
@@ -343,7 +344,7 @@ print(f"\nRandom Forest 01:\n")
 print(f"Mean fold scores: {cv_scores_rf.mean():.3f}")
 print(f"Standard deviation of fold scores: {cv_scores_rf.std():.3f}")
 
-cv_scores_logistic_scaled = cross_val_score(logistic_scaled,X_train,y_train,cv=5)
+cv_scores_logistic_scaled = cross_val_score(logistic_scaled,X_train_scaled,y_train,cv=5)
 
 print(f"\nLogistic Regression 01:\n")
 print(f"Mean fold scores: {cv_scores_logistic_scaled.mean():.3f}")
@@ -354,3 +355,7 @@ cv_scores_logistic_pca = cross_val_score(logistic_pca,X_train,y_train,cv=5)
 print(f"\nLogistic Regression 02:\n")
 print(f"Mean fold scores: {cv_scores_logistic_pca.mean():.3f}")
 print(f"Standard deviation of fold scores: {cv_scores_logistic_pca.std():.3f}")
+
+# The most accurate model is using standard deviation are both Decision Tree 01 and Decision Tree 04. 
+# Both of them have a standard deviation 0.021.
+# The two KNN classifiers are the most stable at 0.794 each.
