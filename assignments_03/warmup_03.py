@@ -4,10 +4,13 @@ import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris, load_digits
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import StandardScaler
+
 from sklearn.decomposition import PCA
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
+
+from sklearn.multiclass import OneVsRestClassifier
 from sklearn.metrics import (
     accuracy_score,
     classification_report,
@@ -38,7 +41,8 @@ print("Mean of sepal width:",X_train_scaled[:,1].mean())
 print("Mean of petal length:",X_train_scaled[:,2].mean())
 print("Mean of petal width:",X_train_scaled[:,3].mean())
 
-# Using X_train because the X_train contains the mean and std for only the training data.
+# Fit the scaler only on X_train so information from the test data
+# does not leak into the preprocessing step.
 
 #KNN 01
 knn = KNeighborsClassifier(n_neighbors=5)
@@ -63,7 +67,10 @@ score2 = accuracy_score(y_test, preds2)
 print(f"\nKNN 02:\n")
 print("Accuracy:", score2)
 
-# The accuracy is the same for unscaled and scaled data, so scaling makes no difference
+# The accuracy is the same for the scaled and unscaled data, so scaling
+# did not improve performance for this test split. The Iris features do
+# not have extremely different numeric scales, so scaling had little
+# effect on the distances KNN calculated.
 
 #KNN 03
 knn3 = KNeighborsClassifier(n_neighbors=5)
@@ -74,22 +81,22 @@ print(f"Fold scores: {cv_scores}")
 print(f"Mean fold scores: {cv_scores.mean():.3f}")
 print(f"Standard deviation of fold scores: {cv_scores.std():.3f}")
 
-'''
-The cross_val_score is more trustworthy than a single train/test 
-split because each group of training data (fold) is evaluated 
-and the average score is more stable than any single split.
-'''
+
+# The cross_val_score is more trustworthy than a single train/test 
+# split because each group of training data (fold) is evaluated 
+# and the average score is more stable than any single split.
+
 
 #KNN 04
 print(f"\nKNN 04:\n")
 
 k_values = [1,3,5,7,9,11,13,15]
 for k in k_values:
-    knn4 = KNeighborsClassifier(n_neighbors=5)
+    knn4 = KNeighborsClassifier(n_neighbors=k)
     cross = cross_val_score(knn4,X_train,y_train,cv=5)
     print(f"k={k:2d}: mean={cross.mean():.3f}")
     
-    # I would use k=15 as it has a wider range of neighbors to average than the other ks. \z
+# I would use k=5 or k=7 as they have the highest mean CV score of 0.975.
     
     
 #Classifier Evaluation 01
@@ -100,6 +107,9 @@ plt.title("KNN Confusion Matrix")
 plt.savefig("outputs/knn_confusion_matrix.png")
 plt.show()
 
+# The model did not confuse any of the species. All 30 test samples
+# were classified correctly.
+
 #Decision Tree 01
 dtc = DecisionTreeClassifier(max_depth=3,random_state=42)
 dtc.fit(X_train,y_train)
@@ -107,31 +117,57 @@ preds3 = dtc.predict(X_test)
 score3 = accuracy_score(y_test, preds3)
 class_report2 = classification_report(y_test, preds3)
 
-print(f"\nDecision Trees 01:\n")
+print(f"\nDecision Tree 01:\n")
 print("Accuracy:", score3)
 print(class_report2)
 
-# KNN's accuracy is 1.0 while Decision Tree accuracy is 0.9666666666666667
-# No scaled vs. unscaled data would not affect the result.
+# 1. KNN's accuracy is 1.0 while Decision Tree accuracy is 0.9666666666666667
+# 2. Scaling should not affect a Decision Tree because it makes decisions
+#    using feature thresholds rather than distances between data points.
 
 #Logical Regression 01
-log_reg1 = LogisticRegression(C=0.01,max_iter=1000,solver='liblinear')
-log_reg2 = LogisticRegression(C=1.0,max_iter=1000,solver='liblinear')
-log_reg3 = LogisticRegression(C=100,max_iter=1000,solver='liblinear')
+log_reg1 = OneVsRestClassifier(
+    LogisticRegression(C=0.01,max_iter=1000,solver='liblinear')
+ )
+
+log_reg2 = OneVsRestClassifier(
+    LogisticRegression(C=1.0,max_iter=1000,solver='liblinear')
+)
+
+log_reg3 = OneVsRestClassifier(
+    LogisticRegression(C=100,max_iter=1000,solver='liblinear')
+)
 
 log_reg1.fit(X_train_scaled,y_train)
 log_reg2.fit(X_train_scaled,y_train)
 log_reg3.fit(X_train_scaled,y_train)
 
-log_reg_np1 = np.abs(log_reg1.coef_).sum()
-log_reg_np2 = np.abs(log_reg2.coef_).sum()
-log_reg_np3 = np.abs(log_reg3.coef_).sum()
+log_reg_np1 = (
+    np.abs(log_reg1.estimators_[0].coef_).sum()
+    + np.abs(log_reg1.estimators_[1].coef_).sum()
+    + np.abs(log_reg1.estimators_[2].coef_).sum()
+)
+
+log_reg_np2 = (
+    np.abs(log_reg2.estimators_[0].coef_).sum()
+    + np.abs(log_reg2.estimators_[1].coef_).sum()
+    + np.abs(log_reg2.estimators_[2].coef_).sum()
+)
+
+
+log_reg_np3 = (
+    np.abs(log_reg3.estimators_[0].coef_).sum()
+    + np.abs(log_reg3.estimators_[1].coef_).sum()
+    + np.abs(log_reg3.estimators_[2].coef_).sum()
+)
 
 print(f"\nLogical Regression 01:\n")
-print(f"Model one C value: {log_reg1.C} and total size: {log_reg_np1}")
-print(f"Model two C value: {log_reg2.C} and total size: {log_reg_np2}")
-print(f"Model three C value: {log_reg3.C} and total size: {log_reg_np3}")
-# The coefficients increase significally depending on the size of C.
+print(f"Model one C value: {log_reg1.estimator.C} and total size: {log_reg_np1}")
+print(f"Model two C value: {log_reg2.estimator.C} and total size: {log_reg_np2}")
+print(f"Model three C value: {log_reg3.estimator.C} and total size: {log_reg_np3}")
+
+# As C increases, the coefficients increase too.
+# Smaller C values keep them lower and bigger C values let them grow.
 
 # PCA
 digits = load_digits()
@@ -166,20 +202,23 @@ plt.title("PCA 2D Projection")
 plt.savefig("outputs/pca-2d_projection.png")
 plt.show()
 
+# Same-digit images generally form clusters, although some of the
+# digit groups overlap in the 2D PCA projection.
+
 #PCA 03
 perc_exp_vals = pca_fit.explained_variance_ratio_ 
 total_explained = np.cumsum(perc_exp_vals)
 
-plt.scatter(perc_exp_vals,total_explained,color="orange")
+plt.scatter(range(1, len(total_explained) + 1),total_explained,color="orange")
 plt.title("PCA Variance Explained")
 
-plt.xlabel("Exp Vals")
-plt.ylabel("Total Explained")
+plt.xlabel("Number of Components")
+plt.ylabel("Cumulative Explained Variance")
 
 plt.savefig("outputs/pca_variance_explained.png")
 plt.show()
 
-# The components are very small and would take 13 components to explain 80% of variance
+# It would take about 13 components to explain 80% of the variance.
 
 #PCA 04
 def reconstruct_digit(sample_idx,scores,pca,n_components):
