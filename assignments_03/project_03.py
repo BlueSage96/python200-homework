@@ -180,17 +180,20 @@ for i, value in enumerate(total_explained):
         n = i + 1
         break
 
-plt.plot(range(1, len(total_explained) + 1), total_explained, color="turquoise")
-plt.title("Task 2 PCA Cumulative Explained Variance")
+plt.plot(range(1, len(total_explained) + 1), total_explained)
 
+plt.axhline(y=0.90, linestyle="--")
+plt.axvline(x=n, linestyle="--")
+
+plt.title("Task 2 PCA Cumulative Explained Variance")
 plt.xlabel("Number of Components")
 plt.ylabel("Cumulative Explained Variance")
 plt.savefig("outputs/task_02_pca_cumulative_variance.png")
-plt.show()    
+plt.show()
 
 print(f"\nTask 02:\n")
 print("Explained variance:", ", ".join(f"{v:.2f}" for v in perc_exp_vals))
-print(f"Components needed for 90% explained variance: {n}")
+print(f"First component count reaching 90% explained variance: {n}")
 
 # Fit PCA on the scaled training data only to avoid using
 # information from the test data during preprocessing.
@@ -299,9 +302,10 @@ print(f"Test Accuracy: {test_accuracy_dtc4}")
 # is almost 100%, showing more overfitting. Decision Tree 03 gives a better
 # balance between test performance and overfitting.
 
-print(f"\nDecision Tree 03 accuracy and report:\n")
+print(f"\nCHOSEN DECISION TREE FOR PRODUCTION: max_depth=10\n")
+print(f"Train Accuracy: {train_accuracy_dtc3}")
 print(f"Test Accuracy: {test_accuracy_dtc3}")
-print(f"Report:\n {class_report_dtc3}")
+print(f"Classification Report:\n{class_report_dtc3}")
 
 #Random Foreset Classifier
 rf = RandomForestClassifier(n_estimators=100,random_state=42)
@@ -489,13 +493,30 @@ lr_pipeline.fit(X_train, y_train)
 lr_pipeline_pred = lr_pipeline.predict(X_test)
 lr_pipeline_report = classification_report(y_test, lr_pipeline_pred)
 
-print(f"\nTask 05:\n")
-print(f"RandomForestClassifier Report:\n {rf_pipeline_report}\n")
-print(f"LogisticRegression Report:\n {lr_pipeline_report}\n")
+rf_pipeline_accuracy = accuracy_score(y_test, rf_pipeline_pred)
+lr_pipeline_accuracy = accuracy_score(y_test, lr_pipeline_pred)
 
-# The Random Forest pipeline only needs the classifier because tree-based
-# models do not require scaling. The Logistic Regression pipeline includes
-# StandardScaler because the scaled version performed best in Task 3.
-# PCA is not included because it lowered Logistic Regression accuracy.
-# The pipeline results match the earlier manual model results, showing that
-# the same preprocessing and model steps are being packaged together.
+manual_lr_accuracy = accuracy_score(y_test, scaled_preds)
+
+print(f"\nTask 05:\n")
+
+print("\nTree-Based Pipeline: Random Forest")
+print(f"Pipeline Accuracy: {rf_pipeline_accuracy}")
+print(f"Manual Task 3 Accuracy: {rf_score}")
+print(f"Report:\n{rf_pipeline_report}")
+
+print("\nNon-Tree Pipeline: Scaled Logistic Regression")
+print(f"Pipeline Accuracy: {lr_pipeline_accuracy}")
+print(f"Manual Task 3 Accuracy: {manual_lr_accuracy}")
+print(f"Report:\n{lr_pipeline_report}")
+
+# The two pipelines have different structures because the models have
+# different preprocessing needs. Random Forest is tree-based and does not
+# require feature scaling, so its pipeline only contains the classifier.
+# Logistic Regression is sensitive to feature scale, so its pipeline contains
+# StandardScaler followed by the classifier. PCA is not included because the
+# scaled Logistic Regression performed better than the PCA version in Task 3.
+#
+# The pipeline accuracies match the corresponding manual Task 3 accuracies,
+# confirming that the pipelines reproduce the earlier model setups while
+# packaging preprocessing and classification into reusable workflows.
