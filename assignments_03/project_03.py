@@ -102,6 +102,12 @@ df.head()
 spam = df[df["spam_label"] == 1]
 ham = df[df["spam_label"] == 0]
 
+print(f"\nTask 01:\n")
+print(f"Total emails: {len(df)}")
+print(f"\nClass counts:\n{df['spam_label'].value_counts()}")
+print(f"\nClass percentages:\n{df['spam_label'].value_counts(normalize=True) * 100}")
+
+
 fig,ax = plt.subplots(1,3,figsize=(15,5))
 ax[0].boxplot(x=[spam["word_freq_free"],ham["word_freq_free"]],
             labels=["Spam","Ham"],patch_artist=True,medianprops={'color':'red'})
@@ -118,19 +124,18 @@ plt.savefig("outputs/spam_ham_comparisons")
 plt.show()
 
 
-#1. The differences between Word frequency free and Character Frequency are subtle, 
-# but the differences for each against Capital Run Length Total are dramatic 
-# given that capital has a long numeric range than the other two classes.
+# 1. Spam and ham emails have some differences in these features.
+#    Some of the differences are more noticeable than others.
 
-#2. The heavy skew to 0 means a lot of the emails don't contain the same 
-# set of words and characters irregardless if they are spam or ham.
+# 2. A lot of the values are 0 because many emails do not use
+#    certain words or characters at all.
 
-#3. Capitalizing individual words would rack up more data than using 
-# similar words and characters.
+# 3. Some features have very small values while others have much
+#    larger values, so the feature scales are very different.
 
-#4. The training and test data will contain drastic skews so there may be 
-# a need to normalize some of the data before training and testing.
-
+# 4. There are more ham emails than spam emails, so the classes are
+#    not evenly balanced. Accuracy alone may not show how well the model
+#    identifies spam.
 
 #Task 02
 
@@ -148,7 +153,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test) # learn same mean & standard deviation from training data
+X_test_scaled = scaler.transform(X_test) # use the mean and standard deviation learned from training data
 
 pca = PCA()
 pca_fit = pca.fit(X_train_scaled)
@@ -163,48 +168,21 @@ for i, value in enumerate(total_explained):
         n = i + 1
         break
 
-
-plt.plot(total_explained,color="turquoise")
+plt.plot(range(1, len(total_explained) + 1), total_explained, color="turquoise")
 plt.title("PCA Variance Explained")
 
-plt.xlabel("Exp Vals")
-plt.ylabel("Total Explained")
+plt.xlabel("Number of Components")
+plt.ylabel("Cumulative Explained Variance")
 plt.savefig("outputs/pca_variance_project_03.png")
-plt.show()
+plt.show()    
 
 print(f"\nTask 02:\n")
-print("Explained variance (%):", ", ".join(f"{v:.2f}" for v in perc_exp_vals))
+print("Explained variance:", ", ".join(f"{v:.2f}" for v in perc_exp_vals))
 print(f"Components needed for 90% explained variance: {n}")
 
 #Transform both train and test data and slice the first n components
 X_train_pca = pca.transform(X_train_scaled)[:, :n]
 X_test_pca  = pca.transform(X_test_scaled)[:, :n]
-
-# Task 05
-
-dt_pca_pipeline = Pipeline([
-    ("scaler",     StandardScaler()),
-    ("pca",        PCA(n_components=n)),  # use your n_components from Task 2
-    ("classifier", DecisionTreeClassifier(max_depth=3, random_state=42))
-])
-dt_pca_pipeline.fit(X_train, y_train)
-dt_pca_pred = dt_pca_pipeline.predict(X_test)
-dt_report = classification_report(y_test, dt_pca_pred)
-
-lr_pca_pipeline = Pipeline([
-    ("scaler",     StandardScaler()),
-    ("pca",        PCA(n_components=n)),  # use your n_components from Task 2
-    ("classifier", LogisticRegression(C=1.0, max_iter=1000, solver='liblinear'))
-])
-lr_pca_pipeline.fit(X_train, y_train)
-lr_pca_pred = lr_pca_pipeline.predict(X_test)
-lr_report = classification_report(y_test, lr_pca_pred)
-
-print(f"\nTask 05:\n")
-print(f"DecisionTreeClassifier Report:\n {dt_report}\n")
-print(f"LogisticRegression Report:\n {lr_report}\n")
-
-# Both pipelines have similar structure to the reports in task 3.
 
 #Task 03
 print(f"\nTask 03:\n")
@@ -224,12 +202,22 @@ print(f"Report:\n {class_report}")
 knn2 = KNeighborsClassifier(n_neighbors=5)
 knn2.fit(X_train_scaled,y_train)
 preds2 = knn2.predict(X_test_scaled)
-score2 = accuracy_score(y_test,preds)
+score2 = accuracy_score(y_test,preds2)
 class_report2 = classification_report(y_test,preds2)
 
 print(f"\nKNN 02:\n")
 print(f"Accuracy: {score2}")
 print(f"Report:\n {class_report2}")
+
+#KNN with PCA
+knn_pca = KNeighborsClassifier(n_neighbors=5)
+knn_pca.fit(X_train_pca, y_train)
+knn_pca_preds = knn_pca.predict(X_test_pca)
+class_report3 = classification_report(y_test, knn_pca_preds)
+
+print(f"\nKNN 03:\n")
+print(f"Accuracy: {accuracy_score(y_test, knn_pca_preds)}\n")
+print(f"Report:\n {class_report3}")
 
 #Decision Tree 01
 dtc1 = DecisionTreeClassifier(max_depth=3,random_state=42)
@@ -265,6 +253,7 @@ test_preds_dtc3 = dtc3.predict(X_test)
 
 train_accuracy_dtc3 = accuracy_score(y_train, train_preds_dtc3)
 test_accuracy_dtc3 = accuracy_score(y_test,test_preds_dtc3)
+class_report_dtc3 = classification_report(y_test, test_preds_dtc3)
 
 print(f"\nDecision Tree 03:\n")
 print(f"Train Accuracy: {train_accuracy_dtc3}")
@@ -278,18 +267,20 @@ test_preds_dtc4 = dtc4.predict(X_test)
 
 train_accuracy_dtc4 = accuracy_score(y_train, train_preds_dtc4)
 test_accuracy_dtc4 = accuracy_score(y_test,test_preds_dtc4)
-class_report_dtc4 = classification_report(y_test, test_preds_dtc4)
 
 print(f"\nDecision Tree 04:\n")
 print(f"Train Accuracy: {train_accuracy_dtc4}")
 print(f"Test Accuracy: {test_accuracy_dtc4}")
 
-# 1. The test accuracy doesn't increase as fast as the train accuracy does.
-# 2. I would use no depth as it has the best train accuracy.
+# 1. As the tree depth increases, the training accuracy keeps increasing.
+# The gap between the training and test accuracy also gets larger, which shows overfitting.
 
-print(f"\nDecision Tree 04 accuracy and report:\n")
-print(f"Test Accuracy: {test_accuracy_dtc4}")
-print(f"Report:\n {class_report_dtc4}")
+# 2. I would use Decision Tree 03 with max_depth=10 for production.
+# Its test accuracy is close to Decision Tree 04, but it has less overfitting.
+
+print(f"\nDecision Tree 03 accuracy and report:\n")
+print(f"Test Accuracy: {test_accuracy_dtc3}")
+print(f"Report:\n {class_report_dtc3}")
 
 #Random Foreset Classifier
 rf = RandomForestClassifier(n_estimators=100,random_state=42)
@@ -310,79 +301,125 @@ logistic_pca = LogisticRegression(C=1.0,max_iter=1000,solver="liblinear")
 logistic_scaled.fit(X_train_scaled,y_train)
 logistic_pca.fit(X_train_pca,y_train)
 
-logistic_scaled_coeff = np.abs(logistic_scaled.coef_).sum()
-logistic_pca_coeff = np.abs(logistic_pca.coef_).sum()
+scaled_preds = logistic_scaled.predict(X_test_scaled)
+pca_preds = logistic_pca.predict(X_test_pca)
+
+logistic_scaled_report = classification_report(y_test, scaled_preds)
+logistic_pca_report = classification_report(y_test, pca_preds)
 
 print(f"\nLogical Regression 01:\n")
-print(f"Scaled data: {logistic_scaled}")
-print(f"PCA data: {logistic_pca}")
 
-# I see that the Decision Tree Classifer and Random Forest Classifier has 
-# much higher accuracy than KNN. Going by the accuracy ratine, the best performing 
-# model was the fourth decision tree (max_depth=None,random_state=42). 
+print("\nLogistic Regression Scaled:")
+print(f"Accuracy: {accuracy_score(y_test, scaled_preds)}\n")
+print(f"Report:\n{logistic_scaled_report}\n")
 
-cm = confusion_matrix(y_train,train_preds_dtc4)
+print("\nLogistic Regression PCA:")
+print(f"Accuracy: {accuracy_score(y_test, pca_preds)}\n")
+print(f"Report:\n{logistic_pca_report}")
+
+# Random Forest performed the best with an accuracy of about 94.57%.
+
+# PCA did not improve Logistic Regression. The scaled version had
+# 92.94% accuracy while the PCA version had 91.86% accuracy.
+
+# I would prioritize reducing false positives because I would rather
+# have some spam get through than have an important email marked as spam.
+
+cm = confusion_matrix(y_test,rf_pred)
 display = ConfusionMatrixDisplay(confusion_matrix=cm)
 display.plot()
-plt.title("Decision Tree 04 Confusion Matrix")
-plt.savefig("outputs/decision_tree_04_confusion_matrix.png")
+plt.title("RandomForestClassifier Confusion Matrix")
+plt.savefig("outputs/best_model_confusion_matrix.png")
+
+# The Random Forest has more false negatives (32) than false positives (18).
+# This means it is more likely to let spam into the inbox than mark a ham email as spam.
 
 #Task 04
 print(f"\nTask 04:\n")
-cv_scores = cross_val_score(knn,X_train,y_train,cv=5)
+cv_scores_knn1 = cross_val_score(knn, X_train, y_train, cv=5)
 
 print(f"\nKNN 01:\n")
-print(f"Mean fold scores: {cv_scores.mean():.3f}")
-print(f"Standard deviation of fold scores: {cv_scores.std():.3f}")
+print(f"Mean fold scores: {cv_scores_knn1.mean():.3f}")
+print(f"Standard deviation of fold scores: {cv_scores_knn1.std():.3f}")
 
-cv_scores2 = cross_val_score(knn2,X_train,y_train,cv=5)
+cv_scores_knn2 = cross_val_score(knn2, X_train_scaled, y_train, cv=5)
 
 print(f"\nKNN 02:\n")
-print(f"Mean fold scores: {cv_scores2.mean():.3f}")
-print(f"Standard deviation of fold scores: {cv_scores2.std():.3f}")
+print(f"Mean fold scores: {cv_scores_knn2.mean():.3f}")
+print(f"Standard deviation of fold scores: {cv_scores_knn2.std():.3f}")
 
-cv_scores_dtc1 = cross_val_score(dtc1,X_train,y_train,cv=5)
+cv_scores_knn3 = cross_val_score(knn_pca, X_train_pca, y_train, cv=5)
+
+print(f"\nKNN 03:\n")
+print(f"Mean fold scores: {cv_scores_knn3.mean():.3f}")
+print(f"Standard deviation of fold scores: {cv_scores_knn3.std():.3f}")
+
+cv_scores_dtc1 = cross_val_score(dtc1, X_train, y_train, cv=5)
 
 print(f"\nDecision Tree 01:\n")
 print(f"Mean fold scores: {cv_scores_dtc1.mean():.3f}")
 print(f"Standard deviation of fold scores: {cv_scores_dtc1.std():.3f}")
 
-cv_scores_dtc2 = cross_val_score(dtc2,X_train,y_train,cv=5)
+cv_scores_dtc2 = cross_val_score(dtc2, X_train, y_train, cv=5)
 
 print(f"\nDecision Tree 02:\n")
 print(f"Mean fold scores: {cv_scores_dtc2.mean():.3f}")
 print(f"Standard deviation of fold scores: {cv_scores_dtc2.std():.3f}")
 
-cv_scores_dtc3 = cross_val_score(dtc3,X_train,y_train,cv=5)
+cv_scores_dtc3 = cross_val_score(dtc3, X_train, y_train, cv=5)
 
 print(f"\nDecision Tree 03:\n")
 print(f"Mean fold scores: {cv_scores_dtc3.mean():.3f}")
 print(f"Standard deviation of fold scores: {cv_scores_dtc3.std():.3f}")
 
-cv_scores_dtc4 = cross_val_score(dtc4,X_train,y_train,cv=5)
+cv_scores_dtc4 = cross_val_score(dtc4, X_train, y_train, cv=5)
 
 print(f"\nDecision Tree 04:\n")
 print(f"Mean fold scores: {cv_scores_dtc4.mean():.3f}")
 print(f"Standard deviation of fold scores: {cv_scores_dtc4.std():.3f}")
 
-cv_scores_rf = cross_val_score(rf,X_train,y_train,cv=5)
+cv_scores_rf = cross_val_score(rf, X_train, y_train, cv=5)
 
 print(f"\nRandom Forest 01:\n")
 print(f"Mean fold scores: {cv_scores_rf.mean():.3f}")
 print(f"Standard deviation of fold scores: {cv_scores_rf.std():.3f}")
 
-cv_scores_logistic_scaled = cross_val_score(logistic_scaled,X_train_scaled,y_train,cv=5)
+cv_scores_logistic_scaled = cross_val_score(logistic_scaled, X_train_scaled, y_train, cv=5)
 
 print(f"\nLogistic Regression 01:\n")
 print(f"Mean fold scores: {cv_scores_logistic_scaled.mean():.3f}")
 print(f"Standard deviation of fold scores: {cv_scores_logistic_scaled.std():.3f}")
 
-cv_scores_logistic_pca = cross_val_score(logistic_pca,X_train,y_train,cv=5)
+cv_scores_logistic_pca = cross_val_score(logistic_pca, X_train_pca, y_train, cv=5)
 
 print(f"\nLogistic Regression 02:\n")
 print(f"Mean fold scores: {cv_scores_logistic_pca.mean():.3f}")
 print(f"Standard deviation of fold scores: {cv_scores_logistic_pca.std():.3f}")
 
-# The most accurate model is using standard deviation are both Decision Tree 01 and Decision Tree 04. 
-# Both of them have a standard deviation 0.021.
-# The two KNN classifiers are the most stable at 0.794 each.
+# The most accurate model using standard deviation is the RandomTreeClassifier with a mean of 0.954.
+# The second LogisticRegressionCassifier is the most stable with a standard deviation of 0.003.
+
+# Task 05
+
+rf_pipeline = Pipeline([
+    ("classifier", RandomForestClassifier(random_state=42))
+])
+
+rf_pipeline.fit(X_train, y_train)
+rf_pipeline_pred = rf_pipeline.predict(X_test)
+rf_pipeline_report = classification_report(y_test, rf_pipeline_pred)
+
+lr_pipeline = Pipeline([
+    ("scaler",     StandardScaler()),
+    ("classifier", LogisticRegression(C=1.0, max_iter=1000, solver='liblinear'))
+])
+
+lr_pipeline.fit(X_train, y_train)
+lr_pipeline_pred = lr_pipeline.predict(X_test)
+lr_pipeline_report = classification_report(y_test, lr_pipeline_pred)
+
+print(f"\nTask 05:\n")
+print(f"RandomForestClassifier Report:\n {rf_pipeline_report}\n")
+print(f"LogisticRegression Report:\n {lr_pipeline_report}\n")
+
+# Both pipelines have similar structure to the reports in task 3.
