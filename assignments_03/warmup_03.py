@@ -142,34 +142,32 @@ log_reg1.fit(X_train_scaled,y_train)
 log_reg2.fit(X_train_scaled,y_train)
 log_reg3.fit(X_train_scaled,y_train)
 
-log_reg_np1 = (
-    np.abs(log_reg1.estimators_[0].coef_).sum()
-    + np.abs(log_reg1.estimators_[1].coef_).sum()
-    + np.abs(log_reg1.estimators_[2].coef_).sum()
-)
+log_reg1_coefs = np.vstack((
+    log_reg1.estimators_[0].coef_,
+    log_reg1.estimators_[1].coef_,
+    log_reg1.estimators_[2].coef_
+))
 
-log_reg_np2 = (
-    np.abs(log_reg2.estimators_[0].coef_).sum()
-    + np.abs(log_reg2.estimators_[1].coef_).sum()
-    + np.abs(log_reg2.estimators_[2].coef_).sum()
-)
+log_reg2_coefs = np.vstack((
+    log_reg2.estimators_[0].coef_,
+    log_reg2.estimators_[1].coef_,
+    log_reg2.estimators_[2].coef_
+))
 
+log_reg3_coefs = np.vstack((
+    log_reg3.estimators_[0].coef_,
+    log_reg3.estimators_[1].coef_,
+    log_reg3.estimators_[2].coef_
+))
 
-log_reg_np3 = (
-    np.abs(log_reg3.estimators_[0].coef_).sum()
-    + np.abs(log_reg3.estimators_[1].coef_).sum()
-    + np.abs(log_reg3.estimators_[2].coef_).sum()
-)
+log_reg_np1 = np.abs(log_reg1_coefs).sum()
+log_reg_np2 = np.abs(log_reg2_coefs).sum()
+log_reg_np3 = np.abs(log_reg3_coefs).sum()
 
 print(f"\nLogical Regression 01:\n")
-print(f"C = {log_reg1.estimator.C}")
-print(f"Total coefficient size = {log_reg_np1:.3f}")
-
-print(f"C = {log_reg2.estimator.C}")
-print(f"Total coefficient size = {log_reg_np2:.3f}")
-
-print(f"C = {log_reg3.estimator.C}")
-print(f"Total coefficient size = {log_reg_np3:.3f}")
+print(f"C = {log_reg1.estimator.C} | Total coefficient size = {log_reg_np1:.3f}")
+print(f"C = {log_reg2.estimator.C} | Total coefficient size = {log_reg_np2:.3f}")
+print(f"C = {log_reg3.estimator.C} | Total coefficient size = {log_reg_np3:.3f}")
 
 # As C increases, the coefficients increase too.
 # Smaller C values keep them lower and bigger C values let them grow.
@@ -246,7 +244,7 @@ for i in range(5):
     axes[0, i].imshow(images[i], cmap="gray_r")
     axes[0, i].axis("off")
 
-axes[0, 0].set_ylabel("Original")
+axes[0, 0].set_ylabel("Original", rotation=0, labelpad=35)
 
 # Reconstruction rows
 for row, n_components in enumerate(n_values, start=1):
@@ -260,7 +258,11 @@ for row, n_components in enumerate(n_values, start=1):
 
         axes[row, i].imshow(reconstructed, cmap="gray_r")
         axes[row, i].axis("off")
-    axes[row, 0].set_ylabel(f"n={n_components}")
+    axes[row, 0].set_ylabel(
+        f"n = {n_components}",
+        rotation=0,
+        labelpad=35
+    )
 
 plt.tight_layout()
 plt.savefig("outputs/pca_reconstructions.png")
