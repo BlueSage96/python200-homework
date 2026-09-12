@@ -120,7 +120,7 @@ ax[1].set_title("Character Frequency")
 ax[2].boxplot(x=[spam["capital_run_length_total"],ham["capital_run_length_total"]],
             labels=["Spam", "Ham"],patch_artist=True,medianprops={'color':'blue'})
 ax[2].set_title("Capital Length Total")
-plt.savefig("outputs/spam_ham_comparisons")
+plt.savefig("outputs/spam_ham_comparisons.png")
 plt.show()
 
 
@@ -139,9 +139,9 @@ plt.show()
 
 #Task 02
 
-# Data prep - Standardize the features because they have different scales
-# like capital_run_length_total that has much larger values
-# than the other features), which helps Logistic Regression perform better.
+# Scale the training data first because the features use very different
+# numeric ranges. Fit both the scaler and PCA on training data only so
+# information from the test set does not leak into training.
 
 #Remove spam_label for X data 
 X = df.drop("spam_label",axis=1)
@@ -275,8 +275,9 @@ print(f"Test Accuracy: {test_accuracy_dtc4}")
 # 1. As the tree depth increases, the training accuracy keeps increasing.
 # The gap between the training and test accuracy also gets larger, which shows overfitting.
 
-# 2. I would use Decision Tree 03 with max_depth=10 for production.
-# Its test accuracy is close to Decision Tree 04, but it has less overfitting.
+# 2. I chose Decision Tree 03 with max_depth=10 because its test accuracy
+#    is close to the unlimited tree, but the train/test gap is smaller,
+#    so it shows less overfitting.
 
 print(f"\nDecision Tree 03 accuracy and report:\n")
 print(f"Test Accuracy: {test_accuracy_dtc3}")
@@ -294,7 +295,38 @@ print(f"\nRandom Forest 01:\n")
 print(f"Accuracy: {rf_score}")
 print(f"Report:\n {rf_class_report}")
 
-#Logical Regression
+
+tree_importance = pd.Series(
+    dtc3.feature_importances_,
+    index=X.columns
+).sort_values(ascending=False)
+
+rf_importance = pd.Series(
+    rf.feature_importances_,
+    index=X.columns
+).sort_values(ascending=False)
+
+print("\nDecision Tree Top 10 Features:")
+print(tree_importance.head(10))
+
+print("\nRandom Forest Top 10 Features:")
+print(rf_importance.head(10))
+
+rf_importance.head(10).sort_values().plot(kind="barh")
+
+plt.title("Random Forest Top 10 Feature Importances")
+plt.xlabel("Importance")
+plt.tight_layout()
+plt.savefig("outputs/feature_importances.png")
+plt.show()
+
+# The Decision Tree and Random Forest agree on several important features,
+# including char_freq_!, char_freq_$, word_freq_remove, word_freq_free,
+# capital_run_length_total, and word_freq_hp. This makes sense because
+# things like special characters, certain words, and capital letters
+# could help distinguish spam from ham emails.
+
+#Logistic Regression
 logistic_scaled = LogisticRegression(C=1.0,max_iter=1000,solver="liblinear")
 logistic_pca = LogisticRegression(C=1.0,max_iter=1000,solver="liblinear")
 
@@ -317,10 +349,10 @@ print("\nLogistic Regression PCA:")
 print(f"Accuracy: {accuracy_score(y_test, pca_preds)}\n")
 print(f"Report:\n{logistic_pca_report}")
 
-# Random Forest performed the best with an accuracy of about 94.57%.
-
 # PCA did not improve Logistic Regression. The scaled version had
 # 92.94% accuracy while the PCA version had 91.86% accuracy.
+
+# Random Forest performed the best with an accuracy of about 94.57%.
 
 # I would prioritize reducing false positives because I would rather
 # have some spam get through than have an important email marked as spam.
@@ -396,13 +428,19 @@ print(f"\nLogistic Regression 02:\n")
 print(f"Mean fold scores: {cv_scores_logistic_pca.mean():.3f}")
 print(f"Standard deviation of fold scores: {cv_scores_logistic_pca.std():.3f}")
 
-# The most accurate model using standard deviation is the RandomTreeClassifier with a mean of 0.954.
-# The second LogisticRegressionCassifier is the most stable with a standard deviation of 0.003.
+# Random Forest had the highest mean cross-validation accuracy at 0.954,
+# so it was the most accurate model.
+
+# Logistic Regression with PCA had the lowest standard deviation at 0.003,
+# so it was the most stable model.
+
+# Random Forest also performed best on the single train/test split,
+# so the cross-validation results support the earlier ranking.
 
 # Task 05
 
 rf_pipeline = Pipeline([
-    ("classifier", RandomForestClassifier(random_state=42))
+    ("classifier", RandomForestClassifier(n_estimators=100,random_state=42))
 ])
 
 rf_pipeline.fit(X_train, y_train)
@@ -422,4 +460,7 @@ print(f"\nTask 05:\n")
 print(f"RandomForestClassifier Report:\n {rf_pipeline_report}\n")
 print(f"LogisticRegression Report:\n {lr_pipeline_report}\n")
 
-# Both pipelines have similar structure to the reports in task 3.
+# The pipelines do not have the same structure because Logistic Regression
+# benefits from scaling while Random Forest does not need scaled data.
+# Pipelines keep preprocessing and the model together, which makes it easier
+# to apply the same steps consistently when the model is reused or deployed.
