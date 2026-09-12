@@ -96,8 +96,8 @@ for k in k_values:
     cross = cross_val_score(knn4,X_train,y_train,cv=5)
     print(f"k={k:2d}: mean={cross.mean():.3f}")
     
-# I would use k=5 or k=7 as they have the highest mean CV score of 0.975.
-    
+# I would use k=5 because it has one of the highest mean CV scores of 0.975,
+# and I would choose the smaller k when k=5 and k=7 have the same mean score.
     
 #Classifier Evaluation 01
 cm = confusion_matrix(y_test,preds)
@@ -244,13 +244,6 @@ def reconstruct_digit(sample_idx,scores,pca,n_components):
 
 n_values = [2, 5, 15, 40]
 fig, axes = plt.subplots(5, 5, figsize=(8, 8))
-
-# Original row
-for i in range(5):
-    axes[0, i].imshow(images[i], cmap="gray_r")
-    axes[0, i].axis("off")
-
-axes[0, 0].set_ylabel("Original", rotation=0, labelpad=35)
 
 # Original row
 for i in range(5):
