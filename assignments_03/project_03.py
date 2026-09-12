@@ -173,14 +173,16 @@ plt.title("PCA Variance Explained")
 
 plt.xlabel("Number of Components")
 plt.ylabel("Cumulative Explained Variance")
-plt.savefig("outputs/pca_variance_project_03.png")
+plt.savefig("outputs/project_pca_variance_explained.png")
 plt.show()    
 
 print(f"\nTask 02:\n")
 print("Explained variance:", ", ".join(f"{v:.2f}" for v in perc_exp_vals))
 print(f"Components needed for 90% explained variance: {n}")
 
-#Transform both train and test data and slice the first n components
+# Fit PCA on the scaled training data only to avoid using
+# information from the test data during preprocessing.
+
 X_train_pca = pca.transform(X_train_scaled)[:, :n]
 X_test_pca  = pca.transform(X_test_scaled)[:, :n]
 
@@ -349,8 +351,9 @@ print("\nLogistic Regression PCA:")
 print(f"Accuracy: {accuracy_score(y_test, pca_preds)}\n")
 print(f"Report:\n{logistic_pca_report}")
 
-# PCA did not improve Logistic Regression. The scaled version had
-# 92.94% accuracy while the PCA version had 91.86% accuracy.
+# Logistic Regression with scaling performed better than Logistic Regression
+# with PCA (92.94% vs. 91.86%), so the scaled version is the best
+# non-tree setup and will be used for the final pipeline.
 
 # Random Forest performed the best with an accuracy of about 94.57%.
 
@@ -428,28 +431,41 @@ print(f"\nLogistic Regression 02:\n")
 print(f"Mean fold scores: {cv_scores_logistic_pca.mean():.3f}")
 print(f"Standard deviation of fold scores: {cv_scores_logistic_pca.std():.3f}")
 
-# Random Forest had the highest mean cross-validation accuracy at 0.954,
-# so it was the most accurate model.
+# Cross-validation included every classifier setup from Task 3:
+# KNN unscaled, KNN scaled, KNN PCA, all four Decision Tree depths,
+# Random Forest, Logistic Regression scaled, and Logistic Regression PCA.
 
-# Logistic Regression with PCA had the lowest standard deviation at 0.003,
-# so it was the most stable model.
-
-# Random Forest also performed best on the single train/test split,
-# so the cross-validation results support the earlier ranking.
+# Random Forest was the most accurate with the highest mean score of 0.954.
+# Logistic Regression PCA was the most stable with the lowest standard
+# deviation of 0.003. Random Forest also ranked highest on the single
+# train/test split, so cross-validation supports the Task 3 results.
 
 # Task 05
 
+# Best tree-based model: Random Forest.
+# Random Forest does not require scaling or PCA.
+
 rf_pipeline = Pipeline([
-    ("classifier", RandomForestClassifier(n_estimators=100,random_state=42))
+    ("classifier", RandomForestClassifier(
+        n_estimators=100,
+        random_state=42
+    ))
 ])
 
 rf_pipeline.fit(X_train, y_train)
 rf_pipeline_pred = rf_pipeline.predict(X_test)
 rf_pipeline_report = classification_report(y_test, rf_pipeline_pred)
 
+# Best non-tree model: scaled Logistic Regression.
+# PCA is intentionally NOT included because Task 3 showed that PCA
+# lowered accuracy from 92.94% to 91.86%.
 lr_pipeline = Pipeline([
-    ("scaler",     StandardScaler()),
-    ("classifier", LogisticRegression(C=1.0, max_iter=1000, solver='liblinear'))
+    ("scaler", StandardScaler()),
+    ("classifier", LogisticRegression(
+        C=1.0,
+        max_iter=1000,
+        solver="liblinear"
+    ))
 ])
 
 lr_pipeline.fit(X_train, y_train)
@@ -460,7 +476,9 @@ print(f"\nTask 05:\n")
 print(f"RandomForestClassifier Report:\n {rf_pipeline_report}\n")
 print(f"LogisticRegression Report:\n {lr_pipeline_report}\n")
 
-# The pipelines do not have the same structure because Logistic Regression
-# benefits from scaling while Random Forest does not need scaled data.
-# Pipelines keep preprocessing and the model together, which makes it easier
-# to apply the same steps consistently when the model is reused or deployed.
+# The Random Forest pipeline only needs the classifier because tree-based
+# models do not require scaling. The Logistic Regression pipeline includes
+# StandardScaler because the scaled version performed best in Task 3.
+# PCA is not included because it lowered Logistic Regression accuracy.
+# The pipeline results match the earlier manual model results, showing that
+# the same preprocessing and model steps are being packaged together.
