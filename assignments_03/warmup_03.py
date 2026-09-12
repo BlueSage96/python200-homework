@@ -162,9 +162,14 @@ log_reg_np3 = (
 )
 
 print(f"\nLogical Regression 01:\n")
-print(f"Model one C value: {log_reg1.estimator.C} and total size: {log_reg_np1}")
-print(f"Model two C value: {log_reg2.estimator.C} and total size: {log_reg_np2}")
-print(f"Model three C value: {log_reg3.estimator.C} and total size: {log_reg_np3}")
+print(f"C = {log_reg1.estimator.C}")
+print(f"Total coefficient size = {log_reg_np1:.3f}")
+
+print(f"C = {log_reg2.estimator.C}")
+print(f"Total coefficient size = {log_reg_np2:.3f}")
+
+print(f"C = {log_reg3.estimator.C}")
+print(f"Total coefficient size = {log_reg_np3:.3f}")
 
 # As C increases, the coefficients increase too.
 # Smaller C values keep them lower and bigger C values let them grow.
@@ -180,26 +185,28 @@ print(f"\nPCA 01:\n")
 print(f"Shape of x digits: {X_digits.shape}")
 print(f"Shape of images: {images.shape}")
 
-fig, ax = plt.subplots(1, 10, figsize=(15, 2))
-#use a loop to prevent "repetitive code"!
-for i in range(10):
-    ax[i].imshow(images[i],cmap="gray_r")
-    ax[i].set_title(y_digits[i])
-    ax[i].axis("off")
+fig, axes = plt.subplots(1, 10, figsize=(12, 2))
+
+for digit in range(10):
+    index = np.where(y_digits == digit)[0][0]
+    axes[digit].imshow(images[index], cmap="gray_r")
+    axes[digit].set_title(str(digit))
+    axes[digit].axis("off")
+
 plt.savefig("outputs/sample_digits.png")
 plt.show()
 
 #PCA 02
 fig, ax1 = plt.subplots()
 
-pca = PCA(svd_solver="randomized",random_state=0)
+pca = PCA()
 pca_fit = pca.fit(X_digits)
 scores = pca.transform(X_digits)
 
 scatter = ax1.scatter(scores[:,0],scores[:,1],c=y_digits,cmap="tab10",s=10) # c = color array
 plt.colorbar(scatter,label="Digit")
 plt.title("PCA 2D Projection")
-plt.savefig("outputs/pca-2d_projection.png")
+plt.savefig("outputs/pca_2d_projection.png")
 plt.show()
 
 # Same-digit images generally form clusters, although some of the
@@ -209,12 +216,14 @@ plt.show()
 perc_exp_vals = pca_fit.explained_variance_ratio_ 
 total_explained = np.cumsum(perc_exp_vals)
 
-plt.scatter(range(1, len(total_explained) + 1),total_explained,color="orange")
-plt.title("PCA Variance Explained")
+plt.plot(
+    range(1, len(total_explained) + 1),
+    total_explained
+)
 
+plt.title("PCA Variance Explained")
 plt.xlabel("Number of Components")
 plt.ylabel("Cumulative Explained Variance")
-
 plt.savefig("outputs/pca_variance_explained.png")
 plt.show()
 
@@ -229,14 +238,31 @@ def reconstruct_digit(sample_idx,scores,pca,n_components):
     return reconstruction.reshape(8,8)
 
 
-fig, axs = plt.subplots(5,5,figsize=(10,10))
-component_counts = [2, 5, 15, 40]
+n_values = [2, 5, 15, 40]
+fig, axes = plt.subplots(5, 5, figsize=(8, 8))
 
-for row, n in enumerate(component_counts, start=1):
-    for col in range(5):
-        axs[0][col].imshow(images[col], cmap="gray")
-        reconstruction = reconstruct_digit(col, scores, pca, n)
-        axs[row][col].imshow(reconstruction, cmap="gray")
+# Original row
+for i in range(5):
+    axes[0, i].imshow(images[i], cmap="gray_r")
+    axes[0, i].axis("off")
+
+axes[0, 0].set_ylabel("Original")
+
+# Reconstruction rows
+for row, n_components in enumerate(n_values, start=1):
+    for i in range(5):
+        reconstructed = reconstruct_digit(
+            i,
+            scores,
+            pca,
+            n_components
+        )
+
+        axes[row, i].imshow(reconstructed, cmap="gray_r")
+        axes[row, i].axis("off")
+    axes[row, 0].set_ylabel(f"n={n_components}")
+
+plt.tight_layout()
 plt.savefig("outputs/pca_reconstructions.png")
 plt.show()
 
