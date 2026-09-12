@@ -108,19 +108,31 @@ print(f"\nClass counts:\n{df['spam_label'].value_counts()}")
 print(f"\nClass percentages:\n{df['spam_label'].value_counts(normalize=True) * 100}")
 
 
-fig,ax = plt.subplots(1,3,figsize=(15,5))
-ax[0].boxplot(x=[spam["word_freq_free"],ham["word_freq_free"]],
-            labels=["Spam","Ham"],patch_artist=True,medianprops={'color':'red'})
-ax[0].set_title("Word Frequency Free")
+plt.figure()
+plt.boxplot(
+    [spam["word_freq_free"], ham["word_freq_free"]],
+    labels=["Spam", "Ham"]
+)
+plt.title("Word Frequency Free")
+plt.savefig("outputs/word_freq_free_boxplot.png")
+plt.show()
 
-ax[1].boxplot(x=[spam["char_freq_!"],ham["char_freq_!"]],
-            labels=["Spam","Ham"],patch_artist=True,medianprops={'color':'white'})
-ax[1].set_title("Character Frequency")
+plt.figure()
+plt.boxplot(
+    [spam["char_freq_!"], ham["char_freq_!"]],
+    labels=["Spam", "Ham"]
+)
+plt.title("Character Frequency !")
+plt.savefig("outputs/char_freq_exclamation_boxplot.png")
+plt.show()
 
-ax[2].boxplot(x=[spam["capital_run_length_total"],ham["capital_run_length_total"]],
-            labels=["Spam", "Ham"],patch_artist=True,medianprops={'color':'blue'})
-ax[2].set_title("Capital Length Total")
-plt.savefig("outputs/spam_ham_comparisons.png")
+plt.figure()
+plt.boxplot(
+    [spam["capital_run_length_total"], ham["capital_run_length_total"]],
+    labels=["Spam", "Ham"]
+)
+plt.title("Capital Run Length Total")
+plt.savefig("outputs/capital_run_length_total_boxplot.png")
 plt.show()
 
 
@@ -169,11 +181,11 @@ for i, value in enumerate(total_explained):
         break
 
 plt.plot(range(1, len(total_explained) + 1), total_explained, color="turquoise")
-plt.title("PCA Variance Explained")
+plt.title("Task 2 PCA Cumulative Explained Variance")
 
 plt.xlabel("Number of Components")
 plt.ylabel("Cumulative Explained Variance")
-plt.savefig("outputs/project_pca_variance_explained.png")
+plt.savefig("outputs/task_02_pca_cumulative_variance.png")
 plt.show()    
 
 print(f"\nTask 02:\n")
@@ -220,6 +232,10 @@ class_report3 = classification_report(y_test, knn_pca_preds)
 print(f"\nKNN 03:\n")
 print(f"Accuracy: {accuracy_score(y_test, knn_pca_preds)}\n")
 print(f"Report:\n {class_report3}")
+
+# KNN performed much better after scaling. PCA did not improve KNN
+# because scaled KNN had about 90.77% accuracy while KNN with PCA
+# had about 90.66% accuracy.
 
 #Decision Tree 01
 dtc1 = DecisionTreeClassifier(max_depth=3,random_state=42)
@@ -274,12 +290,14 @@ print(f"\nDecision Tree 04:\n")
 print(f"Train Accuracy: {train_accuracy_dtc4}")
 print(f"Test Accuracy: {test_accuracy_dtc4}")
 
-# 1. As the tree depth increases, the training accuracy keeps increasing.
-# The gap between the training and test accuracy also gets larger, which shows overfitting.
+# As the tree depth increases, the training accuracy increases, but the
+# gap between training and test accuracy also increases, showing more overfitting.
 
-# 2. I chose Decision Tree 03 with max_depth=10 because its test accuracy
-#    is close to the unlimited tree, but the train/test gap is smaller,
-#    so it shows less overfitting.
+# I would use Decision Tree 03 with max_depth=10 for production.
+# It has 96.74% training accuracy and 90.88% test accuracy. Decision Tree 04
+# has a slightly higher test accuracy of 91.10%, but its training accuracy
+# is almost 100%, showing more overfitting. Decision Tree 03 gives a better
+# balance between test performance and overfitting.
 
 print(f"\nDecision Tree 03 accuracy and report:\n")
 print(f"Test Accuracy: {test_accuracy_dtc3}")
@@ -431,19 +449,17 @@ print(f"\nLogistic Regression 02:\n")
 print(f"Mean fold scores: {cv_scores_logistic_pca.mean():.3f}")
 print(f"Standard deviation of fold scores: {cv_scores_logistic_pca.std():.3f}")
 
-# Cross-validation included every classifier setup from Task 3:
-# KNN unscaled, KNN scaled, KNN PCA, all four Decision Tree depths,
-# Random Forest, Logistic Regression scaled, and Logistic Regression PCA.
-
+# All classifier setups from Task 3 were included in cross-validation.
 # Random Forest was the most accurate with the highest mean score of 0.954.
 # Logistic Regression PCA was the most stable with the lowest standard
-# deviation of 0.003. Random Forest also ranked highest on the single
-# train/test split, so cross-validation supports the Task 3 results.
+# deviation of 0.003. Random Forest also had the highest test accuracy
+# in Task 3, so both evaluation methods ranked Random Forest the best.
 
 # Task 05
 
-# Best tree-based model: Random Forest.
-# Random Forest does not require scaling or PCA.
+# Best tree-based setup from Task 3: Random Forest.
+# The same Random Forest parameters from Task 3 are used here.
+# Random Forest does not need scaling or PCA.
 
 rf_pipeline = Pipeline([
     ("classifier", RandomForestClassifier(
@@ -456,9 +472,10 @@ rf_pipeline.fit(X_train, y_train)
 rf_pipeline_pred = rf_pipeline.predict(X_test)
 rf_pipeline_report = classification_report(y_test, rf_pipeline_pred)
 
-# Best non-tree model: scaled Logistic Regression.
-# PCA is intentionally NOT included because Task 3 showed that PCA
-# lowered accuracy from 92.94% to 91.86%.
+# Best non-tree setup from Task 3: Logistic Regression with scaling.
+# This uses C=1.0, max_iter=1000, and solver="liblinear", matching Task 3.
+# PCA is intentionally excluded because PCA lowered the test accuracy.
+
 lr_pipeline = Pipeline([
     ("scaler", StandardScaler()),
     ("classifier", LogisticRegression(
