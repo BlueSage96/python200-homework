@@ -58,7 +58,7 @@ print(class_report)
 
 #KNN 02
 knn2 = KNeighborsClassifier(n_neighbors=5)
-X_test_scaled = scaler.fit_transform(X_test)
+X_test_scaled = scaler.transform(X_test)
 knn2.fit(X_train_scaled,y_train) #Xs - features y's - labels
 
 preds2 = knn2.predict(X_test_scaled)
@@ -164,10 +164,10 @@ log_reg_np1 = np.abs(log_reg1_coefs).sum()
 log_reg_np2 = np.abs(log_reg2_coefs).sum()
 log_reg_np3 = np.abs(log_reg3_coefs).sum()
 
-print(f"\nLogical Regression 01:\n")
-print(f"C = {log_reg1.estimator.C} | Total coefficient size = {log_reg_np1:.3f}")
-print(f"C = {log_reg2.estimator.C} | Total coefficient size = {log_reg_np2:.3f}")
-print(f"C = {log_reg3.estimator.C} | Total coefficient size = {log_reg_np3:.3f}")
+print(f"\nLogistic Regression 01:\n")
+print(f"C = 0.01 | Total coefficient size = {log_reg_np1:.3f}")
+print(f"C = 1.0 | Total coefficient size = {log_reg_np2:.3f}")
+print(f"C = 100 | Total coefficient size = {log_reg_np3:.3f}")
 
 # As C increases, the coefficients increase too.
 # Smaller C values keep them lower and bigger C values let them grow.
@@ -268,4 +268,5 @@ plt.tight_layout()
 plt.savefig("outputs/pca_reconstructions.png")
 plt.show()
 
-# Numbers become recognizable at n=40 and it matches where the variance curve levels off.
+# The reconstructed digits become more recognizable as more components
+# are added. They are the clearest at n=40.
