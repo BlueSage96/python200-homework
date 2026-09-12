@@ -211,13 +211,19 @@ plt.show()
 # digit groups overlap in the 2D PCA projection.
 
 #PCA 03
-perc_exp_vals = pca_fit.explained_variance_ratio_ 
+perc_exp_vals = pca_fit.explained_variance_ratio_
 total_explained = np.cumsum(perc_exp_vals)
+
+n_80 = np.argmax(total_explained >= 0.80) + 1
+print(f"First component count reaching 80% explained variance: {n_80}")
 
 plt.plot(
     range(1, len(total_explained) + 1),
     total_explained
 )
+
+plt.axhline(y=0.80, linestyle="--")
+plt.axvline(x=n_80, linestyle="--")
 
 plt.title("PCA Variance Explained")
 plt.xlabel("Number of Components")
@@ -225,7 +231,7 @@ plt.ylabel("Cumulative Explained Variance")
 plt.savefig("outputs/pca_variance_explained.png")
 plt.show()
 
-# It would take about 13 components to explain 80% of the variance.
+# About 13 components are needed to explain 80% of the variance..
 
 #PCA 04
 def reconstruct_digit(sample_idx,scores,pca,n_components):
@@ -246,25 +252,29 @@ for i in range(5):
 
 axes[0, 0].set_ylabel("Original", rotation=0, labelpad=35)
 
+# Original row
+for i in range(5):
+    axes[0, i].imshow(images[i], cmap="gray_r")
+    axes[0, i].set_title(f"Sample {i + 1}")
+    axes[0, i].axis("off")
+
+axes[0, 0].set_ylabel("Original", rotation=0, labelpad=35)
+
 # Reconstruction rows
 for row, n_components in enumerate(n_values, start=1):
     for i in range(5):
-        reconstructed = reconstruct_digit(
-            i,
-            scores,
-            pca,
-            n_components
-        )
-
+        reconstructed = reconstruct_digit(i, scores, pca, n_components)
         axes[row, i].imshow(reconstructed, cmap="gray_r")
         axes[row, i].axis("off")
+
     axes[row, 0].set_ylabel(
-        f"n = {n_components}",
+        f"Reconstructed\nn = {n_components}",
         rotation=0,
-        labelpad=35
+        labelpad=55
     )
 
-plt.tight_layout()
+fig.suptitle("Original Digits and PCA Reconstructions")
+plt.tight_layout(rect=[0, 0, 1, 0.95])
 plt.savefig("outputs/pca_reconstructions.png")
 plt.show()
 
