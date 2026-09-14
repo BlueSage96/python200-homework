@@ -96,7 +96,7 @@ def transform(raw_records: dict) -> list:
     # Runs predict & predict_proba on unprocessed records
     predictions = clf.predict(X)
     probabilities = clf.predict_proba(X)[:,1]
-    print(f"ML classification complete. Good days: {int(predictions.sum())}") / {len(predictions)}
+    print(f"ML classification complete. Good days: {int(predictions.sum())} / {len(predictions)}")
     
     # Creates enrichment records
     enrichment_records = [
@@ -138,14 +138,26 @@ def transform(raw_records: dict) -> list:
             
         # Prints progress every 50 seconds
         if (i + 1) % 50 == 0:
-            print(f"    LLM enriched {i + 1} / {len(enrichment_records)} records.")
+            print(f"LLM enriched {i + 1} / {len(enrichment_records)} records.")
     print(f"Transform complete: {len(enrichment_records)} records enriched.")
     # Returns complete list of enrichment records
     return enrichment_records
         
-@task
-def load_enriched(records: list) -> None:
-    ...
+@task(retries=2, retry_delay_seconds=5)
+def load_enriched(enrichment_records: list) -> None:
+    # Guards against an empty list (message & return if nothing to load)
+    if not enrichment_records:
+        print("No new enrichment records to load.")
+        return
+    
+    # Upserts enrichment records into weather_enriched
+    response = (
+        supabase.table("weather_enriched")
+        .upsert(enrichment_records, on_conflict="date")
+        .execute()
+    )
+    
+    print(f"Upserted {len(response.data)} rows into weather_enriched.")
 
 @flow(log_prints=True)
 def etl_pipeline():
@@ -155,5 +167,5 @@ def etl_pipeline():
     enrichment_records = transform(raw_records)
     load_enriched(enrichment_records)
 
-if __name__ == "__main__":
+if __name__ == "__main__": 
     etl_pipeline()
