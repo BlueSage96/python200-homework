@@ -1,4 +1,5 @@
 from prefect import flow, task
+from prefect.logging import get_run_logger
 
 # Prefect Q1
 
@@ -34,4 +35,10 @@ from prefect import flow, task
 
 # Re-running either load task updates existing rows in place rather than failing or duplicating them. 
 # The database always ends up in a consistent state regardless of how many times the load runs. 
-# Using plain insert would overwrite any exisiting records when the pipeline is ran several times.
+
+
+# Production Q3
+
+@task
+def records(enrichment_records) -> list:
+    get_run_logger.info("The number of enriched records are:", enrichment_records)
