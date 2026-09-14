@@ -11,3 +11,9 @@ from prefect import flow, task
 # Prefect Q2
 
 # @task(name="call_api",retries=3,retry_delay_seconds=30)
+
+# Prefect Q3
+
+# The error appears beside of the task (i.e. Task run 'create_series-8ab' - Finished in state Failed()). 
+# Then, there a log connected to the task that describes the error. For example, "NameError: name 'arr' is not defined
+# 20:52:51.479... Finished in state Failed("Flow run encountered an exception: NameError: name 'arr' is not defined"...)"
