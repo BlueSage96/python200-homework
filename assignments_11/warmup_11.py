@@ -7,3 +7,7 @@ from prefect import flow, task
 # into a whole pipeline. 
 # I would decorate the temperature conversion function with @task because it is a helper 
 # function and one piece in a pipeline.
+
+# Prefect Q2
+
+# @task(name="call_api",retries=3,retry_delay_seconds=30)
