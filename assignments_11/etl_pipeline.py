@@ -22,6 +22,7 @@ SYSTEM_PROMPT = (
     "Do not use bullet points, headers, or phrases like 'Based on the data'."
 )
 
+# Extract Task
 latitude = 34.99713980841658
 longitude = -78.33071903597848
 
@@ -56,6 +57,16 @@ def extract(url: str) -> list:
     print(f"Extracted {len(records)} daily records fron Open-Mateo")
     return records
 
+# load_raw task
+@task(retries=2, retry_delay_seconds=5)
+def load_raw(records:list) -> None:
+    response = (
+        # call weather_raw
+        supabase.table("weather_raw")
+        .upsert(records, on_conflict="date")
+        .execute()
+    )
+    print(f"Upserted {len(response.data)} rows into weather_raw.")
 
 @task
 def transform(data: dict) -> list:
