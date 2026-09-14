@@ -30,3 +30,8 @@ from prefect import flow, task
 # or malformed response. That can lead to corrupted downstream data, which leads to misleading results, or a 
 # pipeline that appears successful even though the data is wrong.
 
+# Production Q2
+
+# Re-running either load task updates existing rows in place rather than failing or duplicating them. 
+# The database always ends up in a consistent state regardless of how many times the load runs. 
+# Using plain insert would overwrite any exisiting records when the pipeline is ran several times.
