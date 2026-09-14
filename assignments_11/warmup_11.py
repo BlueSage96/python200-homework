@@ -42,3 +42,11 @@ from prefect.logging import get_run_logger
 @task
 def records(enrichment_records) -> list:
     get_run_logger.info("The number of enriched records are:", enrichment_records)
+    
+# Production 04
+
+# Using upsert with on_conflict="date" in the load_raw task makes it idempotent. This means re-running 
+# the pipeline does not duplicate rows. This task must complete before the transform task runs. 
+# Lastly, if the incremental processing check in the transform task was removed, when the pipeline runs 
+# the ML and LLM steps, all the 365 records will be overwritten comprimising the data correctness and 
+# increases the cost because all of the records are ran each time.
