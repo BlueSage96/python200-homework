@@ -17,3 +17,16 @@ from prefect import flow, task
 # The error appears beside of the task (i.e. Task run 'create_series-8ab' - Finished in state Failed()). 
 # Then, there a log connected to the task that describes the error. For example, "NameError: name 'arr' is not defined
 # 20:52:51.479... Finished in state Failed("Flow run encountered an exception: NameError: name 'arr' is not defined"...)"
+
+# Production Q1
+
+# Using raise_for_statues() allows Prefect to catch the exception and marks the task as "Failed". 
+# Using 
+#   if response.status_code != 200: 
+#       print("Something went wrong") 
+# catches the error, but the pipeline continues running with bad data.
+ 
+# In the if statement, if the API returns a 404 or 500, the pipeline continues with an empty 
+# or malformed response. That can lead to corrupted downstream data, which leads to misleading results, or a 
+# pipeline that appears successful even though the data is wrong.
+
