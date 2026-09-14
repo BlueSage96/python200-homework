@@ -1,6 +1,8 @@
 import os, requests, json, sklearn
 from dotenv import load_dotenv
-import numpy as np
+import joblib
+import pandas as pd
+
 from prefect import flow, task
 from supabase import create_client
 from openai import OpenAI
@@ -28,8 +30,7 @@ longitude = -78.33071903597848
 
 @task(retries=2,retry_delay_seconds=10)
 def extract(url: str) -> list:
-    # calls Open-Meteo & fetches 2023 daily weather data
-    url = "https://archive-api.open-meteo.com/v1/archive" 
+    # fetches 2023 daily weather data
     params = {
         "latitude": latitude,
         "longitude": longitude,
@@ -57,7 +58,7 @@ def extract(url: str) -> list:
     print(f"Extracted {len(records)} daily records fron Open-Mateo")
     return records
 
-# load_raw task
+# Load_raw Task
 @task(retries=2, retry_delay_seconds=5)
 def load_raw(records:list) -> None:
     response = (
@@ -68,19 +69,91 @@ def load_raw(records:list) -> None:
     )
     print(f"Upserted {len(response.data)} rows into weather_raw.")
 
+# Transform Task
 @task
-def transform(data: dict) -> list:
-    ...
+def transform(raw_records: dict) -> list:
+    # incremental check: fetches dates already in weather_raw & skips them
+    already_done = {
+        r["date"]
+        for r in supabase.table("weather_enriched")
+         .select("date").execute().data
+    }
+    
+    # Records to transform
+    to_process = [r for r in raw_records if r["date"] not in already_done]
+    print(f"Records to transform: {len(to_process)} (skipping {len(already_done)} already enriched).")
+    
+    # Records already enriched
+    if not to_process:
+        print("All records already enriched - nothing to do.")
+        return []
+    
+    # Load weather_classifier
+    clf = joblib.load("models/weather_classifier.pkl")
+    df = pd.DataFrame(to_process)
+    X = df[FEATURES]
 
+    # Runs predict & predict_proba on unprocessed records
+    predictions = clf.predict(X)
+    probabilities = clf.predict_proba(X)[:,1]
+    print(f"ML classification complete. Good days: {int(predictions.sum())}") / {len(predictions)}
+    
+    # Creates enrichment records
+    enrichment_records = [
+        {
+            "date": to_process[i]["date"],
+            "good_for_running": bool(predictions[i]),
+            "confidence": round(float(probabilities[i]), 4),
+            "llm_summary": None,
+        }
+        for i in range(len(to_process))
+    ]
+    
+    # Prediction text based on weather conditions & "good_for_running"
+    for i, record in enumerate(enrichment_records):
+        raw_row = to_process[i]
+        prediction_text = "good for running" if record["good_for_running"] else "not ideal for running"
+        user_message = (
+            f"Date: {raw_row['date']}\n"
+            f"High: {raw_row['temperature_2m_max']}°C\n"
+            f"Precipitation: {raw_row['precipitation_sum']}mm\n"
+            f"Max wind speed: {raw_row['wind_speed_10m_max']}km/h\n"
+            f"Model prediction: {prediction_text} (confidence: {record['confidence']:.0%})"
+        )
+        try:
+            response = openai_client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_message}
+                ],
+                max_tokens=100,
+            )
+            record["llm_summary"] = response.choices[0].message.content.strip() or "Recommendation unavailable."
+
+        # Handles LLM errors with a fallback string
+        except Exception as e:
+            print(f"    LLM error on {record['date']}: {e}")
+            record["llm_summart"] = "Recommendation unavailable."
+            
+        # Prints progress every 50 seconds
+        if (i + 1) % 50 == 0:
+            print(f"    LLM enriched {i + 1} / {len(enrichment_records)} records.")
+    print(f"Transform complete: {len(enrichment_records)} records enriched.")
+    # Returns complete list of enrichment records
+    return enrichment_records
+        
 @task
-def load(records: list) -> None:
+def load_enriched(records: list) -> None:
     ...
 
 @flow(log_prints=True)
 def etl_pipeline():
-    data    = extract("https://archive-api.open-meteo.com/v1/archive")
-    records = transform(data)
-    load(records)
+    # calls Open-Meteo historical archive API
+    raw_records = extract("https://archive-api.open-meteo.com/v1/archive")
+    load_raw(raw_records)
+    enrichment_records = transform(raw_records)
+    load_enriched(enrichment_records)
 
 if __name__ == "__main__":
     etl_pipeline()
