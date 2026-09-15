@@ -44,7 +44,7 @@ from prefect.logging import get_run_logger
 # Production Q3
 
 @task
-def records(enrichment_records: list):
+def log_upsert(enrichment_records: list):
     get_run_logger().info(f"Upserted {len(enrichment_records)} enrichment records.")
     
 # Production 04
