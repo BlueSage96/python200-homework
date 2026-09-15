@@ -1,3 +1,5 @@
+# Video: https://youtu.be/d6ESDxqaE-c
+
 import os, requests, json, sklearn
 from dotenv import load_dotenv
 import joblib
