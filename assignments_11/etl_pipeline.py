@@ -71,7 +71,7 @@ def load_raw(records:list) -> None:
 
 # Transform Task
 @task
-def transform(raw_records: dict) -> list:
+def transform(raw_records: list) -> list:
    # Incremental check: fetch dates already in weather_enriched and skip them
     already_done = {
         r["date"]

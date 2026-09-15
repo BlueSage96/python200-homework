@@ -12,7 +12,7 @@ from prefect.logging import get_run_logger
 
 # Prefect Q2
 
-@task(name="call_api",retries=3,retry_delay_seconds=30)
+@task(name="call_api",retries=3, retry_delay_seconds=30)
 
 # Prefect Q3
 

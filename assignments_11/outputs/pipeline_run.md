@@ -4,7 +4,7 @@ I ran the pipeline after I finished each task, but it did not run cleanly on the
 
 # What did the Prefect UI show? Did any tasks retry?
 
-In the Prefect UI, I could see the flow run and the status of each task, including the extract task retrying twice before failing, which helped me identify where the pipeline was stopping.
+During the failed run, the Prefect UI showed the status of each task, including the extract task retrying twice before failing, which helped me identify where the pipeline was stopping.
 
 # Look at a few rows in weather_enriched. Do the LLM summaries seem accurate and useful? Pick one that stands out (positively or negatively) and explain why.
 
