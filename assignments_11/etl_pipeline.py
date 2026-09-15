@@ -12,8 +12,10 @@ load_dotenv()
 supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 openai_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
+# Load feature names from the saved model metadata
 with open("models/weather_classifier_metadata.json") as f:
     metadata = json.load(f)
+
 FEATURES = metadata["features"]
 
 SYSTEM_PROMPT = (
@@ -25,18 +27,16 @@ SYSTEM_PROMPT = (
 )
 
 # Extract Task
-latitude = 34.99713980841658
-longitude = -78.33071903597848
 
-@task(retries=2,retry_delay_seconds=10)
+@task(retries=2, retry_delay_seconds=10)
 def extract(url: str) -> list:
     # fetches 2023 daily weather data
     params = {
-        "latitude": latitude,
-        "longitude": longitude,
+        "latitude": 34.99713980841658,
+        "longitude":-78.33071903597848,
         "start_date": "2023-01-01",
         "end_date": "2023-12-31",
-        "daily": [FEATURES],
+        "daily": FEATURES,
         "timezone": "America/New_York",
     }
     response = requests.get(url, params=params)
@@ -55,7 +55,7 @@ def extract(url: str) -> list:
         for i in range(len(daily["time"]))
     ]
     
-    print(f"Extracted {len(records)} daily records fron Open-Mateo")
+    print(f"Extracted {len(records)} daily records from Open-Meteo")
     return records
 
 # Load_raw Task
@@ -72,7 +72,7 @@ def load_raw(records:list) -> None:
 # Transform Task
 @task
 def transform(raw_records: dict) -> list:
-    # incremental check: fetches dates already in weather_raw & skips them
+   # Incremental check: fetch dates already in weather_enriched and skip them
     already_done = {
         r["date"]
         for r in supabase.table("weather_enriched")
@@ -134,9 +134,9 @@ def transform(raw_records: dict) -> list:
         # Handles LLM errors with a fallback string
         except Exception as e:
             print(f"    LLM error on {record['date']}: {e}")
-            record["llm_summart"] = "Recommendation unavailable."
+            record["llm_summary"] = "Recommendation unavailable."
             
-        # Prints progress every 50 seconds
+        # Prints progress every 50 records
         if (i + 1) % 50 == 0:
             print(f"LLM enriched {i + 1} / {len(enrichment_records)} records.")
     print(f"Transform complete: {len(enrichment_records)} records enriched.")
