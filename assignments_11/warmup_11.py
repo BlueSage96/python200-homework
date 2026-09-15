@@ -3,29 +3,33 @@ from prefect.logging import get_run_logger
 
 # Prefect Q1
 
-# Tasks are the smallest unit in a pipeline and is used for instance, loading datam etc.
+# A task is the smallest unit in a pipeline and is used for instance, loading datam etc.
 # Flows represents the higher-level workflow logic that connects multiple tasks together 
 # into a whole pipeline. 
-# I would decorate the temperature conversion function with @task because it is a helper 
-# function and one piece in a pipeline.
+# I would not decorate a simple Celsius-to-Fahrenheit helper with @task because it is a small, 
+# pure calculation that does not need retries or separate orchestration. A task represents a 
+# meaningful unit of work that Prefect should track, while a flow coordinates those tasks.
 
 # Prefect Q2
 
-# @task(name="call_api",retries=3,retry_delay_seconds=30)
+@task(name="call_api",retries=3,retry_delay_seconds=30)
 
 # Prefect Q3
 
-# The error appears beside of the task (i.e. Task run 'create_series-8ab' - Finished in state Failed()). 
-# Then, there a log connected to the task that describes the error. For example, "NameError: name 'arr' is not defined
-# 20:52:51.479... Finished in state Failed("Flow run encountered an exception: NameError: name 'arr' is not defined"...)"
+# I would open the failed transform task run in the Prefect UI and inspect its logs. The logs 
+# should show the exception type, error message, traceback, and the point where the transform task failed. 
+# Because load_enriched depends on the transform output, it would not run after transform failed.
 
 # Production Q1
 
-# Using raise_for_statues() allows Prefect to catch the exception and marks the task as "Failed". 
+# response.raise_for_status() raises an exception for an unsuccessful HTTP response, allowing Prefect to mark 
+# the task as failed and apply its retry behavior. Merely printing an error for a 500 response does not stop execution, 
+# so downstream tasks could receive missing or malformed data. 
+
 # Using 
 #   if response.status_code != 200: 
 #       print("Something went wrong") 
-# catches the error, but the pipeline continues running with bad data.
+# # detects the error, but the pipeline continues running with bad data.
  
 # In the if statement, if the API returns a 404 or 500, the pipeline continues with an empty 
 # or malformed response. That can lead to corrupted downstream data, which leads to misleading results, or a 
@@ -33,20 +37,21 @@ from prefect.logging import get_run_logger
 
 # Production Q2
 
-# Re-running either load task updates existing rows in place rather than failing or duplicating them. 
-# The database always ends up in a consistent state regardless of how many times the load runs. 
-
+# Using upsert(..., on_conflict="date") makes a retry safe because an existing date is updated rather than duplicated. 
+# If the pipeline crashes and restarts after some rows were already loaded, a normal insert could fail on duplicate dates,
+# while the upsert can safely process those dates again.
 
 # Production Q3
 
 @task
-def records(enrichment_records) -> list:
-    get_run_logger.info("The number of enriched records are:", enrichment_records)
+def records(enrichment_records: list):
+    get_run_logger().info(f"Upserted {len(enrichment_records)} enrichment records.")
     
 # Production 04
 
-# Using upsert with on_conflict="date" in the load_raw task makes it idempotent. This means re-running 
-# the pipeline does not duplicate rows. This task must complete before the transform task runs. 
-# Lastly, if the incremental processing check in the transform task was removed, when the pipeline runs 
-# the ML and LLM steps, all the 365 records will be overwritten comprimising the data correctness and 
-# increases the cost because all of the records are ran each time.
+# Idempotency makes the pipeline safe to rerun because upsert updates records that already
+# exist instead of creating duplicates. Incremental processing checks weather_enriched for
+# dates that have already been processed and only sends new records through the ML model
+# and LLM. Without the incremental check, all 365 records would be processed again every
+# time the pipeline runs, wasting time and unnecessary LLM API calls. It could also produce
+# different LLM summaries for records that were already successfully enriched.
